@@ -7,8 +7,8 @@ import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { config } from "../config.js";
 import {
+	DecisionStoreSchema,
 	type Decisions,
-	DesitionStoreSchema,
 } from "../schemas/decision-schema.js";
 
 export async function getDecisions(): Promise<Decisions> {
@@ -17,10 +17,11 @@ export async function getDecisions(): Promise<Decisions> {
 
 	try {
 		const decisionsContent = await fs.promises.readFile(decisionsPath, "utf-8");
-		const store = DesitionStoreSchema.parse(decisionsContent);
+		const parsedContent = JSON.parse(decisionsContent);
+		const store = DecisionStoreSchema.parse(parsedContent);
 
 		// Validate the JSON structure using Zod schema
-		return store.desitions;
+		return store.decisions;
 	} catch (error) {
 		if (error instanceof SyntaxError) {
 			throw new McpError(
