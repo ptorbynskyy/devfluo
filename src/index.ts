@@ -11,6 +11,7 @@ import {
 } from "./prompts/development.js";
 import { setupProjectInfoResource } from "./resources/project.js";
 import { setupCurrentTimeTool, setupEchoTool } from "./tools/example.js";
+import { setupProjectInitTool } from "./tools/project-init.js";
 
 function createServer(): Server {
 	return new Server(
@@ -37,6 +38,7 @@ async function runServer(): Promise<void> {
 	setupProjectInfoResource(server);
 	setupEchoTool(server);
 	setupCurrentTimeTool(server);
+	setupProjectInitTool(server);
 	setupCodeReviewPrompt(server);
 	setupBugReportPrompt(server);
 
