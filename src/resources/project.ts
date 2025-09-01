@@ -1,5 +1,6 @@
 // ABOUTME: Project resource handlers for the MCP server
 
+import path from "node:path";
 import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import {
 	ErrorCode,
@@ -7,6 +8,7 @@ import {
 	McpError,
 	ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { config } from "../config.js";
 
 export interface ProjectResource {
 	uri: string;
@@ -25,7 +27,7 @@ export const PROJECT_RESOURCES: ProjectResource[] = [
 ];
 
 export function getProjectInfo(): string {
-	return "This is a Model Context Protocol server for development workflow assistance.";
+	return `Project root: ${path.resolve(config.PROJECT_ROOT)}`;
 }
 
 export function handleProjectResource(uri: string): {
