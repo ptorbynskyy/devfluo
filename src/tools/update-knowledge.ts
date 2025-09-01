@@ -62,7 +62,7 @@ export async function handleUpdateKnowledgeTool(
 		if (error instanceof z.ZodError) {
 			throw new McpError(
 				ErrorCode.InvalidParams,
-				`Validation error: ${error.errors.map(e => e.message).join(", ")}`,
+				`Validation error: ${error.errors.map((e) => e.message).join(", ")}`,
 			);
 		}
 		throw new McpError(
