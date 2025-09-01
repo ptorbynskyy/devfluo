@@ -31,11 +31,13 @@ export type UpdateKnowledgeToolInput = z.infer<
 export async function handleUpdateKnowledgeTool(
 	input: UpdateKnowledgeToolInput,
 ) {
-	const { architecture_content, codebase_content } = input;
-	const basePath = path.join(config.PROJECT_ROOT, "base");
-	const results: string[] = [];
-
 	try {
+		// Validate input using the full schema with refine validation
+		const validatedInput = UpdateKnowledgeToolZodSchema.parse(input);
+		const { architecture_content, codebase_content } = validatedInput;
+		const basePath = path.join(config.PROJECT_ROOT, "base");
+		const results: string[] = [];
+
 		if (architecture_content) {
 			const architectureFilePath = path.join(basePath, "architecture.md");
 			await writeFile(architectureFilePath, architecture_content, "utf-8");
@@ -57,6 +59,12 @@ export async function handleUpdateKnowledgeTool(
 			],
 		};
 	} catch (error) {
+		if (error instanceof z.ZodError) {
+			throw new McpError(
+				ErrorCode.InvalidParams,
+				`Validation error: ${error.errors.map(e => e.message).join(", ")}`,
+			);
+		}
 		throw new McpError(
 			ErrorCode.InternalError,
 			`Failed to update knowledge base files: ${error instanceof Error ? error.message : "Unknown error"}`,
