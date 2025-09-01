@@ -9,7 +9,10 @@ import {
 	setupBugReportPrompt,
 	setupCodeReviewPrompt,
 } from "./prompts/development.js";
-import { setupProjectInfoResource } from "./resources/project.js";
+import {
+	setupProjectInfoResource,
+	setupProjectKnowledgeResource,
+} from "./resources/project.js";
 import { setupCurrentTimeTool, setupEchoTool } from "./tools/example.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 
@@ -36,6 +39,7 @@ async function runServer(): Promise<void> {
 	const server = createServer();
 
 	setupProjectInfoResource(server);
+	setupProjectKnowledgeResource(server);
 	setupEchoTool(server);
 	setupCurrentTimeTool(server);
 	setupProjectInitTool(server);
