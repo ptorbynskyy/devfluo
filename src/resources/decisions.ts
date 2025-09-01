@@ -6,20 +6,10 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { config } from "../config.js";
-
-// Zod schema for validating decision data structure
-const DecisionSchema = z.object({
-	name: z.string().describe("The name of the decision"),
-	description: z.string().describe("The description of the decision"),
-	tags: z
-		.array(z.string())
-		.describe("Array of tags associated with the decision"),
-});
-
-const DecisionsArraySchema = z.array(DecisionSchema);
-
-export type Decision = z.infer<typeof DecisionSchema>;
-export type Decisions = z.infer<typeof DecisionsArraySchema>;
+import {
+	type Decisions,
+	DesitionStoreSchema,
+} from "../schemas/decision-schema.js";
 
 export async function getDecisions(): Promise<Decisions> {
 	const basePath = path.join(config.PROJECT_ROOT, "base");
@@ -27,10 +17,10 @@ export async function getDecisions(): Promise<Decisions> {
 
 	try {
 		const decisionsContent = await fs.promises.readFile(decisionsPath, "utf-8");
-		const parsedData = JSON.parse(decisionsContent);
+		const store = DesitionStoreSchema.parse(decisionsContent);
 
 		// Validate the JSON structure using Zod schema
-		return DecisionsArraySchema.parse(parsedData);
+		return store.desitions;
 	} catch (error) {
 		if (error instanceof SyntaxError) {
 			throw new McpError(
