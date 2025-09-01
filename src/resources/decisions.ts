@@ -9,7 +9,7 @@ import { config } from "../config.js";
 import {
 	DecisionStoreSchema,
 	type Decisions,
-} from "../schemas/decision-schema.js";
+} from "../domain/decision-schema.js";
 
 export async function getDecisions(): Promise<Decisions> {
 	const basePath = path.join(config.PROJECT_ROOT, "base");

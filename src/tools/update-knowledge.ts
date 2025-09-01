@@ -1,18 +1,14 @@
 // ABOUTME: Tool for updating knowledge base files (architecture.md and codebase.md)
 
-import { readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { config } from "../config.js";
 import {
-	type Decision,
-	DecisionOperationsSchema,
-	DecisionSchema,
-	DecisionStoreSchema,
-	type Decisions,
-} from "../schemas/decision-schema.js";
+	saveArchitectureMarkDown,
+	saveCodebaseMarkdown,
+} from "../domain/base-knowledge.js";
+import { DecisionOperationsSchema } from "../domain/decision-schema.js";
+import { processDecisionOperations } from "../domain/decisions.js";
 
 const UpdateKnowledgeToolBaseSchema = z.object({
 	architecture_content: z
@@ -39,73 +35,6 @@ export type UpdateKnowledgeToolInput = z.infer<
 	typeof UpdateKnowledgeToolZodSchema
 >;
 
-async function processDecisionOperations(
-	decisions: NonNullable<UpdateKnowledgeToolInput["decisions"]>,
-): Promise<string> {
-	const basePath = path.join(config.PROJECT_ROOT, "base");
-	const decisionsPath = path.join(basePath, "decisions.json");
-
-	// Load existing decisions
-	let existingDecisions: Decisions = [];
-	try {
-		const decisionsContent = await readFile(decisionsPath, "utf-8");
-		const parsedContent = JSON.parse(decisionsContent);
-		const store = DecisionStoreSchema.parse(parsedContent);
-		existingDecisions = store.decisions;
-	} catch (_error) {
-		// File doesn't exist or is invalid, start with empty array
-		existingDecisions = [];
-	}
-
-	// Convert array to map for easier operations
-	const decisionMap = new Map<string, Decision>();
-	for (const decision of existingDecisions) {
-		decisionMap.set(decision.name, decision);
-	}
-
-	let updateCount = 0;
-	let insertCount = 0;
-	let deleteCount = 0;
-
-	// Process updates
-	if (decisions.updates) {
-		for (const [name, updates] of Object.entries(decisions.updates)) {
-			const existingDecision = decisionMap.get(name);
-			if (existingDecision) {
-				// Update existing decision with merged properties
-				const updatedDecision: Decision = {
-					name: updates.name ?? existingDecision.name,
-					description: updates.description ?? existingDecision.description,
-					tags: updates.tags ?? existingDecision.tags,
-				};
-				decisionMap.set(name, updatedDecision);
-				updateCount++;
-			} else {
-				const newData = DecisionSchema.parse(updates);
-				// Create new decision if it has all required fields
-				decisionMap.set(name, newData);
-				insertCount++;
-			}
-		}
-	}
-
-	// Process deletions
-	if (decisions.deletions) {
-		for (const name of decisions.deletions) {
-			if (decisionMap.delete(name)) {
-				deleteCount++;
-			}
-		}
-	}
-
-	// Convert back to array and save
-	const updatedDecisions = Array.from(decisionMap.values());
-	const store = { decisions: updatedDecisions };
-	await writeFile(decisionsPath, JSON.stringify(store, null, 2), "utf-8");
-
-	return `Successfully processed, ${updateCount} decision updates, ${deleteCount} deletions, ${insertCount} insertions`;
-}
-
 export async function handleUpdateKnowledgeTool(
 	input: UpdateKnowledgeToolInput,
 ) {
@@ -114,24 +43,23 @@ export async function handleUpdateKnowledgeTool(
 		const validatedInput = UpdateKnowledgeToolZodSchema.parse(input);
 		const { architecture_content, codebase_content, decisions } =
 			validatedInput;
-		const basePath = path.join(config.PROJECT_ROOT, "base");
 		const results: string[] = [];
 
 		if (architecture_content) {
-			const architectureFilePath = path.join(basePath, "architecture.md");
-			await writeFile(architectureFilePath, architecture_content, "utf-8");
+			await saveArchitectureMarkDown(architecture_content);
 			results.push(`Successfully updated architecture.md`);
 		}
 
 		if (codebase_content) {
-			const codebaseFilePath = path.join(basePath, "codebase.md");
-			await writeFile(codebaseFilePath, codebase_content, "utf-8");
+			await saveCodebaseMarkdown(codebase_content);
 			results.push(`Successfully updated codebase.md`);
 		}
 
 		if (decisions) {
 			const decisionResult = await processDecisionOperations(decisions);
-			results.push(decisionResult);
+			results.push(
+				`Successfully processed ${decisionResult.updateCount} decision updates, ${decisionResult.deleteCount} deletions, ${decisionResult.insertCount} insertions`,
+			);
 		}
 
 		return {

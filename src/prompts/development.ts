@@ -77,9 +77,9 @@ export function generateBugReportPrompt(severity = "medium"): string {
 Brief description of the issue.
 
 ## Steps to Reproduce
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Expected Behavior
 What you expected to happen.
@@ -88,9 +88,9 @@ What you expected to happen.
 What actually happened.
 
 ## Environment
-- OS: 
-- Browser/Runtime: 
-- Version: 
+- OS:
+- Browser/Runtime:
+- Version:
 
 ## Additional Context
 Add any other context about the problem here.`;
@@ -130,26 +130,26 @@ export function setupCodeReviewPrompt(server: McpServer): void {
 	);
 }
 
-export function setupBugReportPrompt(server: McpServer): void {
-	server.registerPrompt(
-		"bug_report",
-		{
-			title: "Bug Report Template",
-			description: "Generate a bug report template",
-			argsSchema: {
-				severity: z.string().optional(),
-			},
-		},
-		({ severity }: { severity?: string | undefined }) => ({
-			messages: [
-				{
-					role: "user" as const,
-					content: {
-						type: "text" as const,
-						text: generateBugReportPrompt(severity || "medium"),
-					},
-				},
-			],
-		}),
-	);
+export function setupBugReportPrompt(_server: McpServer): void {
+	// server.registerPrompt(
+	// 	"bug_report",
+	// 	{
+	// 		title: "Bug Report Template",
+	// 		description: "Generate a bug report template",
+	// 		argsSchema: {
+	// 			severity: z.string().optional(),
+	// 		},
+	// 	},
+	// 	({ severity }: { severity?: string | undefined }) => ({
+	// 		messages: [
+	// 			{
+	// 				role: "user" as const,
+	// 				content: {
+	// 					type: "text" as const,
+	// 					text: generateBugReportPrompt(severity || "medium"),
+	// 				},
+	// 			},
+	// 		],
+	// 	}),
+	// );
 }

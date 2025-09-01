@@ -1,41 +1,15 @@
 // ABOUTME: Project knowledge resource that reads Architecture and Codebase mcdown files
 
-import fs from "node:fs";
-import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
-import { config } from "../config.js";
-
-export async function getArchitectureKnowledge(): Promise<string> {
-	const basePath = path.join(config.PROJECT_ROOT, "base");
-	const architecturePath = path.join(basePath, "architecture.md");
-
-	try {
-		const architectureContent = await fs.promises.readFile(
-			architecturePath,
-			"utf-8",
-		);
-		return architectureContent;
-	} catch (_error) {
-		return "Architecture file not found or could not be read.";
-	}
-}
-
-export async function getCodebaseKnowledge(): Promise<string> {
-	const basePath = path.join(config.PROJECT_ROOT, "base");
-	const codebasePath = path.join(basePath, "codebase.md");
-
-	try {
-		const codebaseContent = await fs.promises.readFile(codebasePath, "utf-8");
-		return codebaseContent;
-	} catch (_error) {
-		return "Codebase file not found or could not be read.";
-	}
-}
+import {
+	getArchitectureKnowledge,
+	getCodebaseKnowledge,
+} from "../domain/base-knowledge.js";
 
 export async function getProjectKnowledge(): Promise<string> {
-	const architectureContent = await getArchitectureKnowledge();
-	const codebaseContent = await getCodebaseKnowledge();
+	const architectureContent = (await getArchitectureKnowledge()) ?? "";
+	const codebaseContent = (await getCodebaseKnowledge()) ?? "";
 
 	let content = "# Architecture Knowledge\n\n";
 	content += architectureContent;
@@ -89,7 +63,7 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
-				const architectureContent = await getArchitectureKnowledge();
+				const architectureContent = (await getArchitectureKnowledge()) ?? "";
 				return {
 					contents: [
 						{
@@ -119,7 +93,7 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
-				const codebaseContent = await getCodebaseKnowledge();
+				const codebaseContent = (await getCodebaseKnowledge()) ?? "";
 				return {
 					contents: [
 						{
