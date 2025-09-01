@@ -14,6 +14,7 @@
 		"dev": "npm run build && npm run start",
 		"clean": "rm -rf build",
 		"typecheck": "tsc --noEmit",
+		"typecheck:watch": "tsc --noEmit --watch",
 		"lint": "biome check",
 		"format": "biome format",
 		"lint:fix": "biome check --fix --unsafe"
