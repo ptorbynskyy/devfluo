@@ -1,6 +1,6 @@
 // ABOUTME: Project initialization tool that creates the base knowledge structure
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, access } from "node:fs/promises";
 import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
@@ -21,6 +21,26 @@ export async function handleProjectInitTool(_input: ProjectInitToolInput) {
 	const baseDir = path.join(projectRoot, "base");
 
 	try {
+		// Check if project is already initialized
+		const architectureFile = path.join(baseDir, "architecture.md");
+		const codebaseFile = path.join(baseDir, "codebase.md");
+		
+		try {
+			await access(architectureFile);
+			await access(codebaseFile);
+			// Both files exist, project is already initialized
+			return {
+				content: [
+					{
+						type: "text" as const,
+						text: `Project is already initialized!\n\nExisting files:\n- ${architectureFile}\n- ${codebaseFile}`,
+					},
+				],
+			};
+		} catch {
+			// Files don't exist, proceed with initialization
+		}
+
 		// Create base directory
 		await mkdir(baseDir, { recursive: true });
 

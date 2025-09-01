@@ -10,3 +10,7 @@
 # Architecture
  - Follow DRY and KISS
  - Prefer functional programming
+
+# MCP Server
+ - Use high level APIs - McpServer
+ - Add tool metadata annotations explicitly
