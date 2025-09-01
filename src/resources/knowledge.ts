@@ -6,45 +6,55 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { config } from "../config.js";
 
-export async function getProjectKnowledge(): Promise<string> {
+export async function getArchitectureKnowledge(): Promise<string> {
 	const basePath = path.join(config.PROJECT_ROOT, "base");
 	const architecturePath = path.join(basePath, "architecture.md");
-	const codebasePath = path.join(basePath, "codebase.md");
-
-	let content = "";
 
 	try {
 		const architectureContent = await fs.promises.readFile(
 			architecturePath,
 			"utf-8",
 		);
-		content += "# Architecture Knowledge\n\n";
-		content += architectureContent;
-		content += "\n\n";
+		return architectureContent;
 	} catch (_error) {
-		content += "# Architecture Knowledge\n\n";
-		content += "Architecture file not found or could not be read.\n\n";
+		return "Architecture file not found or could not be read.";
 	}
+}
+
+export async function getCodebaseKnowledge(): Promise<string> {
+	const basePath = path.join(config.PROJECT_ROOT, "base");
+	const codebasePath = path.join(basePath, "codebase.md");
 
 	try {
 		const codebaseContent = await fs.promises.readFile(codebasePath, "utf-8");
-		content += "# Codebase Knowledge\n\n";
-		content += codebaseContent;
+		return codebaseContent;
 	} catch (_error) {
-		content += "# Codebase Knowledge\n\n";
-		content += "Codebase file not found or could not be read.";
+		return "Codebase file not found or could not be read.";
 	}
+}
+
+export async function getProjectKnowledge(): Promise<string> {
+	const architectureContent = await getArchitectureKnowledge();
+	const codebaseContent = await getCodebaseKnowledge();
+
+	let content = "# Architecture Knowledge\n\n";
+	content += architectureContent;
+	content += "\n\n";
+	content += "# Codebase Knowledge\n\n";
+	content += codebaseContent;
 
 	return content;
 }
 
 export function setupProjectKnowledgeResource(server: McpServer): void {
+	// Combined knowledge resource
 	server.registerResource(
 		"project_knowledge",
 		"project://knowledge",
 		{
 			title: "Project Knowledge",
-			description: "Architecture and codebase knowledge from mcdown files",
+			description:
+				"Combined architecture and codebase knowledge from mcdown files",
 			mimeType: "text/markdown",
 		},
 		async (uri: URL) => {
@@ -62,7 +72,67 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 			} catch (_error) {
 				throw new McpError(
 					ErrorCode.InvalidRequest,
-					`Failed to read knowledge resource: ${uri.href}`,
+					`Failed to read combined knowledge resource: ${uri.href}`,
+				);
+			}
+		},
+	);
+
+	// Architecture knowledge resource
+	server.registerResource(
+		"architecture_knowledge",
+		"project://knowledge/architecture",
+		{
+			title: "Architecture Knowledge",
+			description: "Architecture knowledge from architecture.md file",
+			mimeType: "text/markdown",
+		},
+		async (uri: URL) => {
+			try {
+				const architectureContent = await getArchitectureKnowledge();
+				return {
+					contents: [
+						{
+							uri: uri.href,
+							mimeType: "text/markdown",
+							text: architectureContent,
+						},
+					],
+				};
+			} catch (_error) {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					`Failed to read architecture knowledge resource: ${uri.href}`,
+				);
+			}
+		},
+	);
+
+	// Codebase knowledge resource
+	server.registerResource(
+		"codebase_knowledge",
+		"project://knowledge/codebase",
+		{
+			title: "Codebase Knowledge",
+			description: "Codebase knowledge from codebase.md file",
+			mimeType: "text/markdown",
+		},
+		async (uri: URL) => {
+			try {
+				const codebaseContent = await getCodebaseKnowledge();
+				return {
+					contents: [
+						{
+							uri: uri.href,
+							mimeType: "text/markdown",
+							text: codebaseContent,
+						},
+					],
+				};
+			} catch (_error) {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					`Failed to read codebase knowledge resource: ${uri.href}`,
 				);
 			}
 		},

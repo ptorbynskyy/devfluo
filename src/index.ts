@@ -10,8 +10,6 @@ import {
 	setupCodeReviewPrompt,
 } from "./prompts/development.js";
 import { setupProjectKnowledgeResource } from "./resources/knowledge.js";
-import { setupProjectInfoResource } from "./resources/project.js";
-import { setupCurrentTimeTool, setupEchoTool } from "./tools/example.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 
 function createServer(): McpServer {
@@ -36,10 +34,7 @@ async function runServer(): Promise<void> {
 
 	const server = createServer();
 
-	setupProjectInfoResource(server);
 	setupProjectKnowledgeResource(server);
-	setupEchoTool(server);
-	setupCurrentTimeTool(server);
 	setupProjectInitTool(server);
 	setupCodeReviewPrompt(server);
 	setupBugReportPrompt(server);
