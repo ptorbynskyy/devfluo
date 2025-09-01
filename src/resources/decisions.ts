@@ -1,0 +1,81 @@
+// ABOUTME: Decisions resource that reads decision data from JSON file
+
+import fs from "node:fs";
+import path from "node:path";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
+import { config } from "../config.js";
+
+// Zod schema for validating decision data structure
+const DecisionSchema = z.object({
+	name: z.string().describe("The name of the decision"),
+	description: z.string().describe("The description of the decision"),
+	tags: z
+		.array(z.string())
+		.describe("Array of tags associated with the decision"),
+});
+
+const DecisionsArraySchema = z.array(DecisionSchema);
+
+export type Decision = z.infer<typeof DecisionSchema>;
+export type Decisions = z.infer<typeof DecisionsArraySchema>;
+
+export async function getDecisions(): Promise<Decisions> {
+	const basePath = path.join(config.PROJECT_ROOT, "base");
+	const decisionsPath = path.join(basePath, "decisions.json");
+
+	try {
+		const decisionsContent = await fs.promises.readFile(decisionsPath, "utf-8");
+		const parsedData = JSON.parse(decisionsContent);
+
+		// Validate the JSON structure using Zod schema
+		return DecisionsArraySchema.parse(parsedData);
+	} catch (error) {
+		if (error instanceof SyntaxError) {
+			throw new McpError(
+				ErrorCode.InvalidRequest,
+				"Invalid JSON format in decisions.json file",
+			);
+		}
+		if (error instanceof z.ZodError) {
+			throw new McpError(
+				ErrorCode.InvalidRequest,
+				`Invalid decision data structure: ${error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ")}`,
+			);
+		}
+		// File not found or other read errors - return empty array
+		return [];
+	}
+}
+
+export function setupDecisionsResource(server: McpServer): void {
+	server.registerResource(
+		"decisions",
+		"project://decisions",
+		{
+			title: "Project Decisions",
+			description: "List of all project decisions from decisions.json file",
+			mimeType: "application/json",
+		},
+		async (uri: URL) => {
+			try {
+				const decisions = await getDecisions();
+				return {
+					contents: [
+						{
+							uri: uri.href,
+							mimeType: "application/json",
+							text: JSON.stringify(decisions, null, 2),
+						},
+					],
+				};
+			} catch (_error) {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					`Failed to read decisions resource: ${uri.href}`,
+				);
+			}
+		},
+	);
+}
