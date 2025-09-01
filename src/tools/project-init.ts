@@ -65,6 +65,12 @@ export function setupProjectInitTool(server: McpServer): void {
 			title: "Project Initialization Tool",
 			description: "Initialize project knowledge base structure",
 			inputSchema: ProjectInitToolZodSchema.shape,
+			annotations: {
+				readOnlyHint: false,
+				destructiveHint: false,
+				idempotentHint: false,
+				openWorldHint: false,
+			},
 		},
 		async (args: ProjectInitToolInput) => {
 			return await handleProjectInitTool(args);
