@@ -4,6 +4,7 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { config } from "./config.js";
 import {
 	setupBugReportPrompt,
 	setupCodeReviewPrompt,
@@ -28,6 +29,9 @@ function createServer(): Server {
 }
 
 async function runServer(): Promise<void> {
+	// Initialize configuration
+	console.error(`Using PROJECT_ROOT: ${config.PROJECT_ROOT}`);
+
 	const server = createServer();
 
 	setupProjectInfoResource(server);
