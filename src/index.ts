@@ -5,138 +5,117 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
-  CallToolRequestSchema,
-  ErrorCode,
-  ListResourcesRequestSchema,
-  ListToolsRequestSchema,
-  McpError,
-  ReadResourceRequestSchema,
+	CallToolRequestSchema,
+	ErrorCode,
+	ListResourcesRequestSchema,
+	ListToolsRequestSchema,
+	McpError,
+	ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
+import {
+	handleProjectResource,
+	PROJECT_RESOURCES,
+} from "./resources/project.js";
+import {
+	CurrentTimeToolSchema,
+	CurrentTimeToolZodSchema,
+	EchoToolSchema,
+	EchoToolZodSchema,
+	handleCurrentTimeTool,
+	handleEchoTool,
+} from "./tools/example.js";
 
 class DevFlowMCPServer {
-  private server: Server;
+	private server: Server;
 
-  constructor() {
-    this.server = new Server(
-      {
-        name: "dev-flow-mcp",
-        version: "0.1.0",
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
-      }
-    );
+	constructor() {
+		this.server = new Server(
+			{
+				name: "dev-flow-mcp",
+				version: "0.1.0",
+			},
+			{
+				capabilities: {
+					resources: {},
+					tools: {},
+				},
+			},
+		);
 
-    this.setupHandlers();
-  }
+		this.setupHandlers();
+	}
 
-  private setupHandlers(): void {
-    this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
-      return {
-        resources: [
-          {
-            uri: "project://info",
-            mimeType: "text/plain",
-            name: "Project Information",
-            description: "General information about the current project",
-          },
-        ],
-      };
-    });
+	private setupHandlers(): void {
+		this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
+			return {
+				resources: PROJECT_RESOURCES,
+			};
+		});
 
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-      const { uri } = request.params;
-      
-      switch (uri) {
-        case "project://info":
-          return {
-            contents: [
-              {
-                uri,
-                mimeType: "text/plain",
-                text: "This is a Model Context Protocol server for development workflow assistance.",
-              },
-            ],
-          };
-        default:
-          throw new McpError(ErrorCode.InvalidRequest, `Unknown resource: ${uri}`);
-      }
-    });
+		this.server.setRequestHandler(
+			ReadResourceRequestSchema,
+			async (request) => {
+				const { uri } = request.params;
 
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
-          {
-            name: "echo",
-            description: "Echo back the provided text",
-            inputSchema: {
-              type: "object",
-              properties: {
-                text: {
-                  type: "string",
-                  description: "Text to echo back",
-                },
-              },
-              required: ["text"],
-            },
-          },
-          {
-            name: "current_time",
-            description: "Get the current date and time",
-            inputSchema: {
-              type: "object",
-              properties: {},
-            },
-          },
-        ],
-      };
-    });
+				try {
+					const resource = handleProjectResource(uri);
+					return {
+						contents: [resource],
+					};
+				} catch (_error) {
+					throw new McpError(
+						ErrorCode.InvalidRequest,
+						`Unknown resource: ${uri}`,
+					);
+				}
+			},
+		);
 
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      const { name, arguments: args } = request.params;
+		this.server.setRequestHandler(ListToolsRequestSchema, async () => {
+			return {
+				tools: [
+					{
+						name: "echo",
+						description: "Echo back the provided text",
+						inputSchema: EchoToolSchema,
+					},
+					{
+						name: "current_time",
+						description: "Get the current date and time",
+						inputSchema: CurrentTimeToolSchema,
+					},
+				],
+			};
+		});
 
-      switch (name) {
-        case "echo": {
-          const parsed = z.object({ text: z.string() }).parse(args);
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Echo: ${parsed.text}`,
-              },
-            ],
-          };
-        }
+		this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+			const { name, arguments: args } = request.params;
 
-        case "current_time": {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Current time: ${new Date().toISOString()}`,
-              },
-            ],
-          };
-        }
+			switch (name) {
+				case "echo": {
+					const parsed = EchoToolZodSchema.parse(args);
+					return handleEchoTool(parsed);
+				}
 
-        default:
-          throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
-      }
-    });
-  }
+				case "current_time": {
+					const parsed = CurrentTimeToolZodSchema.parse(args);
+					return handleCurrentTimeTool(parsed);
+				}
 
-  async run(): Promise<void> {
-    const transport = new StdioServerTransport();
-    await this.server.connect(transport);
-  }
+				default:
+					throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+			}
+		});
+	}
+
+	async run(): Promise<void> {
+		const transport = new StdioServerTransport();
+		await this.server.connect(transport);
+	}
 }
 
 const server = new DevFlowMCPServer();
 server.run().catch((error) => {
-  console.error("Server error:", error);
-  process.exit(1);
+	console.error("Server error:", error);
+	process.exit(1);
 });

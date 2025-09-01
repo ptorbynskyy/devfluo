@@ -1,47 +1,50 @@
 // ABOUTME: Development-related prompt templates for the MCP server
 
 export interface PromptTemplate {
-  name: string;
-  description: string;
-  arguments?: {
-    name: string;
-    description: string;
-    required?: boolean;
-  }[];
+	name: string;
+	description: string;
+	arguments?: {
+		name: string;
+		description: string;
+		required?: boolean;
+	}[];
 }
 
 export const DEVELOPMENT_PROMPTS: PromptTemplate[] = [
-  {
-    name: "code_review",
-    description: "Generate a code review template",
-    arguments: [
-      {
-        name: "language",
-        description: "Programming language of the code",
-        required: false,
-      },
-      {
-        name: "complexity",
-        description: "Complexity level (simple, medium, complex)",
-        required: false,
-      },
-    ],
-  },
-  {
-    name: "bug_report",
-    description: "Generate a bug report template",
-    arguments: [
-      {
-        name: "severity",
-        description: "Bug severity level",
-        required: false,
-      },
-    ],
-  },
+	{
+		name: "code_review",
+		description: "Generate a code review template",
+		arguments: [
+			{
+				name: "language",
+				description: "Programming language of the code",
+				required: false,
+			},
+			{
+				name: "complexity",
+				description: "Complexity level (simple, medium, complex)",
+				required: false,
+			},
+		],
+	},
+	{
+		name: "bug_report",
+		description: "Generate a bug report template",
+		arguments: [
+			{
+				name: "severity",
+				description: "Bug severity level",
+				required: false,
+			},
+		],
+	},
 ];
 
-export function generateCodeReviewPrompt(language = "TypeScript", complexity = "medium"): string {
-  return `# Code Review Checklist (${language} - ${complexity})
+export function generateCodeReviewPrompt(
+	language = "TypeScript",
+	complexity = "medium",
+): string {
+	return `# Code Review Checklist (${language} - ${complexity})
 
 ## Functionality
 - [ ] Code meets the requirements
@@ -66,7 +69,7 @@ export function generateCodeReviewPrompt(language = "TypeScript", complexity = "
 }
 
 export function generateBugReportPrompt(severity = "medium"): string {
-  return `# Bug Report Template (Severity: ${severity})
+	return `# Bug Report Template (Severity: ${severity})
 
 ## Description
 Brief description of the issue.
