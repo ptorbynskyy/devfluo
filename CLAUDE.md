@@ -10,6 +10,7 @@
 # Architecture
  - Follow DRY and KISS
  - Prefer functional programming
+ - Use asynchronous programming with async/await
 
 # MCP Server
  - Use high level APIs - McpServer

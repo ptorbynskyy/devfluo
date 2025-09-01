@@ -9,10 +9,8 @@ import {
 	setupBugReportPrompt,
 	setupCodeReviewPrompt,
 } from "./prompts/development.js";
-import {
-	setupProjectInfoResource,
-	setupProjectKnowledgeResource,
-} from "./resources/project.js";
+import { setupProjectKnowledgeResource } from "./resources/knowledge.js";
+import { setupProjectInfoResource } from "./resources/project.js";
 import { setupCurrentTimeTool, setupEchoTool } from "./tools/example.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 
