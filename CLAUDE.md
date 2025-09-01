@@ -16,3 +16,4 @@
  - Use high level APIs - McpServer
  - Add tool metadata annotations explicitly
  - Use separate files for each tool, resource, prompt
+ - Use `describe` function in `Zod` schema

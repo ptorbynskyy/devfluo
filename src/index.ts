@@ -11,6 +11,7 @@ import {
 } from "./prompts/development.js";
 import { setupProjectKnowledgeResource } from "./resources/knowledge.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
+import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
 
 function createServer(): McpServer {
 	return new McpServer(
@@ -36,6 +37,7 @@ async function runServer(): Promise<void> {
 
 	setupProjectKnowledgeResource(server);
 	setupProjectInitTool(server);
+	setupUpdateKnowledgeTool(server);
 	setupCodeReviewPrompt(server);
 	setupBugReportPrompt(server);
 
