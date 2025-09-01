@@ -1,5 +1,12 @@
 // ABOUTME: Example tool implementations for the MCP server
 
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import {
+	CallToolRequestSchema,
+	ErrorCode,
+	ListToolsRequestSchema,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
 export const EchoToolSchema = {
@@ -47,4 +54,54 @@ export function handleCurrentTimeTool(_input: CurrentTimeToolInput) {
 			},
 		],
 	};
+}
+
+export function setupEchoTool(server: Server): void {
+	server.setRequestHandler(ListToolsRequestSchema, async () => {
+		return {
+			tools: [
+				{
+					name: "echo",
+					description: "Echo back the provided text",
+					inputSchema: EchoToolSchema,
+				},
+			],
+		};
+	});
+
+	server.setRequestHandler(CallToolRequestSchema, async (request) => {
+		const { name, arguments: args } = request.params;
+
+		if (name === "echo") {
+			const parsed = EchoToolZodSchema.parse(args);
+			return handleEchoTool(parsed);
+		}
+
+		throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+	});
+}
+
+export function setupCurrentTimeTool(server: Server): void {
+	server.setRequestHandler(ListToolsRequestSchema, async () => {
+		return {
+			tools: [
+				{
+					name: "current_time",
+					description: "Get the current date and time",
+					inputSchema: CurrentTimeToolSchema,
+				},
+			],
+		};
+	});
+
+	server.setRequestHandler(CallToolRequestSchema, async (request) => {
+		const { name, arguments: args } = request.params;
+
+		if (name === "current_time") {
+			const parsed = CurrentTimeToolZodSchema.parse(args);
+			return handleCurrentTimeTool(parsed);
+		}
+
+		throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
+	});
 }

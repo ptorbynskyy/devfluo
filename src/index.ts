@@ -5,90 +5,11 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
-	CallToolRequestSchema,
-	ErrorCode,
-	ListResourcesRequestSchema,
-	ListToolsRequestSchema,
-	McpError,
-	ReadResourceRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
-import {
-	handleProjectResource,
-	PROJECT_RESOURCES,
-} from "./resources/project.js";
-import {
-	CurrentTimeToolSchema,
-	CurrentTimeToolZodSchema,
-	EchoToolSchema,
-	EchoToolZodSchema,
-	handleCurrentTimeTool,
-	handleEchoTool,
-} from "./tools/example.js";
-
-function setupResourceHandlers(server: Server): void {
-	server.setRequestHandler(ListResourcesRequestSchema, async () => {
-		return {
-			resources: PROJECT_RESOURCES,
-		};
-	});
-
-	server.setRequestHandler(
-		ReadResourceRequestSchema,
-		async (request) => {
-			const { uri } = request.params;
-
-			try {
-				const resource = handleProjectResource(uri);
-				return {
-					contents: [resource],
-				};
-			} catch (_error) {
-				throw new McpError(
-					ErrorCode.InvalidRequest,
-					`Unknown resource: ${uri}`,
-				);
-			}
-		},
-	);
-}
-
-function setupToolHandlers(server: Server): void {
-	server.setRequestHandler(ListToolsRequestSchema, async () => {
-		return {
-			tools: [
-				{
-					name: "echo",
-					description: "Echo back the provided text",
-					inputSchema: EchoToolSchema,
-				},
-				{
-					name: "current_time",
-					description: "Get the current date and time",
-					inputSchema: CurrentTimeToolSchema,
-				},
-			],
-		};
-	});
-
-	server.setRequestHandler(CallToolRequestSchema, async (request) => {
-		const { name, arguments: args } = request.params;
-
-		switch (name) {
-			case "echo": {
-				const parsed = EchoToolZodSchema.parse(args);
-				return handleEchoTool(parsed);
-			}
-
-			case "current_time": {
-				const parsed = CurrentTimeToolZodSchema.parse(args);
-				return handleCurrentTimeTool(parsed);
-			}
-
-			default:
-				throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
-		}
-	});
-}
+	setupBugReportPrompt,
+	setupCodeReviewPrompt,
+} from "./prompts/development.js";
+import { setupProjectInfoResource } from "./resources/project.js";
+import { setupCurrentTimeTool, setupEchoTool } from "./tools/example.js";
 
 function createServer(): Server {
 	return new Server(
@@ -100,6 +21,7 @@ function createServer(): Server {
 			capabilities: {
 				resources: {},
 				tools: {},
+				prompts: {},
 			},
 		},
 	);
@@ -107,10 +29,13 @@ function createServer(): Server {
 
 async function runServer(): Promise<void> {
 	const server = createServer();
-	
-	setupResourceHandlers(server);
-	setupToolHandlers(server);
-	
+
+	setupProjectInfoResource(server);
+	setupEchoTool(server);
+	setupCurrentTimeTool(server);
+	setupCodeReviewPrompt(server);
+	setupBugReportPrompt(server);
+
 	const transport = new StdioServerTransport();
 	await server.connect(transport);
 }

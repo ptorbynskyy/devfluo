@@ -1,5 +1,13 @@
 // ABOUTME: Project resource handlers for the MCP server
 
+import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import {
+	ErrorCode,
+	ListResourcesRequestSchema,
+	McpError,
+	ReadResourceRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+
 export interface ProjectResource {
 	uri: string;
 	name: string;
@@ -35,4 +43,25 @@ export function handleProjectResource(uri: string): {
 		default:
 			throw new Error(`Unknown project resource: ${uri}`);
 	}
+}
+
+export function setupProjectInfoResource(server: Server): void {
+	server.setRequestHandler(ListResourcesRequestSchema, async () => {
+		return {
+			resources: PROJECT_RESOURCES,
+		};
+	});
+
+	server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+		const { uri } = request.params;
+
+		try {
+			const resource = handleProjectResource(uri);
+			return {
+				contents: [resource],
+			};
+		} catch (_error) {
+			throw new McpError(ErrorCode.InvalidRequest, `Unknown resource: ${uri}`);
+		}
+	});
 }
