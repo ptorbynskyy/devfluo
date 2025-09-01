@@ -1,13 +1,8 @@
 // ABOUTME: Project resource handlers for the MCP server
 
 import path from "node:path";
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import {
-	ErrorCode,
-	ListResourcesRequestSchema,
-	McpError,
-	ReadResourceRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { config } from "../config.js";
 
 export interface ProjectResource {
@@ -47,23 +42,33 @@ export function handleProjectResource(uri: string): {
 	}
 }
 
-export function setupProjectInfoResource(server: Server): void {
-	server.setRequestHandler(ListResourcesRequestSchema, async () => {
-		return {
-			resources: PROJECT_RESOURCES,
-		};
-	});
-
-	server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-		const { uri } = request.params;
-
-		try {
-			const resource = handleProjectResource(uri);
-			return {
-				contents: [resource],
-			};
-		} catch (_error) {
-			throw new McpError(ErrorCode.InvalidRequest, `Unknown resource: ${uri}`);
-		}
-	});
+export function setupProjectInfoResource(server: McpServer): void {
+	server.registerResource(
+		"project_info",
+		"project://info",
+		{
+			title: "Project Information",
+			description: "General information about the current project",
+			mimeType: "text/plain",
+		},
+		async (uri: URL) => {
+			try {
+				const resource = handleProjectResource(uri.href);
+				return {
+					contents: [
+						{
+							uri: resource.uri,
+							mimeType: resource.mimeType,
+							text: resource.text,
+						},
+					],
+				};
+			} catch (_error) {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					`Unknown resource: ${uri.href}`,
+				);
+			}
+		},
+	);
 }

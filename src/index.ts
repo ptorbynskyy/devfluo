@@ -2,7 +2,7 @@
 
 // ABOUTME: Main entry point for the MCP development workflow server
 
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "./config.js";
 import {
@@ -13,8 +13,8 @@ import { setupProjectInfoResource } from "./resources/project.js";
 import { setupCurrentTimeTool, setupEchoTool } from "./tools/example.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 
-function createServer(): Server {
-	return new Server(
+function createServer(): McpServer {
+	return new McpServer(
 		{
 			name: "dev-flow-mcp",
 			version: "0.1.0",

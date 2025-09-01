@@ -1,12 +1,7 @@
 // ABOUTME: Development-related prompt templates for the MCP server
 
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import {
-	ErrorCode,
-	GetPromptRequestSchema,
-	ListPromptsRequestSchema,
-	McpError,
-} from "@modelcontextprotocol/sdk/types.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 
 export interface PromptTemplate {
 	name: string;
@@ -101,65 +96,60 @@ What actually happened.
 Add any other context about the problem here.`;
 }
 
-export function setupCodeReviewPrompt(server: Server): void {
-	server.setRequestHandler(ListPromptsRequestSchema, async () => {
-		return {
-			prompts: [CODE_REVIEW_PROMPT],
-		};
-	});
-
-	server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-		const { name, arguments: args } = request.params;
-
-		if (name === "code_review") {
-			const language = (args?.language as string) || "TypeScript";
-			const complexity = (args?.complexity as string) || "medium";
-
-			return {
-				description: "Code review checklist template",
-				messages: [
-					{
-						role: "user" as const,
-						content: {
-							type: "text" as const,
-							text: generateCodeReviewPrompt(language, complexity),
-						},
+export function setupCodeReviewPrompt(server: McpServer): void {
+	server.registerPrompt(
+		"code_review",
+		{
+			title: "Code Review Template",
+			description: "Generate a code review template",
+			argsSchema: {
+				language: z.string().optional(),
+				complexity: z.string().optional(),
+			},
+		},
+		({
+			language,
+			complexity,
+		}: {
+			language?: string | undefined;
+			complexity?: string | undefined;
+		}) => ({
+			messages: [
+				{
+					role: "user" as const,
+					content: {
+						type: "text" as const,
+						text: generateCodeReviewPrompt(
+							language || "TypeScript",
+							complexity || "medium",
+						),
 					},
-				],
-			};
-		}
-
-		throw new McpError(ErrorCode.InvalidRequest, `Unknown prompt: ${name}`);
-	});
+				},
+			],
+		}),
+	);
 }
 
-export function setupBugReportPrompt(server: Server): void {
-	server.setRequestHandler(ListPromptsRequestSchema, async () => {
-		return {
-			prompts: [BUG_REPORT_PROMPT],
-		};
-	});
-
-	server.setRequestHandler(GetPromptRequestSchema, async (request) => {
-		const { name, arguments: args } = request.params;
-
-		if (name === "bug_report") {
-			const severity = (args?.severity as string) || "medium";
-
-			return {
-				description: "Bug report template",
-				messages: [
-					{
-						role: "user" as const,
-						content: {
-							type: "text" as const,
-							text: generateBugReportPrompt(severity),
-						},
+export function setupBugReportPrompt(server: McpServer): void {
+	server.registerPrompt(
+		"bug_report",
+		{
+			title: "Bug Report Template",
+			description: "Generate a bug report template",
+			argsSchema: {
+				severity: z.string().optional(),
+			},
+		},
+		({ severity }: { severity?: string | undefined }) => ({
+			messages: [
+				{
+					role: "user" as const,
+					content: {
+						type: "text" as const,
+						text: generateBugReportPrompt(severity || "medium"),
 					},
-				],
-			};
-		}
-
-		throw new McpError(ErrorCode.InvalidRequest, `Unknown prompt: ${name}`);
-	});
+				},
+			],
+		}),
+	);
 }

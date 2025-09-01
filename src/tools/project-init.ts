@@ -2,13 +2,8 @@
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import {
-	CallToolRequestSchema,
-	ErrorCode,
-	ListToolsRequestSchema,
-	McpError,
-} from "@modelcontextprotocol/sdk/types.js";
+import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { config } from "../config.js";
 
@@ -63,27 +58,16 @@ export async function handleProjectInitTool(_input: ProjectInitToolInput) {
 	}
 }
 
-export function setupProjectInitTool(server: Server): void {
-	server.setRequestHandler(ListToolsRequestSchema, async () => {
-		return {
-			tools: [
-				{
-					name: "project_init",
-					description: "Initialize project knowledge base structure",
-					inputSchema: ProjectInitToolSchema,
-				},
-			],
-		};
-	});
-
-	server.setRequestHandler(CallToolRequestSchema, async (request) => {
-		const { name, arguments: args } = request.params;
-
-		if (name === "project_init") {
-			const parsed = ProjectInitToolZodSchema.parse(args);
-			return await handleProjectInitTool(parsed);
-		}
-
-		throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${name}`);
-	});
+export function setupProjectInitTool(server: McpServer): void {
+	server.registerTool(
+		"project_init",
+		{
+			title: "Project Initialization Tool",
+			description: "Initialize project knowledge base structure",
+			inputSchema: ProjectInitToolZodSchema.shape,
+		},
+		async (args: ProjectInitToolInput) => {
+			return await handleProjectInitTool(args);
+		},
+	);
 }
