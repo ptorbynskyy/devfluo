@@ -6,7 +6,7 @@
 	"formatter": {
 		"external": {
 			"command": "biome",
-			"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+			"arguments": ["format", " --write", "--stdin-file-path", "{buffer_path}"]
 		}
 	},
 	"format_on_save": "on",
@@ -17,7 +17,12 @@
 			"formatter": {
 				"external": {
 					"command": "biome",
-					"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+					"arguments": [
+						"format",
+						" --write",
+						"--stdin-file-path",
+						"{buffer_path}"
+					]
 				}
 			},
 			"format_on_save": "on"
@@ -26,7 +31,12 @@
 			"formatter": {
 				"external": {
 					"command": "biome",
-					"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+					"arguments": [
+						"format",
+						" --write",
+						"--stdin-file-path",
+						"{buffer_path}"
+					]
 				}
 			},
 			"format_on_save": "on"
@@ -35,7 +45,12 @@
 			"formatter": {
 				"external": {
 					"command": "biome",
-					"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+					"arguments": [
+						"format",
+						" --write",
+						"--stdin-file-path",
+						"{buffer_path}"
+					]
 				}
 			},
 			"format_on_save": "on"
