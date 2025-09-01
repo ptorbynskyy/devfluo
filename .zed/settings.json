@@ -1,0 +1,44 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+	"formatter": {
+		"external": {
+			"command": "biome",
+			"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+		}
+	},
+	"format_on_save": "on",
+	"hard_tabs": true,
+	"tab_size": 4,
+	"languages": {
+		"TypeScript": {
+			"formatter": {
+				"external": {
+					"command": "biome",
+					"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+				}
+			},
+			"format_on_save": "on"
+		},
+		"JavaScript": {
+			"formatter": {
+				"external": {
+					"command": "biome",
+					"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+				}
+			},
+			"format_on_save": "on"
+		},
+		"TSX": {
+			"formatter": {
+				"external": {
+					"command": "biome",
+					"arguments": ["format", "--stdin-file-path", "{buffer_path}"]
+				}
+			},
+			"format_on_save": "on"
+		}
+	}
+}
