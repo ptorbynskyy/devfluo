@@ -23,10 +23,12 @@ export async function loadDecisions(): Promise<Decisions> {
 	return DecisionStoreSchema.parse(JSON.parse(decisionsContent)).decisions;
 }
 
-export async function saveDecisions(decisions: Decisions): Promise<void> {
+async function saveDecisions(
+	decisionMap: Map<string, Decision>,
+): Promise<void> {
 	await writeFile(
 		decisionsPath,
-		JSON.stringify({ decisions }, null, 2),
+		JSON.stringify({ decisions: Array.from(decisionMap.values()) }, null, 2),
 		"utf-8",
 	);
 }
@@ -84,6 +86,10 @@ export async function processDecisionOperations(
 				const validatedDecision = DecisionSchema.parse(updatedDecision);
 				decisionMap.set(name, validatedDecision);
 				updateCount++;
+			} else {
+				throw new Error(
+					`Decision '${name}' does not exist. Please create it first.`,
+				);
 			}
 			// Note: We don't create new decisions from updates - use create operation for that
 		}
@@ -99,7 +105,7 @@ export async function processDecisionOperations(
 	}
 
 	// Convert back to array and save
-	await saveDecisions(Array.from(decisionMap.values()));
+	await saveDecisions(decisionMap);
 
 	return {
 		updateCount,
