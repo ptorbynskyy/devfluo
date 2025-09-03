@@ -58,7 +58,7 @@ export async function handleUpdateKnowledgeTool(
 		if (decisions) {
 			const decisionResult = await processDecisionOperations(decisions);
 			results.push(
-				`Successfully processed ${decisionResult.updateCount} decision updates, ${decisionResult.deleteCount} deletions, ${decisionResult.insertCount} insertions`,
+				`Successfully processed ${decisionResult.insertCount} decision creations, ${decisionResult.updateCount} updates, ${decisionResult.deleteCount} deletions`,
 			);
 		}
 
@@ -72,9 +72,19 @@ export async function handleUpdateKnowledgeTool(
 		};
 	} catch (error) {
 		if (error instanceof z.ZodError) {
+			const errorDetails = error.errors
+				.map((e) => {
+					const path = e.path.length > 0 ? ` at '${e.path.join(".")}'` : "";
+					return `${e.message}${path}`;
+				})
+				.join(", ");
+
 			throw new McpError(
 				ErrorCode.InvalidParams,
-				`Validation error: ${error.errors.map((e) => e.message).join(", ")}`,
+				`Validation error: ${errorDetails}. Examples: ` +
+					`For decisions: {"create": [{"name": "decision-name", "description": "Description", "tags": ["tag1"]}], ` +
+					`"update": {"existing-name": {"description": "New description"}}, ` +
+					`"delete": ["name-to-delete"]}`,
 			);
 		}
 		throw new McpError(
@@ -90,7 +100,7 @@ export function setupUpdateKnowledgeTool(server: McpServer): void {
 		{
 			title: "Update Knowledge Base",
 			description:
-				"Replace entire architecture.md and/or codebase.md files with new content, and update/delete decisions",
+				"Replace entire architecture.md and/or codebase.md files with new content, and perform decision operations (create/update/delete). At least one operation must be specified.",
 			inputSchema: UpdateKnowledgeToolBaseSchema.shape,
 			annotations: {
 				readOnlyHint: false,

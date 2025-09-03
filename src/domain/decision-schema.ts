@@ -15,18 +15,26 @@ export const DecisionStoreSchema = z.object({
 	decisions: DecisionsArraySchema,
 });
 
-// Decision operations schema for updates and deletions
+// Decision operations schema for create, update, and delete operations
 export const DecisionOperationsSchema = z.object({
-	updates: z
+	create: z
+		.array(DecisionSchema)
+		.optional()
+		.describe(
+			'Array of complete decision objects to create. Example: [{"name": "use-typescript", "description": "Use TypeScript for type safety", "tags": ["language", "types"]}]',
+		),
+	update: z
 		.record(z.string(), DecisionSchema.partial())
 		.optional()
 		.describe(
-			"Object with decision names as keys and partial decision objects as values for updates",
+			'Object with decision names as keys and partial decision objects as values for updates. Example: {"use-typescript": {"description": "Updated description"}}',
 		),
-	deletions: z
+	delete: z
 		.array(z.string())
 		.optional()
-		.describe("Array of decision names to delete"),
+		.describe(
+			'Array of decision names to delete. Example: ["old-decision", "deprecated-choice"]',
+		),
 });
 
 export type Decision = z.infer<typeof DecisionSchema>;

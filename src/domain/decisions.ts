@@ -51,9 +51,27 @@ export async function processDecisionOperations(
 	let insertCount = 0;
 	let deleteCount = 0;
 
-	// Process updates
-	if (decisions.updates) {
-		for (const [name, updates] of Object.entries(decisions.updates)) {
+	// Process creates - new decisions with complete data
+	if (decisions.create) {
+		for (const newDecision of decisions.create) {
+			// Validate that the decision has all required fields
+			const validatedDecision = DecisionSchema.parse(newDecision);
+
+			if (decisionMap.has(validatedDecision.name)) {
+				// If decision already exists, treat as update
+				decisionMap.set(validatedDecision.name, validatedDecision);
+				updateCount++;
+			} else {
+				// Create new decision
+				decisionMap.set(validatedDecision.name, validatedDecision);
+				insertCount++;
+			}
+		}
+	}
+
+	// Process updates - partial updates to existing decisions
+	if (decisions.update) {
+		for (const [name, updates] of Object.entries(decisions.update)) {
 			const existingDecision = decisionMap.get(name);
 			if (existingDecision) {
 				// Update existing decision with merged properties
@@ -62,20 +80,18 @@ export async function processDecisionOperations(
 					description: updates.description ?? existingDecision.description,
 					tags: updates.tags ?? existingDecision.tags,
 				};
-				decisionMap.set(name, updatedDecision);
+				// Validate the updated decision is still complete
+				const validatedDecision = DecisionSchema.parse(updatedDecision);
+				decisionMap.set(name, validatedDecision);
 				updateCount++;
-			} else {
-				const newData = DecisionSchema.parse(updates);
-				// Create new decision if it has all required fields
-				decisionMap.set(name, newData);
-				insertCount++;
 			}
+			// Note: We don't create new decisions from updates - use create operation for that
 		}
 	}
 
 	// Process deletions
-	if (decisions.deletions) {
-		for (const name of decisions.deletions) {
+	if (decisions.delete) {
+		for (const name of decisions.delete) {
 			if (decisionMap.delete(name)) {
 				deleteCount++;
 			}
