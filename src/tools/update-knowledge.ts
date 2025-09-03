@@ -11,11 +11,11 @@ import { DecisionOperationsSchema } from "../domain/decision-schema.js";
 import { processDecisionOperations } from "../domain/decisions.js";
 
 const UpdateKnowledgeToolBaseSchema = z.object({
-	architecture_content: z
+	architectureContent: z
 		.string()
 		.optional()
 		.describe("Content to replace the entire architecture.md file"),
-	codebase_content: z
+	codebaseContent: z
 		.string()
 		.optional()
 		.describe("Content to replace the entire codebase.md file"),
@@ -27,8 +27,8 @@ const UpdateKnowledgeToolBaseSchema = z.object({
 export const UpdateKnowledgeToolZodSchema =
 	UpdateKnowledgeToolBaseSchema.refine(
 		(data) =>
-			data.architecture_content || data.codebase_content || data.decisions,
-		"At least one of architecture_content, codebase_content, or decisions must be provided",
+			data.architectureContent || data.codebaseContent || data.decisions,
+		"At least one of architectureContent, codebaseContent, or decisions must be provided",
 	);
 
 export type UpdateKnowledgeToolInput = z.infer<
@@ -41,17 +41,16 @@ export async function handleUpdateKnowledgeTool(
 	try {
 		// Validate input using the full schema with refine validation
 		const validatedInput = UpdateKnowledgeToolZodSchema.parse(input);
-		const { architecture_content, codebase_content, decisions } =
-			validatedInput;
+		const { architectureContent, codebaseContent, decisions } = validatedInput;
 		const results: string[] = [];
 
-		if (architecture_content) {
-			await saveArchitectureMarkDown(architecture_content);
+		if (architectureContent) {
+			await saveArchitectureMarkDown(architectureContent);
 			results.push(`Successfully updated architecture.md`);
 		}
 
-		if (codebase_content) {
-			await saveCodebaseMarkdown(codebase_content);
+		if (codebaseContent) {
+			await saveCodebaseMarkdown(codebaseContent);
 			results.push(`Successfully updated codebase.md`);
 		}
 
