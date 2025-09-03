@@ -57,7 +57,7 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		"architecture_knowledge",
 		"project://knowledge/architecture",
 		{
-			title: "Architecture Knowledge",
+			title: "Project Architecture Knowledge",
 			description: "Architecture knowledge from architecture.md file",
 			mimeType: "text/markdown",
 		},
@@ -87,7 +87,7 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		"codebase_knowledge",
 		"project://knowledge/codebase",
 		{
-			title: "Codebase Knowledge",
+			title: "Project Codebase Knowledge",
 			description: "Codebase knowledge from codebase.md file",
 			mimeType: "text/markdown",
 		},

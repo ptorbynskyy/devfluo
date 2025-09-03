@@ -97,7 +97,7 @@ export function setupUpdateKnowledgeTool(server: McpServer): void {
 	server.registerTool(
 		"update_knowledge",
 		{
-			title: "Update Knowledge Base",
+			title: "Update Project Knowledge Base",
 			description:
 				"Replace entire architecture.md and/or codebase.md files with new content, and perform decision operations (create/update/delete). At least one operation must be specified.",
 			inputSchema: UpdateKnowledgeToolBaseSchema.shape,
