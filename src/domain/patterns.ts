@@ -44,6 +44,9 @@ export async function processPatternOperations(
 	insertCount: number;
 	deleteCount: number;
 }> {
+	// Ensure patterns directory exists before any file operations
+	await mkdir(patternsPath, { recursive: true });
+
 	// Load existing patterns
 	const existingPatterns: Patterns = await loadPatterns();
 
