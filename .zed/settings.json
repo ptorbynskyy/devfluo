@@ -13,6 +13,20 @@
 	"hard_tabs": true,
 	"tab_size": 4,
 	"languages": {
+		"Markdown": {
+			"formatter": {
+				"external": {
+					"command": "biome",
+					"arguments": [
+						"format",
+						" --write",
+						"--stdin-file-path",
+						"{buffer_path}"
+					]
+				}
+			},
+			"format_on_save": "on"
+		},
 		"TypeScript": {
 			"formatter": {
 				"external": {
