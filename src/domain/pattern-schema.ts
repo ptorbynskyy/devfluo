@@ -14,6 +14,7 @@ export const PatternSchema = z.object({
 		.describe("Filename of the code snippet stored in patterns folder"),
 	codeReferences: z
 		.array(z.string())
+		.optional()
 		.describe(
 			"Array of code references in format 'path:line' or 'path:startLine-endLine'",
 		),
