@@ -14,9 +14,10 @@ export const PatternSchema = z.object({
 		.describe("Filename of the code snippet stored in patterns folder"),
 	codeReferences: z
 		.array(z.string())
+		.max(3, "Provide at most 3 reference examples")
 		.optional()
 		.describe(
-			"Array of code references in format 'path:line' or 'path:startLine-endLine'",
+			"Array of 2-3 example locations in the codebase where this pattern is well-implemented, serving as reference for applying the pattern elsewhere. Format: 'path:line' or 'path:startLine-endLine'",
 		),
 });
 
@@ -39,7 +40,7 @@ export const PatternOperationsSchema = z.object({
 		.array(PatternCreateSchema)
 		.optional()
 		.describe(
-			'Array of complete pattern objects with content to create. Example: [{"name": "pattern-crud", "description": "CRUD operations for patterns", "tags": ["domain", "crud"], "snippetFilename": "pattern-pattern.ts", "snippetContent": "// Pattern code here...", "codeReferences": ["src/domain/patterns.ts:14-24"]}]',
+			'Array of complete pattern objects with content to create. The codeReferences should contain 2-3 examples of where this pattern is well-implemented in the target codebase. Example: [{"name": "error-handling", "description": "Standard error handling pattern", "tags": ["error", "handling"], "snippetFilename": "error-pattern.ts", "snippetContent": "// Pattern code here...", "codeReferences": ["src/api/userService.ts:45-52", "src/components/DataTable.tsx:123"]}]',
 		),
 	update: z
 		.record(
@@ -53,7 +54,7 @@ export const PatternOperationsSchema = z.object({
 		)
 		.optional()
 		.describe(
-			'Object with pattern names as keys and partial pattern objects as values for updates. Example: {"pattern-crud": {"description": "Updated description", "snippetContent": "// Updated pattern code..."}}',
+			'Object with pattern names as keys and partial pattern objects as values for updates. The codeReferences should contain 2-3 examples of where this pattern is well-implemented. Example: {"pattern-crud": {"description": "Updated description", "snippetContent": "// Updated pattern code...", "codeReferences": ["src/services/api.ts:67-74", "src/utils/database.ts:125"]}}',
 		),
 	delete: z
 		.array(z.string())
