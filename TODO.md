@@ -1,3 +1,15 @@
+# Pattern
+ - name
+ - description
+ - tags[]
+ - code example (snippet file ref)
+ - [ Links to real code ] (file path relative to project root, line number(s))
+
+# Solution
+ - problem
+ - solution
+ - tags[]
+ - [ Links to real code ] (file path relative to project root, line number(s))
 
 
 
