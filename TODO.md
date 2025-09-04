@@ -1,9 +1,9 @@
-# Pattern
+# Patterns
  - name
  - description
  - tags[]
- - code example (snippet file ref)
- - [ Links to real code ] (file path relative to project root, line number(s))
+ - code example (snippet file name)
+ - [ Links to real code ] (file path relative to project root, line number(s)) - string[]
 
 # Solution
  - problem

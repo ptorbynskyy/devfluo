@@ -9,6 +9,8 @@ import {
 } from "../domain/base-knowledge.js";
 import { DecisionOperationsSchema } from "../domain/decision-schema.js";
 import { processDecisionOperations } from "../domain/decisions.js";
+import { PatternOperationsSchema } from "../domain/pattern-schema.js";
+import { processPatternOperations } from "../domain/patterns.js";
 
 const UpdateKnowledgeToolBaseSchema = z.object({
 	architectureContent: z
@@ -22,13 +24,19 @@ const UpdateKnowledgeToolBaseSchema = z.object({
 	decisions: DecisionOperationsSchema.optional().describe(
 		"Decision operations to update or delete decisions",
 	),
+	patterns: PatternOperationsSchema.optional().describe(
+		"Pattern operations to update or delete patterns",
+	),
 });
 
 export const UpdateKnowledgeToolZodSchema =
 	UpdateKnowledgeToolBaseSchema.refine(
 		(data) =>
-			data.architectureContent || data.codebaseContent || data.decisions,
-		"At least one of architectureContent, codebaseContent, or decisions must be provided",
+			data.architectureContent ||
+			data.codebaseContent ||
+			data.decisions ||
+			data.patterns,
+		"At least one of architectureContent, codebaseContent, decisions, or patterns must be provided",
 	);
 
 export type UpdateKnowledgeToolInput = z.infer<
@@ -41,7 +49,8 @@ export async function handleUpdateKnowledgeTool(
 	try {
 		// Validate input using the full schema with refine validation
 		const validatedInput = UpdateKnowledgeToolZodSchema.parse(input);
-		const { architectureContent, codebaseContent, decisions } = validatedInput;
+		const { architectureContent, codebaseContent, decisions, patterns } =
+			validatedInput;
 		const results: string[] = [];
 
 		if (architectureContent) {
@@ -58,6 +67,13 @@ export async function handleUpdateKnowledgeTool(
 			const decisionResult = await processDecisionOperations(decisions);
 			results.push(
 				`Successfully processed ${decisionResult.insertCount} decision creations, ${decisionResult.updateCount} updates, ${decisionResult.deleteCount} deletions`,
+			);
+		}
+
+		if (patterns) {
+			const patternResult = await processPatternOperations(patterns);
+			results.push(
+				`Successfully processed ${patternResult.insertCount} pattern creations, ${patternResult.updateCount} updates, ${patternResult.deleteCount} deletions`,
 			);
 		}
 
@@ -83,7 +99,10 @@ export async function handleUpdateKnowledgeTool(
 				`Validation error: ${errorDetails}. Examples: ` +
 					`For decisions: {"create": [{"name": "decision-name", "description": "Description", "tags": ["tag1"]}], ` +
 					`"update": {"existing-name": {"description": "New description"}}, ` +
-					`"delete": ["name-to-delete"]}`,
+					`"delete": ["name-to-delete"]}. ` +
+					`For patterns: {"create": [{"name": "pattern-name", "description": "Description", "tags": ["tag1"], "snippetFilename": "example.ts", "codeReferences": ["src/file.ts:10-20"]}], ` +
+					`"update": {"existing-pattern": {"description": "New description"}}, ` +
+					`"delete": ["pattern-to-delete"]}`,
 			);
 		}
 		throw new McpError(
@@ -99,7 +118,7 @@ export function setupUpdateKnowledgeTool(server: McpServer): void {
 		{
 			title: "Update Project Knowledge Base",
 			description:
-				"Replace entire architecture.md and/or codebase.md files with new content, and perform decision operations (create/update/delete). At least one operation must be specified.",
+				"Replace entire architecture.md and/or codebase.md files with new content, and perform decision/pattern operations (create/update/delete). At least one operation must be specified.",
 			inputSchema: UpdateKnowledgeToolBaseSchema.shape,
 			annotations: {
 				readOnlyHint: false,
