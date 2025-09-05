@@ -14,6 +14,7 @@ import { setupProjectKnowledgeResource } from "./resources/knowledge.js";
 import { setupPatternsResource } from "./resources/patterns.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
+import { setupSolutionsResource } from "./resources/solutions.js";
 
 function createServer(): McpServer {
 	return new McpServer(
@@ -40,6 +41,7 @@ async function runServer(): Promise<void> {
 	setupProjectKnowledgeResource(server);
 	setupDecisionsResource(server);
 	setupPatternsResource(server);
+	setupSolutionsResource(server);
 	setupProjectInitTool(server);
 	setupUpdateKnowledgeTool(server);
 	setupCodeReviewPrompt(server);
