@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { baseKnowledgePath } from "./base-knowledge.js";
 import {
@@ -9,12 +9,15 @@ import {
 	type Decisions,
 } from "./decision-schema.js";
 
-export const decisionsPath = path.join(baseKnowledgePath, "decisions.json");
+export const decisionsPath = path.join(baseKnowledgePath, "decisions");
+export const decisionsJsonPath = path.join(decisionsPath, "decisions.json");
+
+// const a = des
 
 export async function loadDecisions(): Promise<Decisions> {
 	let decisionsContent: string;
 	try {
-		decisionsContent = await readFile(decisionsPath, "utf-8");
+		decisionsContent = await readFile(decisionsJsonPath, "utf-8");
 	} catch (_error) {
 		// File doesn't exist
 		return [];
@@ -26,8 +29,9 @@ export async function loadDecisions(): Promise<Decisions> {
 async function saveDecisions(
 	decisionMap: Map<string, Decision>,
 ): Promise<void> {
+	await mkdir(decisionsPath, { recursive: true });
 	await writeFile(
-		decisionsPath,
+		decisionsJsonPath,
 		JSON.stringify({ decisions: Array.from(decisionMap.values()) }, null, 2),
 		"utf-8",
 	);
