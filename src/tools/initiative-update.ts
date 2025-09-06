@@ -3,11 +3,11 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { updateInitiative } from "../domain/initiative.js";
 import {
 	type InitiativeUpdateInput,
 	InitiativeUpdateSchema,
-} from "../domain/initiative-schema.js";
+	updateInitiative,
+} from "../domain/initiative/index.js";
 
 export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 	try {

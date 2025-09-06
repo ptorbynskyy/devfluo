@@ -3,11 +3,11 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { deleteInitiative } from "../domain/initiative.js";
 import {
+	deleteInitiative,
 	type InitiativeDeleteInput,
 	InitiativeDeleteSchema,
-} from "../domain/initiative-schema.js";
+} from "../domain/initiative/index.js";
 
 export async function handleInitiativeDeleteTool(input: InitiativeDeleteInput) {
 	try {

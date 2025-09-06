@@ -7,7 +7,7 @@ import {
 	getInitiativeIds,
 	loadInitiative,
 	loadInitiatives,
-} from "../domain/initiative.js";
+} from "../domain/initiative/index.js";
 
 export function setupInitiativeResources(server: McpServer): void {
 	// Static resource: List of all initiatives
