@@ -7,6 +7,7 @@ import {
 	readdir,
 	rmdir,
 	access,
+	unlink,
 } from "node:fs/promises";
 import path from "node:path";
 import { baseKnowledgePath } from "./base-knowledge.js";
@@ -34,6 +35,40 @@ function getBacklogItemSpecPath(id: string): string {
 	return path.join(getBacklogItemPath(id), "spec.md");
 }
 
+// Load basic backlog item data (without spec content)
+async function loadBacklogItemBasic(id: string): Promise<BacklogItemWithSpec | null> {
+	try {
+		const dataPath = getBacklogItemDataPath(id);
+		const specPath = getBacklogItemSpecPath(id);
+
+		// Read data.json only
+		const dataContent = await readFile(dataPath, "utf-8");
+		const itemData = JSON.parse(dataContent);
+
+		// Validate the data structure
+		const validatedItem = BacklogItemSchema.parse({ id, ...itemData });
+
+		// Check if spec.md exists without reading its content
+		let hasSpec = false;
+		try {
+			await access(specPath);
+			hasSpec = true;
+		} catch {
+			// spec.md doesn't exist
+			hasSpec = false;
+		}
+
+		return {
+			...validatedItem,
+			spec: undefined, // Don't load spec content for performance
+			hasSpec,
+		};
+	} catch (error) {
+		console.error(`Error loading backlog item ${id}:`, error);
+		return null;
+	}
+}
+
 // Load all backlog items (without spec content)
 export async function loadBacklogItems(): Promise<BacklogItemWithSpec[]> {
 	try {
@@ -44,8 +79,8 @@ export async function loadBacklogItems(): Promise<BacklogItemWithSpec[]> {
 		for (const dir of itemDirs) {
 			if (dir.isDirectory()) {
 				const itemId = dir.name;
-				// TODO: The method reads the entire backlog item with specification. The point is to avoid reading the specification file and return everything faster - just a simple list of backlog items.
-				const item = await loadBacklogItem(itemId);
+				// Use basic loader to avoid reading spec content for better performance
+				const item = await loadBacklogItemBasic(itemId);
 				if (item) {
 					items.push(item);
 				}
@@ -133,9 +168,7 @@ async function saveBacklogItem(
 		if (spec.trim() === "") {
 			// Remove spec file if empty string is provided
 			try {
-				await access(specPath);
-				// TODO: Instead of clearing the file, it needs to be deleted.
-				await writeFile(specPath, "", "utf-8");
+				await unlink(specPath);
 			} catch {
 				// File doesn't exist, nothing to do
 			}
@@ -154,17 +187,13 @@ async function deleteBacklogItem(id: string): Promise<boolean> {
 
 		// Remove files if they exist
 		try {
-			await access(dataPath);
-			// TODO: Instead of clearing the file, it needs to be deleted.
-			await writeFile(dataPath, "", "utf-8");
+			await unlink(dataPath);
 		} catch {
 			// data.json doesn't exist
 		}
 
 		try {
-			await access(specPath);
-			// TODO: Instead of clearing the file, it needs to be deleted.
-			await writeFile(specPath, "", "utf-8");
+			await unlink(specPath);
 		} catch {
 			// spec.md doesn't exist
 		}

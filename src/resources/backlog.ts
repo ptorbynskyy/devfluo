@@ -54,8 +54,23 @@ export function setupBacklogResources(server: McpServer): void {
 	server.registerResource(
 		"backlog-item",
 		new ResourceTemplate("project://backlog/item/{id}", {
-			// TODO: Should we implement this method?
-			list: undefined,
+			list: async () => {
+				try {
+					const itemIds = await getBacklogItemIds();
+					return {
+						resources: itemIds.map(id => ({
+							name: `backlog-item-${id}`,
+							uri: `project://backlog/item/${id}`,
+							title: `Backlog Item: ${id}`,
+							description: `Individual backlog item with ID: ${id}`,
+							mimeType: "text/markdown",
+						}))
+					};
+				} catch (error) {
+					console.error("Error listing backlog items", error);
+					return { resources: [] };
+				}
+			},
 			complete: {
 				id: async (value) => {
 					try {
