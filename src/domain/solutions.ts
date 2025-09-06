@@ -26,7 +26,9 @@ export async function loadSolutions(): Promise<Solutions> {
 	return SolutionStoreSchema.parse(JSON.parse(solutionsContent)).solutions;
 }
 
-async function saveSolutions(solutionMap: Map<string, Solution>): Promise<void> {
+async function saveSolutions(
+	solutionMap: Map<string, Solution>,
+): Promise<void> {
 	// Ensure solutions directory exists
 	await mkdir(solutionsPath, { recursive: true });
 

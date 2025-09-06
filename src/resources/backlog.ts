@@ -4,9 +4,9 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import {
-	loadBacklogItems,
-	loadBacklogItem,
 	getBacklogItemIds,
+	loadBacklogItem,
+	loadBacklogItems,
 } from "../domain/backlog.js";
 
 export function setupBacklogResources(server: McpServer): void {
@@ -58,13 +58,13 @@ export function setupBacklogResources(server: McpServer): void {
 				try {
 					const itemIds = await getBacklogItemIds();
 					return {
-						resources: itemIds.map(id => ({
+						resources: itemIds.map((id) => ({
 							name: `backlog-item-${id}`,
 							uri: `project://backlog/item/${id}`,
 							title: `Backlog Item: ${id}`,
 							description: `Individual backlog item with ID: ${id}`,
 							mimeType: "text/markdown",
-						}))
+						})),
 					};
 				} catch (error) {
 					console.error("Error listing backlog items", error);

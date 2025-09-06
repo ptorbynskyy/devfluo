@@ -3,15 +3,17 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { BacklogOperationsSchema } from "../domain/backlog-schema.js";
 import { processBacklogOperations } from "../domain/backlog.js";
+import { BacklogOperationsSchema } from "../domain/backlog-schema.js";
 
 const BacklogManagementToolSchema = BacklogOperationsSchema.refine(
 	(data) => data.create || data.update || data.delete,
 	"At least one of create, update, or delete operations must be provided",
 );
 
-export type BacklogManagementToolInput = z.infer<typeof BacklogManagementToolSchema>;
+export type BacklogManagementToolInput = z.infer<
+	typeof BacklogManagementToolSchema
+>;
 
 export async function handleBacklogManagementTool(
 	input: BacklogManagementToolInput,
@@ -23,17 +25,23 @@ export async function handleBacklogManagementTool(
 		const results: string[] = [];
 
 		const operationResult = await processBacklogOperations(validatedInput);
-		
+
 		if (operationResult.insertCount > 0) {
-			results.push(`Successfully created ${operationResult.insertCount} backlog item${operationResult.insertCount === 1 ? "" : "s"}`);
+			results.push(
+				`Successfully created ${operationResult.insertCount} backlog item${operationResult.insertCount === 1 ? "" : "s"}`,
+			);
 		}
-		
+
 		if (operationResult.updateCount > 0) {
-			results.push(`Successfully updated ${operationResult.updateCount} backlog item${operationResult.updateCount === 1 ? "" : "s"}`);
+			results.push(
+				`Successfully updated ${operationResult.updateCount} backlog item${operationResult.updateCount === 1 ? "" : "s"}`,
+			);
 		}
-		
+
 		if (operationResult.deleteCount > 0) {
-			results.push(`Successfully deleted ${operationResult.deleteCount} backlog item${operationResult.deleteCount === 1 ? "" : "s"}`);
+			results.push(
+				`Successfully deleted ${operationResult.deleteCount} backlog item${operationResult.deleteCount === 1 ? "" : "s"}`,
+			);
 		}
 
 		if (results.length === 0) {
@@ -43,18 +51,20 @@ export async function handleBacklogManagementTool(
 		// Show summary of what items were affected if any
 		const affectedItems: string[] = [];
 		if (create) {
-			affectedItems.push(...create.map(item => `Created: ${item.id} (${item.name})`));
+			affectedItems.push(
+				...create.map((item) => `Created: ${item.id} (${item.name})`),
+			);
 		}
 		if (update) {
-			affectedItems.push(...Object.keys(update).map(id => `Updated: ${id}`));
+			affectedItems.push(...Object.keys(update).map((id) => `Updated: ${id}`));
 		}
 		if (deleteOps) {
-			affectedItems.push(...deleteOps.map(id => `Deleted: ${id}`));
+			affectedItems.push(...deleteOps.map((id) => `Deleted: ${id}`));
 		}
 
 		let responseText = results.join("; ");
 		if (affectedItems.length > 0) {
-			responseText += "\n\nAffected items:\n" + affectedItems.join("\n");
+			responseText += `\n\nAffected items:\n${affectedItems.join("\n")}`;
 		}
 
 		return {
@@ -82,14 +92,11 @@ export async function handleBacklogManagementTool(
 					`For delete: {"delete": ["item-to-delete", "another-item"]}`,
 			);
 		}
-		
+
 		if (error instanceof Error && error.message.includes("does not exist")) {
-			throw new McpError(
-				ErrorCode.InvalidParams,
-				error.message,
-			);
+			throw new McpError(ErrorCode.InvalidParams, error.message);
 		}
-		
+
 		throw new McpError(
 			ErrorCode.InternalError,
 			`Failed to manage backlog items: ${error instanceof Error ? error.message : "Unknown error"}`,

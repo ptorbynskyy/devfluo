@@ -55,8 +55,13 @@ export async function handleUpdateKnowledgeTool(
 	try {
 		// Validate input using the full schema with refine validation
 		const validatedInput = UpdateKnowledgeToolZodSchema.parse(input);
-		const { architectureContent, codebaseContent, decisions, patterns, solutions } =
-			validatedInput;
+		const {
+			architectureContent,
+			codebaseContent,
+			decisions,
+			patterns,
+			solutions,
+		} = validatedInput;
 		const results: string[] = [];
 
 		if (architectureContent) {

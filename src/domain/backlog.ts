@@ -1,22 +1,22 @@
 // ABOUTME: Domain module for managing backlog items with CRUD operations and file-system storage
 
 import {
-	mkdir,
-	readFile,
-	writeFile,
-	readdir,
-	rmdir,
 	access,
+	mkdir,
+	readdir,
+	readFile,
+	rmdir,
 	unlink,
+	writeFile,
 } from "node:fs/promises";
 import path from "node:path";
-import { baseKnowledgePath } from "./base-knowledge.js";
 import {
 	type BacklogItem,
+	BacklogItemSchema,
 	type BacklogItemWithSpec,
 	type BacklogOperations,
-	BacklogItemSchema,
 } from "./backlog-schema.js";
+import { baseKnowledgePath } from "./base-knowledge.js";
 
 export const backlogPath = path.join(baseKnowledgePath, "backlog");
 
@@ -36,7 +36,9 @@ function getBacklogItemSpecPath(id: string): string {
 }
 
 // Load basic backlog item data (without spec content)
-async function loadBacklogItemBasic(id: string): Promise<BacklogItemWithSpec | null> {
+async function loadBacklogItemBasic(
+	id: string,
+): Promise<BacklogItemWithSpec | null> {
 	try {
 		const dataPath = getBacklogItemDataPath(id);
 		const specPath = getBacklogItemSpecPath(id);
