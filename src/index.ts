@@ -9,12 +9,14 @@ import {
 	setupBugReportPrompt,
 	setupCodeReviewPrompt,
 } from "./prompts/development.js";
+import { setupBacklogResources } from "./resources/backlog.js";
 import { setupDecisionsResource } from "./resources/decisions.js";
 import { setupProjectKnowledgeResource } from "./resources/knowledge.js";
 import { setupPatternsResource } from "./resources/patterns.js";
+import { setupSolutionsResource } from "./resources/solutions.js";
+import { setupBacklogManagementTool } from "./tools/backlog-management.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
-import { setupSolutionsResource } from "./resources/solutions.js";
 
 function createServer(): McpServer {
 	return new McpServer(
@@ -42,8 +44,10 @@ async function runServer(): Promise<void> {
 	setupDecisionsResource(server);
 	setupPatternsResource(server);
 	setupSolutionsResource(server);
+	setupBacklogResources(server);
 	setupProjectInitTool(server);
 	setupUpdateKnowledgeTool(server);
+	setupBacklogManagementTool(server);
 	setupCodeReviewPrompt(server);
 	setupBugReportPrompt(server);
 
