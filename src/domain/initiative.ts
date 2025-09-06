@@ -10,6 +10,7 @@ import {
 	writeFile,
 } from "node:fs/promises";
 import path from "node:path";
+import { deleteBacklogItem, loadBacklogItem } from "./backlog.js";
 import { baseKnowledgePath } from "./base-knowledge.js";
 import {
 	type Initiative,
@@ -36,6 +37,11 @@ function getInitiativeOverviewPath(id: string): string {
 	return path.join(getInitiativePath(id), "overview.md");
 }
 
+// Helper function to get spec.md path for an initiative
+function getInitiativeSpecPath(id: string): string {
+	return path.join(getInitiativePath(id), "spec.md");
+}
+
 // Load basic initiative data (without overview content)
 async function loadInitiativeBasic(
 	id: string,
@@ -43,6 +49,7 @@ async function loadInitiativeBasic(
 	try {
 		const dataPath = getInitiativeDataPath(id);
 		const overviewPath = getInitiativeOverviewPath(id);
+		const specPath = getInitiativeSpecPath(id);
 
 		// Read data.json only
 		const dataContent = await readFile(dataPath, "utf-8");
@@ -64,10 +71,22 @@ async function loadInitiativeBasic(
 			hasOverview = false;
 		}
 
+		// Check if spec.md exists without reading its content
+		let hasSpec = false;
+		try {
+			await access(specPath);
+			hasSpec = true;
+		} catch {
+			// spec.md doesn't exist
+			hasSpec = false;
+		}
+
 		return {
 			...validatedInitiative,
 			overview: undefined, // Don't load overview content for performance
 			hasOverview,
+			spec: undefined, // Don't load spec content for performance
+			hasSpec,
 		};
 	} catch (error) {
 		console.error(`Error loading initiative ${id}:`, error);
@@ -109,6 +128,7 @@ export async function loadInitiative(
 	try {
 		const dataPath = getInitiativeDataPath(id);
 		const overviewPath = getInitiativeOverviewPath(id);
+		const specPath = getInitiativeSpecPath(id);
 
 		// Read data.json
 		const dataContent = await readFile(dataPath, "utf-8");
@@ -133,10 +153,25 @@ export async function loadInitiative(
 			hasOverview = false;
 		}
 
+		// Check if spec.md exists and read it
+		let spec: string | undefined;
+		let hasSpec = false;
+
+		try {
+			spec = await readFile(specPath, "utf-8");
+			hasSpec = true;
+		} catch {
+			// spec.md doesn't exist
+			spec = undefined;
+			hasSpec = false;
+		}
+
 		return {
 			...validatedInitiative,
 			overview,
 			hasOverview,
+			spec,
+			hasSpec,
 		};
 	} catch (error) {
 		console.error(`Error loading initiative ${id}:`, error);
@@ -164,10 +199,12 @@ export async function getInitiativeIds(): Promise<string[]> {
 async function saveInitiative(
 	initiative: Initiative,
 	overview?: string,
+	spec?: string | null,
 ): Promise<void> {
 	const itemPath = getInitiativePath(initiative.id);
 	const dataPath = getInitiativeDataPath(initiative.id);
 	const overviewPath = getInitiativeOverviewPath(initiative.id);
+	const specPath = getInitiativeSpecPath(initiative.id);
 
 	// Create initiative directory
 	await mkdir(itemPath, { recursive: true });
@@ -187,6 +224,20 @@ async function saveInitiative(
 			}
 		} else {
 			await writeFile(overviewPath, overview, "utf-8");
+		}
+	}
+
+	// Save spec.md if provided
+	if (spec !== undefined) {
+		if (spec === null || spec.trim() === "") {
+			// Remove spec file if null or empty string is provided
+			try {
+				await unlink(specPath);
+			} catch {
+				// File doesn't exist, nothing to do
+			}
+		} else {
+			await writeFile(specPath, spec, "utf-8");
 		}
 	}
 }
@@ -211,9 +262,25 @@ export async function createInitiative(
 		state: "new",
 	};
 
+	// Handle creation from backlog if specified
+	let specFromBacklog: string | undefined;
+	if (input.fromBacklogId) {
+		const backlogItem = await loadBacklogItem(input.fromBacklogId);
+		if (!backlogItem) {
+			throw new Error(`Backlog item '${input.fromBacklogId}' does not exist`);
+		}
+		// Copy spec from backlog if it exists
+		specFromBacklog = backlogItem.spec;
+	}
+
 	// Validate the initiative data
 	const validatedInitiative = InitiativeSchema.parse(newInitiative);
-	await saveInitiative(validatedInitiative, input.overview);
+	await saveInitiative(validatedInitiative, input.overview, specFromBacklog);
+
+	// Delete backlog item after successful initiative creation
+	if (input.fromBacklogId) {
+		await deleteBacklogItem(input.fromBacklogId);
+	}
 }
 
 // Update an existing initiative
@@ -235,7 +302,7 @@ export async function updateInitiative(
 
 	// Validate the updated initiative
 	const validatedInitiative = InitiativeSchema.parse(updatedInitiative);
-	await saveInitiative(validatedInitiative, input.overview);
+	await saveInitiative(validatedInitiative, input.overview, input.spec);
 }
 
 // Delete an initiative from file system
@@ -249,6 +316,7 @@ export async function deleteInitiative(id: string): Promise<void> {
 	const itemPath = getInitiativePath(id);
 	const dataPath = getInitiativeDataPath(id);
 	const overviewPath = getInitiativeOverviewPath(id);
+	const specPath = getInitiativeSpecPath(id);
 
 	// Remove files if they exist
 	try {
@@ -261,6 +329,12 @@ export async function deleteInitiative(id: string): Promise<void> {
 		await unlink(overviewPath);
 	} catch {
 		// overview.md doesn't exist
+	}
+
+	try {
+		await unlink(specPath);
+	} catch {
+		// spec.md doesn't exist
 	}
 
 	// Remove directory if it exists

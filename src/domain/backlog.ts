@@ -181,7 +181,7 @@ async function saveBacklogItem(
 }
 
 // Delete a backlog item from file system
-async function deleteBacklogItem(id: string): Promise<boolean> {
+export async function deleteBacklogItem(id: string): Promise<boolean> {
 	try {
 		const itemPath = getBacklogItemPath(id);
 		const dataPath = getBacklogItemDataPath(id);

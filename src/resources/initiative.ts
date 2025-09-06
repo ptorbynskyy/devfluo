@@ -23,12 +23,13 @@ export function setupInitiativeResources(server: McpServer): void {
 			try {
 				const initiatives = await loadInitiatives();
 
-				// Return list format without overview content
+				// Return list format without overview/spec content
 				const listInitiatives = initiatives.map((initiative) => ({
 					id: initiative.id,
 					name: initiative.name,
 					state: initiative.state,
 					hasOverview: initiative.hasOverview,
+					hasSpec: initiative.hasSpec,
 				}));
 
 				return {
@@ -119,6 +120,16 @@ export function setupInitiativeResources(server: McpServer): void {
 				} else {
 					markdown += `## Overview\n\n`;
 					markdown += `*No overview provided*`;
+				}
+
+				markdown += `\n\n`;
+
+				if (initiative.hasSpec && initiative.spec) {
+					markdown += `## Specification\n\n`;
+					markdown += initiative.spec;
+				} else {
+					markdown += `## Specification\n\n`;
+					markdown += `*No specification provided*`;
 				}
 
 				return {

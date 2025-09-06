@@ -31,7 +31,7 @@ export const InitiativeSchema = z.object({
 		),
 });
 
-// Initiative with overview content included
+// Initiative with overview and spec content included
 export const InitiativeWithOverviewSchema = InitiativeSchema.extend({
 	overview: z
 		.string()
@@ -40,6 +40,13 @@ export const InitiativeWithOverviewSchema = InitiativeSchema.extend({
 	hasOverview: z
 		.boolean()
 		.describe("Indicates whether overview.md file exists for this initiative"),
+	spec: z
+		.string()
+		.optional()
+		.describe("Markdown content of the specification file (spec.md)"),
+	hasSpec: z
+		.boolean()
+		.describe("Indicates whether spec.md file exists for this initiative"),
 });
 
 // Schema for creating a new initiative
@@ -64,6 +71,17 @@ export const InitiativeCreateSchema = z.object({
 		.describe(
 			"Optional markdown content for overview.md file. Example: '# User Authentication\\n\\nThis initiative covers...'",
 		),
+	fromBacklogId: z
+		.string()
+		.min(1)
+		.regex(
+			/^[a-z0-9-]+$/,
+			"ID must contain only lowercase letters, numbers, and hyphens",
+		)
+		.optional()
+		.describe(
+			"Optional backlog item ID to create initiative from. If specified, will copy spec from backlog and delete the backlog item. Example: 'user-auth'",
+		),
 });
 
 // Schema for updating an existing initiative
@@ -80,6 +98,13 @@ export const InitiativeUpdateSchema = z.object({
 		.string()
 		.optional()
 		.describe("Updated markdown content for overview.md file"),
+	spec: z
+		.string()
+		.nullable()
+		.optional()
+		.describe(
+			"Updated markdown content for spec.md file. Pass empty string or null to delete the spec file.",
+		),
 });
 
 // Schema for deleting an initiative

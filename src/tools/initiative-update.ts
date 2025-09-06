@@ -71,7 +71,7 @@ export function setupInitiativeUpdateTool(server: McpServer): void {
 		{
 			title: "Update Initiative",
 			description:
-				"Update an existing initiative by ID. All fields except ID are optional - only provided fields will be updated.",
+				"Update an existing initiative by ID. All fields except ID are optional - only provided fields will be updated. Pass empty string or null for spec to delete spec file.",
 			inputSchema: InitiativeUpdateSchema.shape,
 			annotations: {
 				readOnlyHint: false,

@@ -57,7 +57,7 @@ export function setupInitiativeCreateTool(server: McpServer): void {
 		{
 			title: "Create Initiative",
 			description:
-				"Create a new initiative with status 'new'. Each initiative gets its own folder with data.json for metadata and optional overview.md for content.",
+				"Create a new initiative with status 'new'. Can optionally create from existing backlog item (copies spec and deletes backlog). Each initiative gets its own folder with data.json for metadata, optional overview.md, and optional spec.md files.",
 			inputSchema: InitiativeCreateSchema.shape,
 			annotations: {
 				readOnlyHint: false,

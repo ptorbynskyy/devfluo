@@ -1,28 +1,8 @@
-# Initiative Create from backlog, spec - update, create, delete
-Add specification concept to initiative. Specification can be added to initiative in two ways. First way: create initiative by specifying backlog ID to create from. If backlog already has specification, copy it from backlog. When creating initiative from backlog, delete the backlog afterwards. Second way: if initiative was created without backlog or backlog had no specification, add specification by updating initiative. Update tool should optionally support specification content as Markdown text and save it to corresponding file. If empty value is explicitly passed (empty string or null), delete specification file from filesystem. Distinguish between cases when specification is not passed during update versus when it's passed as empty string or null - empty string or null means delete specification file.
-
- - extend create tool // bakclog item delete after create initative
- - extend update tool // update initiative spec data or delete it
- - List should also return spec flag (yes/no)
- - Single initiative resource template should return full initiative data in MD - id, name, status, overview and spec
-
-## Folder structure
-- root
-	- initiatives
-		- [initiative-id] // user-auth
-			- spec.md [optional]
-
-
------------------------
-
- - prompt for initiative brainstorming with create spec as result ***
-
------------------------
-
 # Tasks
 
 ## MCP
- -
+ - extend update tool // should get tasks CUD operations and handling them to create/update/delete tasks, like desitions or solutions or backlog items
+ - extend single initiative resource template and add task list informations with phases and statuses to it MD result
 
 ## tasks data
 	- id // t001
@@ -61,3 +41,8 @@ Add specification concept to initiative. Specification can be added to initiativ
 # Issues management
 
 # Copmlete Initiative
+
+
+-----------------------
+# Initiative brainstorming
+ - prompt for initiative brainstorming with create spec as result ***
