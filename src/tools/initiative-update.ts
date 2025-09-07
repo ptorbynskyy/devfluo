@@ -8,6 +8,7 @@ import {
 	InitiativeUpdateSchema,
 	updateInitiative,
 } from "../domain/initiative/index.js";
+import { processTaskOperations } from "../domain/initiative/tasks.js";
 
 export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 	try {
@@ -26,6 +27,40 @@ export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 		}
 		if (validatedInput.overview !== undefined) {
 			changes.push("overview content");
+		}
+
+		// Process task operations if provided
+		let taskResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
+		if (validatedInput.tasks) {
+			taskResults = await processTaskOperations(
+				validatedInput.id,
+				validatedInput.tasks,
+			);
+		}
+
+		// Add task changes to the changes list
+		if (
+			taskResults.insertCount > 0 ||
+			taskResults.updateCount > 0 ||
+			taskResults.deleteCount > 0
+		) {
+			const taskChanges: string[] = [];
+			if (taskResults.insertCount > 0) {
+				taskChanges.push(
+					`${taskResults.insertCount} task${taskResults.insertCount === 1 ? "" : "s"} created`,
+				);
+			}
+			if (taskResults.updateCount > 0) {
+				taskChanges.push(
+					`${taskResults.updateCount} task${taskResults.updateCount === 1 ? "" : "s"} updated`,
+				);
+			}
+			if (taskResults.deleteCount > 0) {
+				taskChanges.push(
+					`${taskResults.deleteCount} task${taskResults.deleteCount === 1 ? "" : "s"} deleted`,
+				);
+			}
+			changes.push(`tasks (${taskChanges.join(", ")})`);
 		}
 
 		const changesText =
@@ -50,7 +85,7 @@ export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 
 			throw new McpError(
 				ErrorCode.InvalidParams,
-				`Validation error: ${errorDetails}. Example: {"id": "user-auth", "name": "Updated User Authentication", "state": "inprogress", "overview": "# Updated Overview\\n\\nNew content..."}`,
+				`Validation error: ${errorDetails}. Example: {"id": "user-auth", "name": "Updated User Authentication", "state": "inprogress", "overview": "# Updated Overview\\n\\nNew content...", "tasks": {"create": [{"id": "t001", "name": "Setup auth", "description": "Configure OAuth", "effort": "L", "status": "new", "order": 1, "phase": 1}]}}`,
 			);
 		}
 
@@ -71,7 +106,7 @@ export function setupInitiativeUpdateTool(server: McpServer): void {
 		{
 			title: "Update Initiative",
 			description:
-				"Update an existing initiative by ID. All fields except ID are optional - only provided fields will be updated. Pass empty string or null for spec to delete spec file.",
+				"Update an existing initiative by ID. All fields except ID are optional - only provided fields will be updated. Pass empty string or null for spec to delete spec file. Use tasks field to create, update, or delete tasks within the initiative.",
 			inputSchema: InitiativeUpdateSchema.shape,
 			annotations: {
 				readOnlyHint: false,

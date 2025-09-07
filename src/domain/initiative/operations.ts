@@ -8,6 +8,7 @@ import {
 	getInitiativeOverviewPath,
 	getInitiativePath,
 	getInitiativeSpecPath,
+	getInitiativeTasksPath,
 	initiativePath,
 } from "./paths.js";
 import { saveInitiative } from "./persistence.js";
@@ -93,6 +94,7 @@ export async function deleteInitiative(id: string): Promise<void> {
 	const dataPath = getInitiativeDataPath(id);
 	const overviewPath = getInitiativeOverviewPath(id);
 	const specPath = getInitiativeSpecPath(id);
+	const tasksPath = getInitiativeTasksPath(id);
 
 	// Remove files if they exist
 	try {
@@ -111,6 +113,12 @@ export async function deleteInitiative(id: string): Promise<void> {
 		await unlink(specPath);
 	} catch {
 		// spec.md doesn't exist
+	}
+
+	try {
+		await unlink(tasksPath);
+	} catch {
+		// tasks.json doesn't exist
 	}
 
 	// Remove directory if it exists

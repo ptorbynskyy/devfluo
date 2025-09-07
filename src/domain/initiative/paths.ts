@@ -24,3 +24,8 @@ export function getInitiativeOverviewPath(id: string): string {
 export function getInitiativeSpecPath(id: string): string {
 	return path.join(getInitiativePath(id), "spec.md");
 }
+
+// Helper function to get tasks.json path for an initiative
+export function getInitiativeTasksPath(id: string): string {
+	return path.join(getInitiativePath(id), "tasks.json");
+}

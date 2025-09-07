@@ -1,6 +1,7 @@
 // ABOUTME: Zod schemas for validating initiative data structure
 
 import { z } from "zod";
+import { TaskOperationsSchema } from "./task-schema.js";
 
 // Initiative states
 export const InitiativeStates = ["new", "inprogress", "completed"] as const;
@@ -105,6 +106,9 @@ export const InitiativeUpdateSchema = z.object({
 		.describe(
 			"Updated markdown content for spec.md file. Pass empty string or null to delete the spec file.",
 		),
+	tasks: TaskOperationsSchema.optional().describe(
+		"Task operations to create, update or delete tasks within this initiative",
+	),
 });
 
 // Schema for deleting an initiative
