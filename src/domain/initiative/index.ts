@@ -1,5 +1,6 @@
 // ABOUTME: Main exports for initiative domain - barrel file for clean imports
 
+export * from "./generate-tasks-markdown-report.js";
 // Re-export loading functions
 export {
 	getInitiativeIds,
