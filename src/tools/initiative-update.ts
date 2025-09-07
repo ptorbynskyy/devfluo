@@ -8,6 +8,11 @@ import {
 	InitiativeUpdateSchema,
 	updateInitiative,
 } from "../domain/initiative/index.js";
+import {
+	processInitiativeDecisions,
+	processInitiativePatterns,
+	processInitiativeSolutions,
+} from "../domain/initiative/knowledge.js";
 import { processTaskOperations } from "../domain/initiative/tasks.js";
 
 export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
@@ -38,30 +43,74 @@ export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 			);
 		}
 
-		// Add task changes to the changes list
-		if (
-			taskResults.insertCount > 0 ||
-			taskResults.updateCount > 0 ||
-			taskResults.deleteCount > 0
-		) {
-			const taskChanges: string[] = [];
-			if (taskResults.insertCount > 0) {
-				taskChanges.push(
-					`${taskResults.insertCount} task${taskResults.insertCount === 1 ? "" : "s"} created`,
-				);
-			}
-			if (taskResults.updateCount > 0) {
-				taskChanges.push(
-					`${taskResults.updateCount} task${taskResults.updateCount === 1 ? "" : "s"} updated`,
-				);
-			}
-			if (taskResults.deleteCount > 0) {
-				taskChanges.push(
-					`${taskResults.deleteCount} task${taskResults.deleteCount === 1 ? "" : "s"} deleted`,
-				);
-			}
-			changes.push(`tasks (${taskChanges.join(", ")})`);
+		// Process decision operations if provided
+		let decisionResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
+		if (validatedInput.decisions) {
+			decisionResults = await processInitiativeDecisions(
+				validatedInput.id,
+				validatedInput.decisions,
+			);
 		}
+
+		// Process solution operations if provided
+		let solutionResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
+		if (validatedInput.solutions) {
+			solutionResults = await processInitiativeSolutions(
+				validatedInput.id,
+				validatedInput.solutions,
+			);
+		}
+
+		// Process pattern operations if provided
+		let patternResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
+		if (validatedInput.patterns) {
+			patternResults = await processInitiativePatterns(
+				validatedInput.id,
+				validatedInput.patterns,
+			);
+		}
+
+		// Helper function to format entity changes
+		function formatEntityChanges(
+			entityName: string,
+			results: {
+				insertCount: number;
+				updateCount: number;
+				deleteCount: number;
+			},
+		): string[] {
+			if (
+				results.insertCount === 0 &&
+				results.updateCount === 0 &&
+				results.deleteCount === 0
+			) {
+				return [];
+			}
+
+			const entityChanges: string[] = [];
+			if (results.insertCount > 0) {
+				entityChanges.push(
+					`${results.insertCount} ${entityName}${results.insertCount === 1 ? "" : "s"} created`,
+				);
+			}
+			if (results.updateCount > 0) {
+				entityChanges.push(
+					`${results.updateCount} ${entityName}${results.updateCount === 1 ? "" : "s"} updated`,
+				);
+			}
+			if (results.deleteCount > 0) {
+				entityChanges.push(
+					`${results.deleteCount} ${entityName}${results.deleteCount === 1 ? "" : "s"} deleted`,
+				);
+			}
+			return [`${entityName}s (${entityChanges.join(", ")})`];
+		}
+
+		// Add entity changes to the changes list
+		changes.push(...formatEntityChanges("task", taskResults));
+		changes.push(...formatEntityChanges("decision", decisionResults));
+		changes.push(...formatEntityChanges("solution", solutionResults));
+		changes.push(...formatEntityChanges("pattern", patternResults));
 
 		const changesText =
 			changes.length > 0 ? ` (updated: ${changes.join(", ")})` : "";
@@ -85,7 +134,7 @@ export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 
 			throw new McpError(
 				ErrorCode.InvalidParams,
-				`Validation error: ${errorDetails}. Example: {"id": "user-auth", "name": "Updated User Authentication", "state": "inprogress", "overview": "# Updated Overview\\n\\nNew content...", "tasks": {"create": [{"id": "t001", "name": "Setup auth", "description": "Configure OAuth", "effort": "L", "status": "new", "order": 1, "phase": 1}]}}`,
+				`Validation error: ${errorDetails}. Example: {"id": "user-auth", "name": "Updated User Authentication", "state": "inprogress", "overview": "# Updated Overview\\n\\nNew content...", "tasks": {"create": [{"id": "t001", "name": "Setup auth", "description": "Configure OAuth", "effort": "L", "status": "new", "order": 1, "phase": 1}]}, "decisions": {"create": [{"name": "auth-provider", "description": "Use OAuth2 for authentication", "tags": ["security"]}]}}`,
 			);
 		}
 
@@ -106,7 +155,7 @@ export function setupInitiativeUpdateTool(server: McpServer): void {
 		{
 			title: "Update Initiative",
 			description:
-				"Update an existing initiative by ID. All fields except ID are optional - only provided fields will be updated. Pass empty string or null for spec to delete spec file. Use tasks field to create, update, or delete tasks within the initiative.",
+				"Update an existing initiative by ID. All fields except ID are optional - only provided fields will be updated. Pass empty string or null for spec to delete spec file. Use tasks, decisions, solutions, and patterns fields to manage knowledge within the initiative.",
 			inputSchema: InitiativeUpdateSchema.shape,
 			annotations: {
 				readOnlyHint: false,

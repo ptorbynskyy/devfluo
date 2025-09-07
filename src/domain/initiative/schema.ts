@@ -1,6 +1,9 @@
 // ABOUTME: Zod schemas for validating initiative data structure
 
 import { z } from "zod";
+import { DecisionOperationsSchema } from "../decision-schema.js";
+import { PatternOperationsSchema } from "../pattern-schema.js";
+import { SolutionOperationsSchema } from "../solution-schema.js";
 import { TaskOperationsSchema } from "./task-schema.js";
 
 // Initiative states
@@ -108,6 +111,15 @@ export const InitiativeUpdateSchema = z.object({
 		),
 	tasks: TaskOperationsSchema.optional().describe(
 		"Task operations to create, update or delete tasks within this initiative",
+	),
+	decisions: DecisionOperationsSchema.optional().describe(
+		"Decision operations to create, update or delete decisions within this initiative",
+	),
+	solutions: SolutionOperationsSchema.optional().describe(
+		"Solution operations to create, update or delete solutions within this initiative",
+	),
+	patterns: PatternOperationsSchema.optional().describe(
+		"Pattern operations to create, update or delete patterns within this initiative",
 	),
 });
 

@@ -29,3 +29,33 @@ export function getInitiativeSpecPath(id: string): string {
 export function getInitiativeTasksPath(id: string): string {
 	return path.join(getInitiativePath(id), "tasks.json");
 }
+
+// Helper function to get decisions directory path for an initiative
+export function getInitiativeDecisionsPath(id: string): string {
+	return path.join(getInitiativePath(id), "decisions");
+}
+
+// Helper function to get decisions.json path for an initiative
+export function getInitiativeDecisionsJsonPath(id: string): string {
+	return path.join(getInitiativeDecisionsPath(id), "decisions.json");
+}
+
+// Helper function to get solutions directory path for an initiative
+export function getInitiativeSolutionsPath(id: string): string {
+	return path.join(getInitiativePath(id), "solutions");
+}
+
+// Helper function to get solutions.json path for an initiative
+export function getInitiativeSolutionsJsonPath(id: string): string {
+	return path.join(getInitiativeSolutionsPath(id), "solutions.json");
+}
+
+// Helper function to get patterns directory path for an initiative
+export function getInitiativePatternsPath(id: string): string {
+	return path.join(getInitiativePath(id), "patterns");
+}
+
+// Helper function to get patterns.json path for an initiative
+export function getInitiativePatternsJsonPath(id: string): string {
+	return path.join(getInitiativePatternsPath(id), "patterns.json");
+}

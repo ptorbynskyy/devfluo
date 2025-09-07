@@ -12,12 +12,10 @@ import {
 export const decisionsPath = path.join(baseKnowledgePath, "decisions");
 export const decisionsJsonPath = path.join(decisionsPath, "decisions.json");
 
-// const a = des
-
-export async function loadDecisions(): Promise<Decisions> {
+async function loadDecisionsFromPaths(jsonPath: string): Promise<Decisions> {
 	let decisionsContent: string;
 	try {
-		decisionsContent = await readFile(decisionsJsonPath, "utf-8");
+		decisionsContent = await readFile(jsonPath, "utf-8");
 	} catch (_error) {
 		// File doesn't exist
 		return [];
@@ -26,26 +24,40 @@ export async function loadDecisions(): Promise<Decisions> {
 	return DecisionStoreSchema.parse(JSON.parse(decisionsContent)).decisions;
 }
 
-async function saveDecisions(
+export async function loadDecisions(): Promise<Decisions> {
+	return loadDecisionsFromPaths(decisionsJsonPath);
+}
+
+async function saveDecisionsWithPaths(
 	decisionMap: Map<string, Decision>,
+	basePath: string,
+	jsonPath: string,
 ): Promise<void> {
-	await mkdir(decisionsPath, { recursive: true });
+	await mkdir(basePath, { recursive: true });
 	await writeFile(
-		decisionsJsonPath,
+		jsonPath,
 		JSON.stringify({ decisions: Array.from(decisionMap.values()) }, null, 2),
 		"utf-8",
 	);
 }
 
-export async function processDecisionOperations(
+export async function saveDecisions(
+	decisionMap: Map<string, Decision>,
+): Promise<void> {
+	return saveDecisionsWithPaths(decisionMap, decisionsPath, decisionsJsonPath);
+}
+
+export async function processDecisionOperationsWithPaths(
 	decisions: DecisionOperations,
+	basePath: string,
+	jsonPath: string,
 ): Promise<{
 	updateCount: number;
 	insertCount: number;
 	deleteCount: number;
 }> {
 	// Load existing decisions
-	const existingDecisions: Decisions = await loadDecisions();
+	const existingDecisions: Decisions = await loadDecisionsFromPaths(jsonPath);
 
 	// Convert array to map for easier operations
 	const decisionMap = new Map<string, Decision>();
@@ -109,11 +121,25 @@ export async function processDecisionOperations(
 	}
 
 	// Convert back to array and save
-	await saveDecisions(decisionMap);
+	await saveDecisionsWithPaths(decisionMap, basePath, jsonPath);
 
 	return {
 		updateCount,
 		insertCount,
 		deleteCount,
 	};
+}
+
+export async function processDecisionOperations(
+	decisions: DecisionOperations,
+): Promise<{
+	updateCount: number;
+	insertCount: number;
+	deleteCount: number;
+}> {
+	return processDecisionOperationsWithPaths(
+		decisions,
+		decisionsPath,
+		decisionsJsonPath,
+	);
 }

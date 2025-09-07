@@ -14,10 +14,10 @@ import {
 export const solutionsPath = path.join(baseKnowledgePath, "solutions");
 export const solutionsJsonPath = path.join(solutionsPath, "solutions.json");
 
-export async function loadSolutions(): Promise<Solutions> {
+async function loadSolutionsFromPaths(jsonPath: string): Promise<Solutions> {
 	let solutionsContent: string;
 	try {
-		solutionsContent = await readFile(solutionsJsonPath, "utf-8");
+		solutionsContent = await readFile(jsonPath, "utf-8");
 	} catch (_error) {
 		// File doesn't exist
 		return [];
@@ -26,17 +26,29 @@ export async function loadSolutions(): Promise<Solutions> {
 	return SolutionStoreSchema.parse(JSON.parse(solutionsContent)).solutions;
 }
 
-async function saveSolutions(
+export async function loadSolutions(): Promise<Solutions> {
+	return loadSolutionsFromPaths(solutionsJsonPath);
+}
+
+async function saveSolutionsWithPaths(
 	solutionMap: Map<string, Solution>,
+	basePath: string,
+	jsonPath: string,
 ): Promise<void> {
 	// Ensure solutions directory exists
-	await mkdir(solutionsPath, { recursive: true });
+	await mkdir(basePath, { recursive: true });
 
 	await writeFile(
-		solutionsJsonPath,
+		jsonPath,
 		JSON.stringify({ solutions: Array.from(solutionMap.values()) }, null, 2),
 		"utf-8",
 	);
+}
+
+export async function saveSolutions(
+	solutionMap: Map<string, Solution>,
+): Promise<void> {
+	return saveSolutionsWithPaths(solutionMap, solutionsPath, solutionsJsonPath);
 }
 
 function getSolutionKey(solution: Solution): string {
@@ -44,18 +56,20 @@ function getSolutionKey(solution: Solution): string {
 	return solution.problem.toLowerCase().replace(/[^a-z0-9]/g, "-");
 }
 
-export async function processSolutionOperations(
+export async function processSolutionOperationsWithPaths(
 	solutions: SolutionOperations,
+	basePath: string,
+	jsonPath: string,
 ): Promise<{
 	updateCount: number;
 	insertCount: number;
 	deleteCount: number;
 }> {
 	// Ensure solutions directory exists before any file operations
-	await mkdir(solutionsPath, { recursive: true });
+	await mkdir(basePath, { recursive: true });
 
 	// Load existing solutions
-	const existingSolutions: Solutions = await loadSolutions();
+	const existingSolutions: Solutions = await loadSolutionsFromPaths(jsonPath);
 
 	// Convert array to map for easier operations
 	const solutionMap = new Map<string, Solution>();
@@ -124,11 +138,25 @@ export async function processSolutionOperations(
 	}
 
 	// Convert back to array and save
-	await saveSolutions(solutionMap);
+	await saveSolutionsWithPaths(solutionMap, basePath, jsonPath);
 
 	return {
 		updateCount,
 		insertCount,
 		deleteCount,
 	};
+}
+
+export async function processSolutionOperations(
+	solutions: SolutionOperations,
+): Promise<{
+	updateCount: number;
+	insertCount: number;
+	deleteCount: number;
+}> {
+	return processSolutionOperationsWithPaths(
+		solutions,
+		solutionsPath,
+		solutionsJsonPath,
+	);
 }

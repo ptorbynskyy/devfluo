@@ -14,10 +14,10 @@ import {
 export const patternsPath = path.join(baseKnowledgePath, "patterns");
 export const patternsJsonPath = path.join(patternsPath, "patterns.json");
 
-export async function loadPatterns(): Promise<Patterns> {
+async function loadPatternsFromPaths(jsonPath: string): Promise<Patterns> {
 	let patternsContent: string;
 	try {
-		patternsContent = await readFile(patternsJsonPath, "utf-8");
+		patternsContent = await readFile(jsonPath, "utf-8");
 	} catch (_error) {
 		// File doesn't exist
 		return [];
@@ -26,29 +26,45 @@ export async function loadPatterns(): Promise<Patterns> {
 	return PatternStoreSchema.parse(JSON.parse(patternsContent)).patterns;
 }
 
-async function savePatterns(patternMap: Map<string, Pattern>): Promise<void> {
+export async function loadPatterns(): Promise<Patterns> {
+	return loadPatternsFromPaths(patternsJsonPath);
+}
+
+async function savePatternsWithPaths(
+	patternMap: Map<string, Pattern>,
+	basePath: string,
+	jsonPath: string,
+): Promise<void> {
 	// Ensure patterns directory exists
-	await mkdir(patternsPath, { recursive: true });
+	await mkdir(basePath, { recursive: true });
 
 	await writeFile(
-		patternsJsonPath,
+		jsonPath,
 		JSON.stringify({ patterns: Array.from(patternMap.values()) }, null, 2),
 		"utf-8",
 	);
 }
 
-export async function processPatternOperations(
+export async function savePatterns(
+	patternMap: Map<string, Pattern>,
+): Promise<void> {
+	return savePatternsWithPaths(patternMap, patternsPath, patternsJsonPath);
+}
+
+export async function processPatternOperationsWithPaths(
 	patterns: PatternOperations,
+	basePath: string,
+	jsonPath: string,
 ): Promise<{
 	updateCount: number;
 	insertCount: number;
 	deleteCount: number;
 }> {
 	// Ensure patterns directory exists before any file operations
-	await mkdir(patternsPath, { recursive: true });
+	await mkdir(basePath, { recursive: true });
 
 	// Load existing patterns
-	const existingPatterns: Patterns = await loadPatterns();
+	const existingPatterns: Patterns = await loadPatternsFromPaths(jsonPath);
 
 	// Convert array to map for easier operations
 	const patternMap = new Map<string, Pattern>();
@@ -68,10 +84,7 @@ export async function processPatternOperations(
 			const validatedPattern = PatternSchema.parse(patternData);
 
 			// Save snippet content to file
-			const snippetPath = path.join(
-				patternsPath,
-				validatedPattern.snippetFilename,
-			);
+			const snippetPath = path.join(basePath, validatedPattern.snippetFilename);
 			await writeFile(snippetPath, snippetContent, "utf-8");
 
 			if (patternMap.has(validatedPattern.name)) {
@@ -111,11 +124,11 @@ export async function processPatternOperations(
 				const filenameChanged =
 					validatedPattern.snippetFilename !== existingPattern.snippetFilename;
 				const oldSnippetPath = path.join(
-					patternsPath,
+					basePath,
 					existingPattern.snippetFilename,
 				);
 				const newSnippetPath = path.join(
-					patternsPath,
+					basePath,
 					validatedPattern.snippetFilename,
 				);
 
@@ -162,11 +175,25 @@ export async function processPatternOperations(
 	}
 
 	// Convert back to array and save
-	await savePatterns(patternMap);
+	await savePatternsWithPaths(patternMap, basePath, jsonPath);
 
 	return {
 		updateCount,
 		insertCount,
 		deleteCount,
 	};
+}
+
+export async function processPatternOperations(
+	patterns: PatternOperations,
+): Promise<{
+	updateCount: number;
+	insertCount: number;
+	deleteCount: number;
+}> {
+	return processPatternOperationsWithPaths(
+		patterns,
+		patternsPath,
+		patternsJsonPath,
+	);
 }

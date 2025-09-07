@@ -1,27 +1,23 @@
-# Initiative knowledge
-## MCP
-### Tools
- - extend update initative tool with correspondent operations
-### Resources
+# Issues management
 
-## Folder structure
-- root
-	- initiatives
-		- [initiative-id] // user-auth
-			- decisions [optional]
-				decisions.json // same as global decistions but produced by the initiative
-			- solutions [optional]
-				- solutions.json // same as global solutions but were born within initative
-			- patterns [optional]
-				- patterns.json // same as global patterns but were born within initative
-				- [some-pattern-snipet]
+# Get initiative context (for task(s) - phase)
+  	- global context
+   		- decisions, solutions, patterns (filter by tags)
+	    - arhitecture.md
+	    - codebase.md
+    - initative context
+    	- overview.md
+    	- name
+    	- spec.md
+        - desitions, solutions, patterns (filter by tags)
+    - tasks
+
 
 # Prompt to complete initiative
  - check
  - get knoaladge ??
  - update state
 
-# Issues management
 
 # Copmlete Initiative
  - prompt ....
@@ -46,3 +42,6 @@
 
 ## Output
  - Created tasks list -> update_initiative
+
+---
+# Session end - collect knowledge
