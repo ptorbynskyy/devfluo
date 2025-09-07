@@ -5,6 +5,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "./config.js";
+import { setupBacklogSpecificationPrompt } from "./prompts/backlog-specification.js";
 import {
 	setupBugReportPrompt,
 	setupCodeReviewPrompt,
@@ -60,6 +61,7 @@ async function runServer(): Promise<void> {
 	setupIssueManagementTool(server);
 	setupCodeReviewPrompt(server);
 	setupBugReportPrompt(server);
+	setupBacklogSpecificationPrompt(server);
 
 	const transport = new StdioServerTransport();
 	await server.connect(transport);
