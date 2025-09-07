@@ -59,3 +59,24 @@ export function getInitiativePatternsPath(id: string): string {
 export function getInitiativePatternsJsonPath(id: string): string {
 	return path.join(getInitiativePatternsPath(id), "patterns.json");
 }
+
+// Helper function to get issues directory path for an initiative
+export function getInitiativeIssuesPath(id: string): string {
+	return path.join(getInitiativePath(id), "issues");
+}
+
+// Helper function to get specific issue directory path
+export function getIssueDataPath(
+	initiativeId: string,
+	issueId: string,
+): string {
+	return path.join(getInitiativeIssuesPath(initiativeId), issueId, "data.json");
+}
+
+// Helper function to get issue directory path
+export function getIssueDirectoryPath(
+	initiativeId: string,
+	issueId: string,
+): string {
+	return path.join(getInitiativeIssuesPath(initiativeId), issueId);
+}

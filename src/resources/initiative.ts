@@ -9,6 +9,11 @@ import {
 	loadInitiative,
 	loadInitiatives,
 } from "../domain/initiative/index.js";
+import {
+	getIssueIds,
+	loadIssue,
+	loadIssues,
+} from "../domain/initiative/issues.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
 
 export function setupInitiativeResources(server: McpServer): void {
@@ -162,6 +167,184 @@ export function setupInitiativeResources(server: McpServer): void {
 				throw new McpError(
 					ErrorCode.InvalidRequest,
 					`Failed to read initiative '${id}': ${error instanceof Error ? error.message : "Unknown error"}`,
+				);
+			}
+		},
+	);
+
+	// ResourceTemplate: List issues for an initiative
+	server.registerResource(
+		"initiative-issues",
+		new ResourceTemplate("project://initiative/issues/{initiativeId}", {
+			list: async () => {
+				try {
+					const initiativeIds = await getInitiativeIds();
+					return {
+						resources: initiativeIds.map((id) => ({
+							name: `initiative-issues-${id}`,
+							uri: `project://initiative/issues/${id}`,
+							title: `Issues for Initiative: ${id}`,
+							description: `List of issues for initiative with ID: ${id}`,
+							mimeType: "application/json",
+						})),
+					};
+				} catch (error) {
+					console.error("Error listing initiatives for issues", error);
+					return { resources: [] };
+				}
+			},
+			complete: {
+				initiativeId: async (value) => {
+					try {
+						const initiativeIds = await getInitiativeIds();
+						return initiativeIds.filter((id) => id.startsWith(value || ""));
+					} catch (error) {
+						console.error("Error fetching initiative IDs for issues", error);
+						return [];
+					}
+				},
+			},
+		}),
+		{
+			title: "Initiative Issues",
+			description: "List of all issues for a specific initiative",
+			mimeType: "application/json",
+		},
+		async (uri: URL, variables) => {
+			const initiativeId = variables.initiativeId;
+			if (typeof initiativeId !== "string") {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					"Invalid or missing initiativeId parameter",
+				);
+			}
+
+			try {
+				const issues = await loadIssues(initiativeId);
+
+				return {
+					contents: [
+						{
+							uri: uri.href,
+							mimeType: "application/json",
+							text: JSON.stringify(issues, null, 2),
+						},
+					],
+				};
+			} catch (error) {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					`Failed to read issues for initiative '${initiativeId}': ${error instanceof Error ? error.message : "Unknown error"}`,
+				);
+			}
+		},
+	);
+
+	// ResourceTemplate: Specific issue within an initiative
+	server.registerResource(
+		"initiative-issue",
+		new ResourceTemplate(
+			"project://initiative/issues/{initiativeId}/{issueId}",
+			{
+				list: async () => {
+					try {
+						const initiativeIds = await getInitiativeIds();
+						const resources = [];
+
+						for (const initiativeId of initiativeIds) {
+							const issueIds = await getIssueIds(initiativeId);
+							for (const issueId of issueIds) {
+								resources.push({
+									name: `initiative-issue-${initiativeId}-${issueId}`,
+									uri: `project://initiative/issues/${initiativeId}/${issueId}`,
+									title: `Issue: ${issueId} (Initiative: ${initiativeId})`,
+									description: `Individual issue with ID: ${issueId} in initiative: ${initiativeId}`,
+									mimeType: "application/json",
+								});
+							}
+						}
+
+						return { resources };
+					} catch (error) {
+						console.error("Error listing issues", error);
+						return { resources: [] };
+					}
+				},
+				complete: {
+					initiativeId: async (value) => {
+						try {
+							const initiativeIds = await getInitiativeIds();
+							return initiativeIds.filter((id) => id.startsWith(value || ""));
+						} catch (error) {
+							console.error("Error fetching initiative IDs for issue", error);
+							return [];
+						}
+					},
+					issueId: async (value, context) => {
+						try {
+							const initiativeId = context?.arguments?.initiativeId;
+							if (typeof initiativeId !== "string") {
+								return [];
+							}
+							const issueIds = await getIssueIds(initiativeId);
+							return issueIds.filter((id) => id.startsWith(value || ""));
+						} catch (error) {
+							console.error("Error fetching issue IDs", error);
+							return [];
+						}
+					},
+				},
+			},
+		),
+		{
+			title: "Initiative Issue",
+			description: "Individual issue within an initiative with full details",
+			mimeType: "application/json",
+		},
+		async (uri: URL, variables) => {
+			const initiativeId = variables.initiativeId;
+			const issueId = variables.issueId;
+
+			if (typeof initiativeId !== "string") {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					"Invalid or missing initiativeId parameter",
+				);
+			}
+
+			if (typeof issueId !== "string") {
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					"Invalid or missing issueId parameter",
+				);
+			}
+
+			try {
+				const issue = await loadIssue(initiativeId, issueId);
+
+				if (!issue) {
+					throw new McpError(
+						ErrorCode.InvalidRequest,
+						`Issue '${issueId}' not found in initiative '${initiativeId}'`,
+					);
+				}
+
+				return {
+					contents: [
+						{
+							uri: uri.href,
+							mimeType: "application/json",
+							text: JSON.stringify(issue, null, 2),
+						},
+					],
+				};
+			} catch (error) {
+				if (error instanceof McpError) {
+					throw error;
+				}
+				throw new McpError(
+					ErrorCode.InvalidRequest,
+					`Failed to read issue '${issueId}' in initiative '${initiativeId}': ${error instanceof Error ? error.message : "Unknown error"}`,
 				);
 			}
 		},

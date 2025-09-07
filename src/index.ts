@@ -19,6 +19,7 @@ import { setupBacklogManagementTool } from "./tools/backlog-management.js";
 import { setupInitiativeCreateTool } from "./tools/initiative-create.js";
 import { setupInitiativeDeleteTool } from "./tools/initiative-delete.js";
 import { setupInitiativeUpdateTool } from "./tools/initiative-update.js";
+import { setupIssueManagementTool } from "./tools/issue-management.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
 
@@ -56,6 +57,7 @@ async function runServer(): Promise<void> {
 	setupInitiativeCreateTool(server);
 	setupInitiativeUpdateTool(server);
 	setupInitiativeDeleteTool(server);
+	setupIssueManagementTool(server);
 	setupCodeReviewPrompt(server);
 	setupBugReportPrompt(server);
 
