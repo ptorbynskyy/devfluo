@@ -141,7 +141,7 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 	server.registerPrompt(
 		"backlog_specification",
 		{
-			title: "Create Backlog Item Specification",
+			title: "create-backlog-item-specification",
 			description:
 				"Generate a comprehensive specification for a backlog item through guided brainstorming",
 			argsSchema: {

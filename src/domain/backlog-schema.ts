@@ -52,7 +52,7 @@ export const BacklogOperationsSchema = z.object({
 				spec: z
 					.string()
 					.optional()
-					.describe("Optional markdown content for spec.md file"),
+					.describe("Optional markdown content for spec.md file. User should provide the content directly."),
 			}),
 		)
 		.optional()
@@ -68,7 +68,7 @@ export const BacklogOperationsSchema = z.object({
 					spec: z
 						.string()
 						.optional()
-						.describe("Optional markdown content for spec.md file"),
+						.describe("Optional markdown content for spec.md file. Provide directly by user or produced by brainstorming flow."),
 				}),
 		)
 		.optional()
