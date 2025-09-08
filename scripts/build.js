@@ -6,31 +6,45 @@ import fs from "node:fs";
 import path from "node:path";
 
 const buildFilePath = path.join(process.cwd(), "build", "index.js");
-const templatesSourceDir = path.join(process.cwd(), "src", "templates");
-const templatesBuildDir = path.join(process.cwd(), "build", "templates");
+
+// Template categories configuration
+const templateCategories = [
+	{
+		name: "markdown templates",
+		sourceDir: path.join(process.cwd(), "src", "templates"),
+		buildDir: path.join(process.cwd(), "build", "templates"),
+	},
+	{
+		name: "prompt templates",
+		sourceDir: path.join(process.cwd(), "src", "prompts", "templates"),
+		buildDir: path.join(process.cwd(), "build", "prompts", "templates"),
+	},
+];
 
 try {
 	// Make the built file executable
 	fs.chmodSync(buildFilePath, "755");
 	console.log("✓ Index.js made executable");
 
-	// Copy template files to build directory
-	if (fs.existsSync(templatesSourceDir)) {
-		// Create templates directory in build
-		fs.mkdirSync(templatesBuildDir, { recursive: true });
+	// Copy template files for both categories
+	for (const category of templateCategories) {
+		if (fs.existsSync(category.sourceDir)) {
+			// Create templates directory in build
+			fs.mkdirSync(category.buildDir, { recursive: true });
 
-		// Read all files in templates directory
-		const templateFiles = fs.readdirSync(templatesSourceDir);
+			// Read all files in templates directory
+			const templateFiles = fs.readdirSync(category.sourceDir);
 
-		for (const file of templateFiles) {
-			const sourcePath = path.join(templatesSourceDir, file);
-			const destPath = path.join(templatesBuildDir, file);
-			fs.copyFileSync(sourcePath, destPath);
+			for (const file of templateFiles) {
+				const sourcePath = path.join(category.sourceDir, file);
+				const destPath = path.join(category.buildDir, file);
+				fs.copyFileSync(sourcePath, destPath);
+			}
+
+			console.log(
+				`✓ Copied ${templateFiles.length} ${category.name} to build directory`,
+			);
 		}
-
-		console.log(
-			`✓ Copied ${templateFiles.length} template files to build directory`,
-		);
 	}
 
 	console.log("✓ Build completed successfully");

@@ -1,6 +1,7 @@
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { config } from "../config.js";
+import { getMarkdownTemplatePath } from "../utils/template-paths.js";
 
 export const baseKnowledgePath = path.join(config.PROJECT_ROOT, "base");
 const codebasePath = path.join(baseKnowledgePath, "codebase.md");
@@ -52,19 +53,12 @@ export async function init(): Promise<{
 	await mkdir(baseKnowledgePath, { recursive: true });
 
 	// Read template files
-	const templatesDir = path.join(
-		path.dirname(new URL(import.meta.url).pathname),
-		"..",
-		"..",
-		"build",
-		"templates",
-	);
 	const architectureTemplate = await readFile(
-		path.join(templatesDir, "architecture-template.md"),
+		getMarkdownTemplatePath("architecture-template.md"),
 		"utf-8",
 	);
 	const codebaseTemplate = await readFile(
-		path.join(templatesDir, "codebase-template.md"),
+		getMarkdownTemplatePath("codebase-template.md"),
 		"utf-8",
 	);
 

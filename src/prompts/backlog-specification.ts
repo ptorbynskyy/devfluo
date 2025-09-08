@@ -11,6 +11,7 @@ import { loadPatterns } from "../domain/patterns.js";
 import type { Solution } from "../domain/solution-schema.js";
 import { loadSolutions } from "../domain/solutions.js";
 import { getProjectKnowledge } from "../resources/knowledge.js";
+import { renderTemplateFile } from "../utils/template-engine.js";
 
 export async function validateBacklogItemForSpec(backlogItemId: string) {
 	const item = await loadBacklogItem(backlogItemId);
@@ -48,7 +49,7 @@ export async function loadProjectContext() {
 	};
 }
 
-export function generateBacklogSpecificationPrompt(
+export async function generateBacklogSpecificationPrompt(
 	backlogItem: {
 		id: string;
 		name: string;
@@ -61,80 +62,11 @@ export function generateBacklogSpecificationPrompt(
 		solutions: Solution[];
 		patterns: Pattern[];
 	},
-): string {
-	const effortSection = backlogItem.effort
-		? `**Effort Estimate:** ${backlogItem.effort}\n\n`
-		: "";
-
-	const decisionsSection =
-		context.decisions.length > 0
-			? `## Project Decisions\n${context.decisions.map((d) => `- **${d.name}**: ${d.description}`).join("\n")}\n\n`
-			: "";
-
-	const solutionsSection =
-		context.solutions.length > 0
-			? `## Project Solutions\n${context.solutions.map((s) => `- **${s.problem}**: ${s.solution}`).join("\n")}\n\n`
-			: "";
-
-	const patternsSection =
-		context.patterns.length > 0
-			? `## Project Patterns\n${context.patterns.map((p) => `- **${p.name}**: ${p.description}`).join("\n")}\n\n`
-			: "";
-
-	return `# Create Specification for Backlog Item: ${backlogItem.name}
-
-You are helping create a detailed specification for the following backlog item:
-
-**ID:** ${backlogItem.id}
-**Name:** ${backlogItem.name}
-**Description:** ${backlogItem.description}
-${effortSection}
-
-## Project Context
-
-${context.knowledge}
-
-${decisionsSection}${solutionsSection}${patternsSection}
-
-## Your Task
-
-Please conduct a comprehensive brainstorming session to create a detailed specification for this backlog item. Ask clarifying questions to gather all necessary information, then generate a complete specification document.
-
-### Specification Structure
-
-The final specification should be a markdown document with the following sections:
-
-1. **Overview** - Brief summary of what this item accomplishes
-2. **Requirements** - Detailed functional and non-functional requirements
-3. **Acceptance Criteria** - Clear, testable criteria for completion
-4. **Technical Considerations** - Architecture, dependencies, constraints
-5. **Implementation Notes** - Specific guidance for developers
-6. **Testing Strategy** - How this feature should be tested
-7. **Documentation Needs** - What documentation should be updated
-
-### Brainstorming Process
-
-Start by asking relevant questions about:
-- User needs and use cases
-- Technical requirements and constraints
-- Integration points with existing systems
-- Performance and scalability considerations
-- Security and compliance requirements
-- User experience and interface requirements
-
-Continue the conversation until you have enough information to create a comprehensive specification. When ready, generate the complete markdown specification and suggest using the backlog_management tool to save it:
-
-\`\`\`json
-{
-  "update": {
-    "${backlogItem.id}": {
-      "spec": "[Generated specification content here]"
-    }
-  }
-}
-\`\`\`
-
-Let's begin the brainstorming session for "${backlogItem.name}". What questions do you have about this backlog item?`;
+): Promise<string> {
+	return await renderTemplateFile("backlog-specification.eta", {
+		backlogItem,
+		context,
+	});
 }
 
 export function setupBacklogSpecificationPrompt(server: McpServer): void {
@@ -164,7 +96,7 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 				const context = await loadProjectContext();
 
 				// Generate the prompt
-				const promptText = generateBacklogSpecificationPrompt(
+				const promptText = await generateBacklogSpecificationPrompt(
 					backlogItem,
 					context,
 				);

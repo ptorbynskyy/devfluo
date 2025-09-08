@@ -1,0 +1,68 @@
+# Create Specification for Backlog Item: <%= it.backlogItem.name %>
+
+You are helping create a detailed specification for the following backlog item:
+
+**ID:** <%= it.backlogItem.id %>
+**Name:** <%= it.backlogItem.name %>
+**Description:** <%= it.backlogItem.description %>
+<% if (it.backlogItem.effort) { %>**Effort Estimate:** <%= it.backlogItem.effort %>
+
+<% } %>
+
+## Project Context
+
+<%= it.context.knowledge %>
+
+<% if (it.context.decisions.length > 0) { %>## Project Decisions
+<% it.context.decisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
+<% }); %>
+
+<% } %><% if (it.context.solutions.length > 0) { %>## Project Solutions
+<% it.context.solutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
+<% }); %>
+
+<% } %><% if (it.context.patterns.length > 0) { %>## Project Patterns
+<% it.context.patterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
+<% }); %>
+
+<% } %>
+
+## Your Task
+
+Please conduct a comprehensive brainstorming session to create a detailed specification for this backlog item. Ask clarifying questions to gather all necessary information, then generate a complete specification document.
+
+### Specification Structure
+
+The final specification should be a markdown document with the following sections:
+
+1. **Overview** - Brief summary of what this item accomplishes
+2. **Requirements** - Detailed functional and non-functional requirements
+3. **Acceptance Criteria** - Clear, testable criteria for completion
+4. **Technical Considerations** - Architecture, dependencies, constraints
+5. **Implementation Notes** - Specific guidance for developers
+6. **Testing Strategy** - How this feature should be tested
+7. **Documentation Needs** - What documentation should be updated
+
+### Brainstorming Process
+
+Start by asking relevant questions about:
+- User needs and use cases
+- Technical requirements and constraints
+- Integration points with existing systems
+- Performance and scalability considerations
+- Security and compliance requirements
+- User experience and interface requirements
+
+Continue the conversation until you have enough information to create a comprehensive specification. When ready, generate the complete markdown specification and suggest using the backlog_management tool to save it:
+
+```json
+{
+  "update": {
+    "<%= it.backlogItem.id %>": {
+      "spec": "[Generated specification content here]"
+    }
+  }
+}
+```
+
+Let's begin the brainstorming session for "<%= it.backlogItem.name %>". What questions do you have about this backlog item?
