@@ -3,7 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { loadBacklogItem } from "../domain/backlog.js";
+import { loadBacklogItem, loadBacklogItems } from "../domain/backlog.js";
 import type { Decision } from "../domain/decision-schema.js";
 import { loadDecisions } from "../domain/decisions.js";
 import type { Pattern } from "../domain/pattern-schema.js";
@@ -12,6 +12,7 @@ import type { Solution } from "../domain/solution-schema.js";
 import { loadSolutions } from "../domain/solutions.js";
 import { getProjectKnowledge } from "../resources/knowledge.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
+import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 
 export async function validateBacklogItemForSpec(backlogItemId: string) {
 	const item = await loadBacklogItem(backlogItemId);
@@ -77,14 +78,27 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 			description:
 				"Generate a comprehensive specification for a backlog item through guided brainstorming",
 			argsSchema: {
-				backlogItemId: z
-					.string()
-					.regex(
-						/^[a-z0-9-]+$/,
-						"ID must contain only lowercase letters, numbers, and hyphens",
-					)
-					.min(1)
-					.describe("ID of the backlog item to create a specification for"),
+				backlogItemId: completable(
+					z
+						.string()
+						.regex(
+							/^[a-z0-9-]+$/,
+							"ID must contain only lowercase letters, numbers, and hyphens",
+						)
+						.min(1)
+						.describe("ID of the backlog item to create a specification for"),
+					async (backlogItemId): Promise<string[]> => {
+						const items = await loadBacklogItems();
+						if (!backlogItemId) {
+							return items.map((item) => item.id);
+						}
+
+						const existingIds = items
+							.map((item) => item.id)
+							.filter((id) => id.startsWith(backlogItemId));
+						return existingIds;
+					},
+				),
 			},
 		},
 		async ({ backlogItemId }: { backlogItemId: string }) => {
