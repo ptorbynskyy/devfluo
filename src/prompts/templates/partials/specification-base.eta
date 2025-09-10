@@ -1,0 +1,31 @@
+## Your Task
+
+Please conduct a comprehensive brainstorming session to create a detailed specification for this <%= it.entityType %>. Ask clarifying questions one by one to gather all necessary information, then generate a complete specification document.
+
+### Specification Structure
+
+The final specification should be a markdown document with the following sections:
+
+1. **Overview** - Brief summary of what this <%= it.entityType %> accomplishes
+2. **Requirements** - Detailed functional and non-functional requirements
+3. **Acceptance Criteria** - Clear, testable criteria for completion
+4. **Technical Considerations** - Architecture, dependencies, constraints
+5. **Implementation Notes** - Specific guidance for developers
+
+### Brainstorming Process
+
+Start by asking relevant questions about:
+- User needs and use cases
+- Technical requirements and constraints
+- Integration points with existing systems
+- Performance and scalability considerations
+- Security and compliance requirements
+- User experience and interface requirements
+
+Continue the conversation until you have enough information to create a comprehensive specification. When ready, generate the complete markdown specification and suggest using the <%= it.toolName %> tool to save it:
+
+```json
+<%= it.toolExample %>
+```
+
+Let's begin the brainstorming session for "<%= it.entityName %>". What questions do you have about this <%= it.entityType %>?

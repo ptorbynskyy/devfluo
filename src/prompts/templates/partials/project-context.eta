@@ -1,0 +1,23 @@
+## Project Context
+### Resources
+ - Architecture - project://knowledge/architecture
+ - Codebase - project://knowledge/codebase
+ - Desition - project://decisions/item/{name}
+ - Solution - project://solutions/item/{key}
+ - Pattern - project://patterns/item/{name}
+
+<%= it.context.knowledge %>
+
+<% if (it.context.decisions.length > 0) { %>## Project Decisions
+<% it.context.decisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
+<% }); %>
+
+<% } %><% if (it.context.solutions.length > 0) { %>## Project Solutions
+<% it.context.solutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
+<% }); %>
+
+<% } %><% if (it.context.patterns.length > 0) { %>## Project Patterns
+<% it.context.patterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
+<% }); %>
+
+<% } %>

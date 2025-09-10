@@ -9,64 +9,18 @@ You are helping create a detailed specification for the following backlog item:
 
 <% } %>
 
-## Project Context
-### Resources
- - Architecture - project://knowledge/architecture
- - Codebase - project://knowledge/codebase
- - Desition - project://decisions/item/{name}
- - Solution - project://solutions/item/{key}
- - Pattern - project://patterns/item/{name}
+<%~ include('partials/project-context', it) %>
 
-<%= it.context.knowledge %>
-
-<% if (it.context.decisions.length > 0) { %>## Project Decisions
-<% it.context.decisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
-<% }); %>
-
-<% } %><% if (it.context.solutions.length > 0) { %>## Project Solutions
-<% it.context.solutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
-<% }); %>
-
-<% } %><% if (it.context.patterns.length > 0) { %>## Project Patterns
-<% it.context.patterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
-<% }); %>
-
-<% } %>
-
-## Your Task
-
-Please conduct a comprehensive brainstorming session to create a detailed specification for this backlog item. Ask clarifying questions one by one to gather all necessary information, then generate a complete specification document.
-
-### Specification Structure
-
-The final specification should be a markdown document with the following sections:
-
-1. **Overview** - Brief summary of what this item accomplishes
-2. **Requirements** - Detailed functional and non-functional requirements
-3. **Acceptance Criteria** - Clear, testable criteria for completion
-4. **Technical Considerations** - Architecture, dependencies, constraints
-5. **Implementation Notes** - Specific guidance for developers
-
-### Brainstorming Process
-
-Start by asking relevant questions about:
-- User needs and use cases
-- Technical requirements and constraints
-- Integration points with existing systems
-- Performance and scalability considerations
-- Security and compliance requirements
-- User experience and interface requirements
-
-Continue the conversation until you have enough information to create a comprehensive specification. When ready, generate the complete markdown specification and suggest using the backlog_management tool to save it:
-
-```json
-{
-  "update": {
-    "<%= it.backlogItem.id %>": {
-      "spec": "[Generated specification content here]"
-    }
-  }
-}
-```
-
-Let's begin the brainstorming session for "<%= it.backlogItem.name %>". What questions do you have about this backlog item?
+<%~ include('partials/specification-base', {
+	entityType: 'backlog item',
+	entityName: it.backlogItem.name,
+	toolName: 'backlog_management',
+	toolExample: JSON.stringify({
+		"update": {
+			[it.backlogItem.id]: {
+				"spec": "[Generated specification content here]"
+			}
+		}
+	}, null, 2),
+	context: it.context
+}) %>

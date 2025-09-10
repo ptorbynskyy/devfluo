@@ -2,23 +2,17 @@
 
 import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-	ErrorCode,
-	McpError,
-} from "@modelcontextprotocol/sdk/types.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import type { Decision } from "../domain/decision-schema.js";
-import { loadDecisions } from "../domain/decisions.js";
 import {
 	getInitiativeIds,
 	loadInitiative,
 } from "../domain/initiative/index.js";
-import type { Pattern } from "../domain/pattern-schema.js";
-import { loadPatterns } from "../domain/patterns.js";
-import type { Solution } from "../domain/solution-schema.js";
-import { loadSolutions } from "../domain/solutions.js";
-import { getProjectKnowledge } from "../resources/knowledge.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
+import {
+	loadProjectContext,
+	type ProjectContext,
+} from "./shared/project-context.js";
 
 export async function validateInitiativeForSpec(initiativeId: string) {
 	const initiative = await loadInitiative(initiativeId);
@@ -40,34 +34,13 @@ export async function validateInitiativeForSpec(initiativeId: string) {
 	return initiative;
 }
 
-export async function loadProjectContext() {
-	const [knowledge, decisions, solutions, patterns] = await Promise.all([
-		getProjectKnowledge(),
-		loadDecisions(),
-		loadSolutions(),
-		loadPatterns(),
-	]);
-
-	return {
-		knowledge,
-		decisions,
-		solutions,
-		patterns,
-	};
-}
-
 export async function generateInitiativeSpecificationPrompt(
 	initiative: {
 		id: string;
 		name: string;
 		overview?: string | undefined;
 	},
-	context: {
-		knowledge: string;
-		decisions: Decision[];
-		solutions: Solution[];
-		patterns: Pattern[];
-	},
+	context: ProjectContext,
 ): Promise<string> {
 	return await renderTemplateFile("initiative-specification.eta", {
 		initiative,
@@ -98,9 +71,7 @@ export function setupInitiativeSpecificationPrompt(server: McpServer): void {
 							return initiativeIds;
 						}
 
-						return initiativeIds.filter((id) =>
-							id.startsWith(initiativeId),
-						);
+						return initiativeIds.filter((id) => id.startsWith(initiativeId));
 					},
 				),
 			},

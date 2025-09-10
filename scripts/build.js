@@ -32,18 +32,51 @@ try {
 			// Create templates directory in build
 			fs.mkdirSync(category.buildDir, { recursive: true });
 
-			// Read all files in templates directory
-			const templateFiles = fs.readdirSync(category.sourceDir);
+			// Copy directory recursively with proper error handling
+			const copyDir = (src, dest) => {
+				const items = fs.readdirSync(src);
+				for (const item of items) {
+					const srcPath = path.join(src, item);
+					const destPath = path.join(dest, item);
 
-			for (const file of templateFiles) {
-				const sourcePath = path.join(category.sourceDir, file);
-				const destPath = path.join(category.buildDir, file);
-				fs.copyFileSync(sourcePath, destPath);
-			}
+					try {
+						const stat = fs.statSync(srcPath);
 
-			console.log(
-				`✓ Copied ${templateFiles.length} ${category.name} to build directory`,
-			);
+						if (stat.isDirectory()) {
+							fs.mkdirSync(destPath, { recursive: true });
+							copyDir(srcPath, destPath);
+						} else if (stat.isFile()) {
+							fs.copyFileSync(srcPath, destPath);
+						}
+					} catch (error) {
+						console.warn(
+							`Warning: Could not copy ${srcPath}: ${error.message}`,
+						);
+					}
+				}
+			};
+
+			// Count files recursively for progress reporting
+			const countFiles = (dir) => {
+				let count = 0;
+				const items = fs.readdirSync(dir);
+				for (const item of items) {
+					const itemPath = path.join(dir, item);
+					const stat = fs.statSync(itemPath);
+					if (stat.isFile()) {
+						count++;
+					} else if (stat.isDirectory()) {
+						count += countFiles(itemPath);
+					}
+				}
+				return count;
+			};
+
+			// Perform the copy
+			copyDir(category.sourceDir, category.buildDir);
+			const fileCount = countFiles(category.sourceDir);
+
+			console.log(`✓ Copied ${fileCount} ${category.name} to build directory`);
 		}
 	}
 
