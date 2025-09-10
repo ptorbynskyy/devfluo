@@ -10,6 +10,12 @@ You are helping create a detailed specification for the following backlog item:
 <% } %>
 
 ## Project Context
+### Resources
+ - Architecture - project://knowledge/architecture
+ - Codebase - project://knowledge/codebase
+ - Desition - project://decisions/item/{name}
+ - Solution - project://solutions/item/{key}
+ - Pattern - project://patterns/item/{name}
 
 <%= it.context.knowledge %>
 
@@ -29,7 +35,7 @@ You are helping create a detailed specification for the following backlog item:
 
 ## Your Task
 
-Please conduct a comprehensive brainstorming session to create a detailed specification for this backlog item. Ask clarifying questions to gather all necessary information, then generate a complete specification document.
+Please conduct a comprehensive brainstorming session to create a detailed specification for this backlog item. Ask clarifying questions one by one to gather all necessary information, then generate a complete specification document.
 
 ### Specification Structure
 
@@ -40,8 +46,6 @@ The final specification should be a markdown document with the following section
 3. **Acceptance Criteria** - Clear, testable criteria for completion
 4. **Technical Considerations** - Architecture, dependencies, constraints
 5. **Implementation Notes** - Specific guidance for developers
-6. **Testing Strategy** - How this feature should be tested
-7. **Documentation Needs** - What documentation should be updated
 
 ### Brainstorming Process
 

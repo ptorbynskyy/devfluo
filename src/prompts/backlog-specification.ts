@@ -1,5 +1,6 @@
 // ABOUTME: Prompt for creating comprehensive specifications for backlog items
 
+import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
@@ -12,7 +13,6 @@ import type { Solution } from "../domain/solution-schema.js";
 import { loadSolutions } from "../domain/solutions.js";
 import { getProjectKnowledge } from "../resources/knowledge.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
-import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 
 export async function validateBacklogItemForSpec(backlogItemId: string) {
 	const item = await loadBacklogItem(backlogItemId);

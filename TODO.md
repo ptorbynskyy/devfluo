@@ -1,13 +1,20 @@
+---
+# Initiative spec creation
+- Create initiative spec
 
 ---
+# Initiative planning
+- prompt for initiative planning with create tasks based on context
+    - global context
+        - decisions, solutions, patterns (filter by tags)
+        - arhitecture.md
+        - codebase.md
+    - initative context
+        - overview.md
+        - name
+        - spec.md
 
-# Add resources for pattern, solution, decision
-- Add resource to pattern, solution, decision
-- Show references in prompts
-- Show references in knowledge base
-???
 
----
 
 ### Domain
 - Resolution strategies:
@@ -44,17 +51,6 @@
 -----------------------
 # Initiative brainstorming
  - prompt for initiative brainstorming with create spec as result ***
-
-# Initiative planning
-  - prompt for initiative planning with create tasks based on context
-  	- global context
-   		- decisions, solutions, patterns (filter by tags)
-	    - arhitecture.md
-	    - codebase.md
-    - initative context
-    	- overview.md
-    	- name
-    	- spec.md
 
 ## Checks
  - Must have empty task list
