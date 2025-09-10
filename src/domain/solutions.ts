@@ -147,6 +147,16 @@ export async function processSolutionOperationsWithPaths(
 	};
 }
 
+export async function getSolutionIds(): Promise<string[]> {
+	const solutions = await loadSolutions();
+	return solutions.map((solution) => getSolutionKey(solution));
+}
+
+export async function loadSolution(key: string): Promise<Solution | null> {
+	const solutions = await loadSolutions();
+	return solutions.find((solution) => getSolutionKey(solution) === key) || null;
+}
+
 export async function processSolutionOperations(
 	solutions: SolutionOperations,
 ): Promise<{

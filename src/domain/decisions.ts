@@ -130,6 +130,16 @@ export async function processDecisionOperationsWithPaths(
 	};
 }
 
+export async function getDecisionIds(): Promise<string[]> {
+	const decisions = await loadDecisions();
+	return decisions.map((decision) => decision.name);
+}
+
+export async function loadDecision(name: string): Promise<Decision | null> {
+	const decisions = await loadDecisions();
+	return decisions.find((decision) => decision.name === name) || null;
+}
+
 export async function processDecisionOperations(
 	decisions: DecisionOperations,
 ): Promise<{

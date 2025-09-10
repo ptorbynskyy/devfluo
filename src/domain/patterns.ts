@@ -184,6 +184,16 @@ export async function processPatternOperationsWithPaths(
 	};
 }
 
+export async function getPatternIds(): Promise<string[]> {
+	const patterns = await loadPatterns();
+	return patterns.map((pattern) => pattern.name);
+}
+
+export async function loadPattern(name: string): Promise<Pattern | null> {
+	const patterns = await loadPatterns();
+	return patterns.find((pattern) => pattern.name === name) || null;
+}
+
 export async function processPatternOperations(
 	patterns: PatternOperations,
 ): Promise<{
