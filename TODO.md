@@ -1,6 +1,7 @@
----
-# Initiative spec creation
-- Create initiative spec
+Create template and function that get overall project context,
+Refactor initiaive brainstorming to use it.
+Refactor backlog item brainstorming to use it.
+
 
 ---
 # Initiative planning
