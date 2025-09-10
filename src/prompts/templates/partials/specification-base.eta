@@ -25,7 +25,7 @@ Start by asking relevant questions about:
 Continue the conversation until you have enough information to create a comprehensive specification. When ready, generate the complete markdown specification and suggest using the <%= it.toolName %> tool to save it:
 
 ```json
-<%= it.toolExample %>
+<%~ it.toolExample %>
 ```
 
 Let's begin the brainstorming session for "<%= it.entityName %>". What questions do you have about this <%= it.entityType %>?

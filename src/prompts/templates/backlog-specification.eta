@@ -15,12 +15,14 @@ You are helping create a detailed specification for the following backlog item:
 	entityType: 'backlog item',
 	entityName: it.backlogItem.name,
 	toolName: 'backlog_management',
-	toolExample: JSON.stringify({
-		"update": {
-			[it.backlogItem.id]: {
-				"spec": "[Generated specification content here]"
-			}
-		}
-	}, null, 2),
+	toolExample: (() => {
+		const example = {
+			"update": {}
+		};
+		example.update[it.backlogItem.id] = {
+			"spec": "[Generated specification content here]"
+		};
+		return JSON.stringify(example, null, 2);
+	})(),
 	context: it.context
 }) %>
