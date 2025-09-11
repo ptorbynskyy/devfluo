@@ -10,6 +10,7 @@ import {
 	setupBugReportPrompt,
 	setupCodeReviewPrompt,
 } from "./prompts/development.js";
+import { setupInitiativePlanningPrompt } from "./prompts/initiative-planning.js";
 import { setupInitiativeSpecificationPrompt } from "./prompts/initiative-specification.js";
 import { setupBacklogResources } from "./resources/backlog.js";
 import { setupDecisionsResource } from "./resources/decisions.js";
@@ -64,6 +65,7 @@ async function runServer(): Promise<void> {
 	setupBugReportPrompt(server);
 	setupBacklogSpecificationPrompt(server);
 	setupInitiativeSpecificationPrompt(server);
+	setupInitiativePlanningPrompt(server);
 
 	const transport = new StdioServerTransport();
 	await server.connect(transport);

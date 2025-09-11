@@ -1,0 +1,59 @@
+# Create Task Plan for Initiative: <%= it.initiative.name %>
+
+You are helping create a structured task list for the following initiative:
+
+**ID:** <%= it.initiative.id %>
+**Name:** <%= it.initiative.name %>
+<% if (it.initiative.overview) { %>**Overview:** <%= it.initiative.overview %>
+
+<% } %>## Initiative Specification
+
+<%= it.initiative.spec %>
+
+<%~ include('partials/project-context', it) %>
+
+## Your Task
+
+Create a comprehensive task breakdown for this initiative based on the specification provided. Break the work into logical phases and create specific, actionable tasks that will lead to successful completion.
+
+### Task Structure Requirements
+
+Each task must have:
+- **ID**: Sequential format starting with 't001', 't002', etc.
+- **Name**: Clear, action-oriented task name
+- **Description**: Detailed explanation of what needs to be accomplished
+- **Effort**: Size estimation (S/M/L/XL/XXL)
+- **Phase**: Logical grouping number (1, 2, 3, etc.)
+- **Order**: Position within the phase for proper sequencing
+
+### Planning Guidelines
+
+1. **Phase Organization**: Group related tasks into logical development phases
+2. **Dependencies**: Ensure tasks are ordered to respect dependencies
+3. **Granularity**: Break down work into tasks that can be completed in reasonable timeframes
+4. **Clarity**: Each task should have clear acceptance criteria within its description
+
+### Output Format
+
+When you've created the task plan, use the initiative_update tool to save the tasks:
+
+```json
+{
+	"id": "<%= it.initiative.id %>",
+	"tasks": {
+		"create": [
+			{
+				"id": "t001",
+				"name": "Task name here",
+				"description": "Detailed description of what this task involves and its acceptance criteria",
+				"effort": "M",
+				"status": "new",
+				"order": 1,
+				"phase": 1
+			}
+		]
+	}
+}
+```
+
+Please analyze the specification and create a comprehensive task breakdown that will guide the successful implementation of this initiative.

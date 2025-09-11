@@ -1,20 +1,26 @@
-Create template and function that get overall project context,
-Refactor initiaive brainstorming to use it.
-Refactor backlog item brainstorming to use it.
 
-
----
-# Initiative planning
-- prompt for initiative planning with create tasks based on context
+# Tasks execution
+- prompt for tasks execution with create tasks based on context
     - global context
         - decisions, solutions, patterns (filter by tags)
         - arhitecture.md
         - codebase.md
     - initative context
         - overview.md
-        - name
-        - spec.md
 
+---
+# Collect knowledge
+- prompt for knowledge collection within initiative
+
+---
+# Initiative issue review
+- prompt for initiative review with merge knowledge from initative context and global context
+
+---
+# Initiative completion
+- prompt for initiative completion with merge knowledge from initative context and global context
+
+---
 
 
 ### Domain
@@ -50,9 +56,6 @@ Refactor backlog item brainstorming to use it.
  - prompt ....
 
 -----------------------
-# Initiative brainstorming
- - prompt for initiative brainstorming with create spec as result ***
-
 ## Checks
  - Must have empty task list
 
