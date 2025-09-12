@@ -6,10 +6,6 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "./config.js";
 import { setupBacklogSpecificationPrompt } from "./prompts/backlog-specification.js";
-import {
-	setupBugReportPrompt,
-	setupCodeReviewPrompt,
-} from "./prompts/development.js";
 import { setupInitiativePlanningPrompt } from "./prompts/initiative-planning.js";
 import { setupInitiativeSpecificationPrompt } from "./prompts/initiative-specification.js";
 import { setupBacklogResources } from "./resources/backlog.js";
@@ -61,8 +57,6 @@ async function runServer(): Promise<void> {
 	setupInitiativeUpdateTool(server);
 	setupInitiativeDeleteTool(server);
 	setupIssueManagementTool(server);
-	setupCodeReviewPrompt(server);
-	setupBugReportPrompt(server);
 	setupBacklogSpecificationPrompt(server);
 	setupInitiativeSpecificationPrompt(server);
 	setupInitiativePlanningPrompt(server);
