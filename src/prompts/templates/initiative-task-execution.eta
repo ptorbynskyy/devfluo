@@ -1,0 +1,120 @@
+# Execute Tasks for Initiative: <%= it.context.initiative.name %>
+
+You are executing specific tasks within the following initiative:
+
+**Initiative ID:** <%= it.context.initiative.id %>
+**Initiative Name:** <%= it.context.initiative.name %>
+<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
+
+<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
+
+<%= it.context.initiative.spec %>
+
+<% } %><%~ include('partials/project-context', it) %>
+
+<% if (it.context.initiativeDecisions.length > 0) { %>## Initiative Decisions
+<% it.context.initiativeDecisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
+<% }); %>
+
+<% } %><% if (it.context.initiativeSolutions.length > 0) { %>## Initiative Solutions
+<% it.context.initiativeSolutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
+<% }); %>
+
+<% } %><% if (it.context.initiativePatterns.length > 0) { %>## Initiative Patterns
+<% it.context.initiativePatterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
+<% }); %>
+
+<% } %>## Current Initiative Tasks
+
+<%= it.generateTasksMarkdownReport(it.context.tasks) %>
+
+## Tasks to Execute
+
+You are specifically assigned to execute the following tasks:
+
+<% it.selectedTasks.forEach(function(task, index) { %>### Task <%= index + 1 %>: <%= task.name %> (ID: <%= task.id %>)
+
+**Description:** <%= task.description %>
+<% if (task.effort) { %>**Effort:** <%= task.effort %>
+<% } %>**Phase:** <%= task.phase %>
+**Order:** <%= task.order %>
+<% if (task.predecessors.length > 0) { %>**Prerequisites:** <%= task.predecessors.join(', ') %> (all completed or included in this execution batch)
+<% } else { %>**Prerequisites:** None
+<% } %>
+<% }); %>
+
+## Execution Guidelines
+
+### Work Approach
+1. **Use Available Knowledge**: Leverage the project decisions, solutions, and patterns shown above
+2. **Follow Architecture**: Respect existing codebase patterns and constraints
+3. **Maintain Quality**: Follow established coding standards and practices
+4. **Test Thoroughly**: Ensure all changes work correctly and don't break existing functionality
+
+### Knowledge Tracking
+During execution, capture emerging insights for the initiative:
+
+**Decisions Made**: Track key technical or design decisions you make
+- Format: `decision-name: description`
+- Example: `auth-middleware: Use JWT tokens for API authentication`
+
+**Problems & Solutions**: Document problems encountered and how you solved them
+- Format: `problem → solution`
+- Example: `Database connection timeout → Implemented connection pooling with retry logic`
+
+**Patterns Applied**: Note reusable patterns you implement or discover
+- Format: `pattern-name: description`
+- Example: `error-boundary: Centralized error handling wrapper for React components`
+
+### Task Completion Process
+
+For each task you complete:
+
+1. **Execute the work** following the task description and acceptance criteria
+2. **Test your implementation** to ensure it works correctly
+3. **Document any knowledge gained** (decisions, solutions, patterns)
+4. **Update task status** using the initiative_update tool
+
+### Status Updates
+
+After completing tasks, update their status using the initiative_update tool:
+
+```json
+{
+	"id": "<%= it.context.initiative.id %>",
+	"tasks": {
+		"update": {
+			"<task-id>": {"status": "done"}
+		}
+	},
+	"decisions": {
+		"create": [
+			{"name": "decision-name", "description": "Decision description", "tags": ["tag1", "tag2"]}
+		]
+	},
+	"solutions": {
+		"create": [
+			{"problem": "Problem statement", "solution": "Solution description", "tags": ["tag1", "tag2"]}
+		]
+	},
+	"patterns": {
+		"create": [
+			{"name": "pattern-name", "description": "Pattern description", "tags": ["tag1", "tag2"]}
+		]
+	}
+}
+```
+
+### Code Quality Requirements
+
+- **Follow existing patterns** in the codebase
+- **Maintain consistency** with established conventions
+- **Add appropriate tests** if test framework exists
+- **Update documentation** if changes affect public APIs
+- **Run linting/formatting** tools before completion
+
+## Ready to Execute
+
+You now have all the context needed to execute these tasks effectively. Begin with the first task and work systematically through each one, tracking your decisions and solutions as you progress.
+
+Remember to update task statuses and capture knowledge using the initiative_update tool after completing each task.

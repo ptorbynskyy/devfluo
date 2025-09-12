@@ -11,13 +11,15 @@ function validatePredecessors(
 	currentTaskId?: string,
 ): void {
 	const existingTaskIds = new Set(tasks.map((task) => task.id));
-	
+
 	for (const predecessorId of predecessors) {
 		if (!existingTaskIds.has(predecessorId)) {
 			throw new Error(`Predecessor task '${predecessorId}' does not exist`);
 		}
 		if (currentTaskId && predecessorId === currentTaskId) {
-			throw new Error(`Task '${currentTaskId}' cannot be a predecessor of itself`);
+			throw new Error(
+				`Task '${currentTaskId}' cannot be a predecessor of itself`,
+			);
 		}
 	}
 }
@@ -26,7 +28,7 @@ function validatePredecessors(
 function detectCircularDependencies(tasks: Task[]): void {
 	const visited = new Set<string>();
 	const recursionStack = new Set<string>();
-	
+
 	function hasCycle(taskId: string): boolean {
 		if (recursionStack.has(taskId)) {
 			return true;
@@ -34,10 +36,10 @@ function detectCircularDependencies(tasks: Task[]): void {
 		if (visited.has(taskId)) {
 			return false;
 		}
-		
+
 		visited.add(taskId);
 		recursionStack.add(taskId);
-		
+
 		const task = tasks.find((t) => t.id === taskId);
 		if (task) {
 			for (const predecessor of task.predecessors) {
@@ -46,11 +48,11 @@ function detectCircularDependencies(tasks: Task[]): void {
 				}
 			}
 		}
-		
+
 		recursionStack.delete(taskId);
 		return false;
 	}
-	
+
 	for (const task of tasks) {
 		if (hasCycle(task.id)) {
 			throw new Error("Circular dependency detected in task predecessors");
@@ -135,10 +137,14 @@ export async function processTaskOperations(
 
 			// Validate and add new task
 			const validatedTask = TaskSchema.parse(newTask);
-			
+
 			// Validate predecessors exist
-			validatePredecessors(existingTasks, validatedTask.predecessors, validatedTask.id);
-			
+			validatePredecessors(
+				existingTasks,
+				validatedTask.predecessors,
+				validatedTask.id,
+			);
+
 			existingTasks.push(validatedTask);
 			insertCount++;
 		}
@@ -157,12 +163,12 @@ export async function processTaskOperations(
 
 			// Validate updated task
 			const validatedTask = TaskSchema.parse(updatedTask);
-			
+
 			// If predecessors are being updated, validate them
 			if (updates.predecessors !== undefined) {
 				validatePredecessors(existingTasks, validatedTask.predecessors, taskId);
 			}
-			
+
 			existingTasks[taskIndex] = validatedTask;
 			updateCount++;
 		}
@@ -178,12 +184,12 @@ export async function processTaskOperations(
 
 			// Check if any other tasks depend on this task
 			const dependentTasks = existingTasks.filter((task) =>
-				task.predecessors.includes(taskId)
+				task.predecessors.includes(taskId),
 			);
 			if (dependentTasks.length > 0) {
 				const dependentIds = dependentTasks.map((task) => task.id).join(", ");
 				throw new Error(
-					`Cannot delete task '${taskId}' because it is a predecessor for tasks: ${dependentIds}`
+					`Cannot delete task '${taskId}' because it is a predecessor for tasks: ${dependentIds}`,
 				);
 			}
 

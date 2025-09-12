@@ -1,5 +1,45 @@
+# Tasks execution prompt
+Create an MCP Server Prompt that orchestrates task execution within an initiative. The prompt receives a task list as input - either a single task identifier, comma-separated task list, or task range specified with hyphens. Validate the format and verify all tasks exist, are not already completed, and are executable. Check that there are no unfinished predecessors for these tasks, focusing on external predecessors outside the specified task range. If three interconnected tasks are all included in execution, their internal dependencies can be ignored since they'll execute in proper order naturally. Only external predecessors outside the task list that aren't completed and would block execution matter. Load Project Context similar to other prompts, including initiative context with its decisions, solutions, patterns, overview, specification, and full task list as Markdown table. During execution, track emerging solutions, patterns, problems, and solutions found, saving them for the initiative using Tool Initiative Update for potential future consolidation into project knowledge. Mark all completed tasks as finished after successful execution using Initiative Update Tool to update state.
 
-# Tasks execution
+### Validation
+ - Validate task range
+   - t001
+   - t001,t002
+   - t003-t005
+ - Task(s) should not be started or completted
+ - Validate that group of task don't have not completted predessors
+### Context
+ - load project context
+ - load initiative context 
+   - decisions, solutions, patterns, 
+   - overview, 
+   - spec 
+   - full task list - generateTasksMarkdownReport 
+
+### Task Execution
+**Work on task using:**
+- Relevant decisions from knowledge base
+- Architecture constraints
+- Similar solutions
+- Established patterns
+
+**Track(initiative update tool) in current session:**
+- Decisions made (key: value format)
+- Problems solved (problem → solution)
+- Patterns applied
+
+### Code Quality Checks
+- Follow existing patterns
+- Maintain consistency
+- Update documentation
+
+### Update State
+After execution:
+- Update task status to completted(done) - initiative update tool
+
+
+
+
 - prompt for tasks execution with create tasks based on context
     - global context
         - decisions, solutions, patterns (filter by tags)
@@ -46,21 +86,4 @@
     - tasks
 
 
-# Prompt to complete initiative
- - check
- - get knoaladge ??
- - update state
 
-
-# Copmlete Initiative
- - prompt ....
-
------------------------
-## Checks
- - Must have empty task list
-
-## Output
- - Created tasks list -> update_initiative
-
----
-# Session end - collect knowledge

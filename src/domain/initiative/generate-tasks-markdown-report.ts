@@ -33,7 +33,8 @@ export function generateTasksMarkdownReport(tasks: Task[]): string {
 		for (const task of sortedTasks) {
 			const effort = task.effort || "-";
 			const status = task.status === "done" ? "✅ Done" : "🔲 New";
-			const predecessors = task.predecessors.length > 0 ? task.predecessors.join(", ") : "-";
+			const predecessors =
+				task.predecessors.length > 0 ? task.predecessors.join(", ") : "-";
 			markdown += `| ${task.id} | ${task.name} | ${effort} | ${status} | ${predecessors} | ${task.description} |\n`;
 		}
 

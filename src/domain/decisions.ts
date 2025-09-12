@@ -12,7 +12,9 @@ import {
 export const decisionsPath = path.join(baseKnowledgePath, "decisions");
 export const decisionsJsonPath = path.join(decisionsPath, "decisions.json");
 
-async function loadDecisionsFromPaths(jsonPath: string): Promise<Decisions> {
+export async function loadDecisionsFromPaths(
+	jsonPath: string,
+): Promise<Decisions> {
 	let decisionsContent: string;
 	try {
 		decisionsContent = await readFile(jsonPath, "utf-8");

@@ -14,7 +14,9 @@ import {
 export const solutionsPath = path.join(baseKnowledgePath, "solutions");
 export const solutionsJsonPath = path.join(solutionsPath, "solutions.json");
 
-async function loadSolutionsFromPaths(jsonPath: string): Promise<Solutions> {
+export async function loadSolutionsFromPaths(
+	jsonPath: string,
+): Promise<Solutions> {
 	let solutionsContent: string;
 	try {
 		solutionsContent = await readFile(jsonPath, "utf-8");

@@ -14,7 +14,9 @@ import {
 export const patternsPath = path.join(baseKnowledgePath, "patterns");
 export const patternsJsonPath = path.join(patternsPath, "patterns.json");
 
-async function loadPatternsFromPaths(jsonPath: string): Promise<Patterns> {
+export async function loadPatternsFromPaths(
+	jsonPath: string,
+): Promise<Patterns> {
 	let patternsContent: string;
 	try {
 		patternsContent = await readFile(jsonPath, "utf-8");
