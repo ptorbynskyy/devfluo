@@ -48,6 +48,18 @@ export const TaskSchema = z.object({
 		.describe(
 			"Phase number that groups tasks by development stage. Displayed as 'Phase X'",
 		),
+	predecessors: z
+		.array(
+			z
+				.string()
+				.regex(
+					/^t\d+$/,
+					"Predecessor task ID must start with 't' followed by numbers (e.g., t001, t123)",
+				),
+		)
+		.describe(
+			"Array of task IDs that must be completed before this task can start. Use empty array [] if no predecessors. Example: ['t001', 't002']",
+		),
 });
 
 // Schema for task operations (create/update/delete)
@@ -56,13 +68,13 @@ export const TaskOperationsSchema = z.object({
 		.array(TaskSchema)
 		.optional()
 		.describe(
-			'Array of complete task objects to create. Example: [{"id": "t001", "name": "Setup authentication", "description": "Setup OAuth system", "effort": "L", "status": "new", "order": 1, "phase": 1}]',
+			'Array of complete task objects to create. Example: [{"id": "t001", "name": "Setup authentication", "description": "Setup OAuth system", "effort": "L", "status": "new", "order": 1, "phase": 1, "predecessors": []}]',
 		),
 	update: z
 		.record(z.string(), TaskSchema.omit({ id: true }).partial())
 		.optional()
 		.describe(
-			'Object with task IDs as keys and partial task objects as values for updates. Example: {"t001": {"name": "Updated task name", "status": "done"}}',
+			'Object with task IDs as keys and partial task objects as values for updates. Example: {"t001": {"name": "Updated task name", "status": "done", "predecessors": ["t002"]}}',
 		),
 	delete: z
 		.array(z.string())

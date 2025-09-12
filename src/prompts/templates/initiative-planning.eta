@@ -25,13 +25,18 @@ Each task must have:
 - **Effort**: Size estimation (S/M/L/XL/XXL)
 - **Phase**: Logical grouping number (1, 2, 3, etc.)
 - **Order**: Position within the phase for proper sequencing
+- **Predecessors**: Array of task IDs that must complete before this task can start
 
 ### Planning Guidelines
 
 1. **Phase Organization**: Group related tasks into logical development phases
-2. **Dependencies**: Ensure tasks are ordered to respect dependencies
+2. **Dependencies**: Use the predecessors array to specify which tasks must complete before others can start
 3. **Granularity**: Break down work into tasks that can be completed in reasonable timeframes
 4. **Clarity**: Each task should have clear acceptance criteria within its description
+5. **Dependency Management**: 
+   - Use empty array `[]` for tasks with no dependencies
+   - List prerequisite task IDs like `["t001", "t002"]` for dependent tasks
+   - Avoid circular dependencies where tasks depend on each other
 
 ### Output Format
 
@@ -49,7 +54,18 @@ When you've created the task plan, use the initiative_update tool to save the ta
 				"effort": "M",
 				"status": "new",
 				"order": 1,
-				"phase": 1
+				"phase": 1,
+				"predecessors": []
+			},
+			{
+				"id": "t002",
+				"name": "Dependent task example",
+				"description": "This task depends on t001 completing first",
+				"effort": "L",
+				"status": "new",
+				"order": 2,
+				"phase": 1,
+				"predecessors": ["t001"]
 			}
 		]
 	}
