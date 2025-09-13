@@ -107,8 +107,8 @@ export async function handleIssueManagementTool(
 			throw new McpError(
 				ErrorCode.InvalidParams,
 				`Validation error: ${errorDetails}. Examples: ` +
-					`For create: {"initiativeId": "user-auth", "create": [{"id": "oauth-bug", "name": "OAuth redirect issue", "description": "Google OAuth redirects to wrong URL", "tags": ["oauth"], "status": "open"}]}. ` +
-					`For update: {"initiativeId": "user-auth", "update": {"oauth-bug": {"recommendedStrategy": "embed", "status": "closed"}}}. ` +
+					`For create: {"initiativeId": "user-auth", "create": [{"id": "oauth-bug", "name": "OAuth redirect issue", "description": "Google OAuth redirects to wrong URL", "tags": ["oauth"], "status": "open", "actualStrategy": "embed", "summary": "Decided to embed fix directly in current sprint"}]}. ` +
+					`For update: {"initiativeId": "user-auth", "update": {"oauth-bug": {"recommendedStrategy": "embed", "actualStrategy": "embed", "status": "closed", "summary": "Successfully embedded OAuth fix in authentication module"}}}. ` +
 					`For delete: {"initiativeId": "user-auth", "delete": ["oauth-bug", "performance-issue"]}`,
 			);
 		}
