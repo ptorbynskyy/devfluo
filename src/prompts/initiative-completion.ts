@@ -1,16 +1,16 @@
 // ABOUTME: Prompt for completing initiatives with knowledge extraction and promotion to project knowledge base
 
-import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import {
-	getInitiativeIds,
-	loadInitiative,
-} from "../domain/initiative/index.js";
+import { loadInitiative } from "../domain/initiative/index.js";
 import type { Task } from "../domain/initiative/task-schema.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
+import {
+	createCompletableInitiativeId,
+	initiativeIdSchema,
+} from "./shared/initiative-id.js";
 import {
 	type InitiativeContext,
 	loadInitiativeContext,
@@ -18,14 +18,7 @@ import {
 
 // Zod schema for completion input validation
 export const InitiativeCompletionInputSchema = z.object({
-	initiativeId: z
-		.string()
-		.regex(
-			/^[a-z0-9-]+$/,
-			"ID must contain only lowercase letters, numbers, and hyphens",
-		)
-		.min(1)
-		.describe("ID of the initiative to complete"),
+	initiativeId: initiativeIdSchema.describe("ID of the initiative to complete"),
 });
 
 export type InitiativeCompletionInput = z.infer<
@@ -97,16 +90,8 @@ export function setupInitiativeCompletionPrompt(server: McpServer): void {
 			description:
 				"Complete an initiative by extracting knowledge, promoting valuable items to project knowledge base, and marking initiative as complete",
 			argsSchema: {
-				initiativeId: completable(
-					InitiativeCompletionInputSchema.shape.initiativeId,
-					async (initiativeId): Promise<string[]> => {
-						const initiativeIds = await getInitiativeIds();
-						if (!initiativeId) {
-							return initiativeIds;
-						}
-
-						return initiativeIds.filter((id) => id.startsWith(initiativeId));
-					},
+				initiativeId: createCompletableInitiativeId(
+					"ID of the initiative to complete",
 				),
 			},
 		},

@@ -1,14 +1,10 @@
 // ABOUTME: Prompt for creating comprehensive specifications for initiatives
 
-import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
-import {
-	getInitiativeIds,
-	loadInitiative,
-} from "../domain/initiative/index.js";
+import { loadInitiative } from "../domain/initiative/index.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
+import { createCompletableInitiativeId } from "./shared/initiative-id.js";
 import {
 	loadProjectContext,
 	type ProjectContext,
@@ -56,23 +52,8 @@ export function setupInitiativeSpecificationPrompt(server: McpServer): void {
 			description:
 				"Generate a comprehensive specification for an initiative through guided brainstorming",
 			argsSchema: {
-				initiativeId: completable(
-					z
-						.string()
-						.regex(
-							/^[a-z0-9-]+$/,
-							"ID must contain only lowercase letters, numbers, and hyphens",
-						)
-						.min(1)
-						.describe("ID of the initiative to create a specification for"),
-					async (initiativeId): Promise<string[]> => {
-						const initiativeIds = await getInitiativeIds();
-						if (!initiativeId) {
-							return initiativeIds;
-						}
-
-						return initiativeIds.filter((id) => id.startsWith(initiativeId));
-					},
+				initiativeId: createCompletableInitiativeId(
+					"ID of the initiative to create a specification for",
 				),
 			},
 		},
