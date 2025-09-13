@@ -1,69 +1,87 @@
-# Initiative completion
-- prompt for initiative completion with merge knowledge from initative context and global context
-  
-Create a prompt for MCP server that completes initiative execution. It should load global project context and current initiative context. Verify all initiative tasks are completed. Then start knowledge collection process. Knowledge is based on completed tasks and git log history from the initiative (usually separate branch with commits). Analyze all decisions, solutions, and patterns from this initiative to determine if they should be merged with project knowledge base. Validate each decision, solution, and pattern, then decide whether to merge based on criteria. After collecting merge candidates, update project knowledge base using Update knowledge tool. Analyze how initiative changes affected main project knowledge artifacts like Architecture Markdown and Codebase Markdown documents. Update these documents if necessary, carefully considering changes since they impact the entire project and codebase.
+1. prompt to report initiative issue
+2. Create issue
+    - uderstand changes
+    - impact analyses
+    - Options Analysis
+    - Update recomend strattegy
+    - Show user the result
 
-### Stage 1: Validation Check
-- All tasks done?
+## MCP Server Prompt for Initiative Scope Change Management
 
-### Stage 2: Knowledge Extraction
+Create an MCP server that handles initiative scope change situations. The core business entity is an **issue** in the initiative's issue bank.
 
-**Key Achievements:**
- - From completed tasks
- - From git log major changes
- - From decisions architectural choices
+### Issue Entity Management
 
-### Stage 3: Promote to Knowledge Base
+When encountering a problem, capture it as an issue entity in the knowledge base with:
+- Status
+- Name
+- Description
+- Identifier
 
-**Quality Filtering Process:**
+### Analysis Process
 
-```python
-# Evaluate each decision/solution for promotion
-def should_promote(item, type):
-    if type == "decision":
-        # Promote if:
-        # - Applies to multiple features/modules
-        # - Sets architectural precedent
-        # - Solves recurring problem
-        # - Has tag "**" (important marker)
-        return (
-            item.get("scope", "local") != "local" or
-            "**" in item.get("key", "") or
-            item.get("reusable", False)
-        )
-    elif type == "solution":
-        # Promote if:
-        # - Used 3+ times
-        # - Tagged as "structured" and "validated"
-        # - Has clear file references
-        # - Not a trivial fix (>50 chars description)
-        return (
-            item.get("usage_count", 1) >= 3 or
-            "structured" in item.get("tags", []) or
-            len(item.get("solution", "")) > 50
-        )
-```
+**Step 1: Change Analysis**
+- Analyze existing changes related to the initiative
+- Analyze current changes in the session, recent git logs
+- Use agent guidelines to conduct impact analysis
 
-**Best Decisions → project knowledge decisions:**
-#### Only add decisions that pass quality filter:
-- Apply beyond this initiative (scope: "global")
-- Solve fundamental problems (tagged with "**")
-- Set precedents (marked as "reusable": true)
-- Have been validated in practice
+**Step 2: Solution Options Analysis**
 
-**Reusable Solutions → project knowledge solutions:**
-#### Only add solutions that pass quality filter:
-- Fixed non-trivial problems (>50 char description)
-- Can apply to other areas (tagged "reusable")
-- Have clear file references
-- Used multiple times or tagged "validated"
+After understanding changes and impact, analyze recommended options:
+
+#### Option 1: Embedding
+- For small problems that can be integrated into the current task plan
+- Slightly modify existing plan to solve the issue within current initiative
+- Pros: unified deliverable
+- Cons: timeline extension
+- Effort estimate
 
 
-**Patterns → project knowledge patterns:**
- - Only add patterns used 3+ times:
+#### Option 2: Complete Replanning
+- For serious changes and larger, more important issues
+- Replan remaining work scope
+- May require returning to and reworking previous tasks
+- Update task list to reflect new reality
+- Still execute within current initiative but requires replanning
+
+#### Option 3: Defer
+- For non-critical issues that don't block initiative completion
+- Move to backlog for future planning as separate initiative
+
+#### Option 4: Cancel Initiative
+- For fatal issues that completely question initiative continuation
+- Results in canceling entire initiative execution
+
+#### Option 5: Close as Non-Issue
+- Determine issue is not actually a problem
+- Designed behavior, not a defect
+- Close issue without action
+
+### Final Steps
+
+1. Update recommended strategy in issue entity using Initiative Update Tool
+2. Output analysis results to user
+3. Show selected option with explanation of why other options were rejected
+
+Important to note that we don't apply any of the strategies, we only recommend them. We calculate and save our recommendation using Iniciative Update tool
+
+---
+1. prompt to handle issue
+2. Show user the options and the recomendation, ask about the choice
+3. Depend on the choice process the issue
+    - Embed: Add tasks to current initiative plan for simple problems (initiative_update)
+    - Replan: Substantial rescheduling with task replacement and new task additions for serious problems
+      - update the tasks list according to new plan (initiative_update)
+    - Defer: Create backlog item for non-critical issues that don't affect main workflow
+      - create the backlog item based on the issue (backlog_management tool)
+    - Cancel initiative: Terminate entire initiative when problem makes it unnecessary
+    - Cancel issue: Mark issue as insignificant or reject without action
+4. Update issue result, status and summary to reflect the choice (initiative_update)
 
 
 
+---
+use issues context while collect khoaldge on initiative complete
 
 ---
 # Collect knowledge
@@ -85,18 +103,6 @@ def should_promote(item, type):
     - Cancel issue: Mark issue as insignificant or reject without action
 - Knowledge base: Accumulate decisions, solutions, and patterns from issues for future reference and project-wide learning
 
-
-# Get initiative context (for task(s) - phase)
-  	- global context
-   		- decisions, solutions, patterns (filter by tags)
-	    - arhitecture.md
-	    - codebase.md
-    - initative context
-    	- overview.md
-    	- name
-    	- spec.md
-        - desitions, solutions, patterns (filter by tags)
-    - tasks
 
 
 

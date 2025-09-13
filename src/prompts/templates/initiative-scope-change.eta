@@ -1,0 +1,148 @@
+# Initiative Scope Change Analysis: <%= it.context.initiative.name %>
+
+You are analyzing a scope change situation for the following initiative:
+
+**Initiative ID:** <%= it.context.initiative.id %>
+**Initiative Name:** <%= it.context.initiative.name %>
+**Initiative State:** <%= it.context.initiative.state %>
+<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
+
+<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
+
+<%= it.context.initiative.spec %>
+
+<% } %><%~ include('partials/project-context', it) %>
+
+<% if (it.context.initiativeDecisions.length > 0) { %>## Initiative Decisions
+<% it.context.initiativeDecisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
+<% }); %>
+
+<% } %><% if (it.context.initiativeSolutions.length > 0) { %>## Initiative Solutions
+<% it.context.initiativeSolutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
+<% }); %>
+
+<% } %><% if (it.context.initiativePatterns.length > 0) { %>## Initiative Patterns
+<% it.context.initiativePatterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
+<% }); %>
+
+<% } %>## Current Initiative Tasks
+
+<%= it.generateTasksMarkdownReport(it.context.tasks) %>
+
+<% if (it.context.issues.length > 0) { %>## Existing Issues
+
+The following issues have already been identified for this initiative:
+
+<% it.context.issues.forEach(function(issue, index) { %>### Issue <%= index + 1 %>: <%= issue.name %> (ID: <%= issue.id %>)
+
+**Status:** <%= issue.status %>
+**Description:** <%= issue.description %>
+<% if (issue.tags && issue.tags.length > 0) { %>**Tags:** <%= issue.tags.join(', ') %>
+<% } %><% if (issue.recommendedStrategy) { %>**Recommended Strategy:** <%= issue.recommendedStrategy %>
+<% } %><% if (issue.actualStrategy) { %>**Actual Strategy:** <%= issue.actualStrategy %>
+<% } %><% if (issue.effortAssessment) { %>**Effort Assessment:** <%= issue.effortAssessment %>
+<% } %><% if (issue.summary) { %>**Summary:** <%= issue.summary %>
+<% } %>
+<% }); %>
+
+<% } %><% if (it.issueDescription) { %>## New Issue to Analyze
+
+**Issue Description:** <%= it.issueDescription %>
+
+<% } %>## Scope Change Analysis Framework
+
+### Step 1: Change Impact Analysis
+
+Analyze the current situation by examining:
+1. **Recent Changes**: Review recent git commits, code changes, and implementation progress
+2. **Task Progress**: Assess how the issue affects current and remaining tasks
+3. **Knowledge Dependencies**: Consider impact on existing decisions, solutions, and patterns
+4. **Timeline Impact**: Estimate how the issue affects initiative completion timeline
+
+### Step 2: Resolution Strategy Analysis
+
+Evaluate each of the following strategies for handling this scope change:
+
+#### Option 1: Embed
+- **Description**: Integrate the issue resolution into the current task plan
+- **Best For**: Small problems that can be solved within existing scope
+- **Process**: Slightly modify existing tasks to address the issue
+- **Pros**: Unified deliverable, maintains current initiative structure
+- **Cons**: Timeline extension, potential scope creep
+- **Effort Assessment**: [Estimate effort required]
+
+#### Option 2: Complete Replan
+- **Description**: Replan remaining work scope to address the issue comprehensively
+- **Best For**: Serious changes requiring significant task list updates
+- **Process**: Return to previous tasks if needed, update remaining task scope
+- **Pros**: Proper handling of significant scope changes
+- **Cons**: Major timeline impact, potential rework
+- **Effort Assessment**: [Estimate effort required]
+
+#### Option 3: Defer
+- **Description**: Move the issue to backlog for future planning as separate initiative
+- **Best For**: Non-critical issues that don't block initiative completion
+- **Process**: Document issue thoroughly, create backlog item
+- **Pros**: Maintains current initiative focus, clear separation of concerns
+- **Cons**: Issue may resurface, potential technical debt
+- **Effort Assessment**: [Estimate effort required]
+
+#### Option 4: Cancel Initiative
+- **Description**: Terminate the current initiative execution
+- **Best For**: Fatal issues that question the entire initiative's viability
+- **Process**: Document learning, promote valuable knowledge to project level
+- **Pros**: Prevents further investment in fundamentally flawed approach
+- **Cons**: Complete loss of initiative investment
+- **Effort Assessment**: [Estimate effort required]
+
+#### Option 5: Close as Non-Issue
+- **Description**: Determine the issue is expected behavior or not actually a problem
+- **Best For**: Issues that are actually designed behavior or misunderstandings
+- **Process**: Document the analysis and close the issue
+- **Pros**: No disruption to current plan
+- **Cons**: Risk of dismissing legitimate concerns
+- **Effort Assessment**: Minimal
+
+### Step 3: Recommendation Process
+
+1. **Analyze each strategy** against the specific situation
+2. **Consider existing issues** to avoid duplicating previous analysis
+3. **Select recommended strategy** with clear rationale
+4. **Document decision** using issue_management tool
+5. **Update initiative knowledge** using initiative_update tool if needed
+
+## Analysis Guidelines
+
+### Avoiding Duplicate Analysis
+- **Review existing issues** above to understand previous scope change decisions
+- **Build upon prior analysis** rather than repeating the same evaluation
+- **Reference related issues** when making new recommendations
+
+### Using the Tools
+
+**Create New Issue:**
+```json
+{
+	"initiativeId": "<%= it.context.initiative.id %>",
+	"create": [{
+		"id": "issue-id",
+		"name": "Issue Name",
+		"description": "Detailed issue description",
+		"recommendedStrategy": "embed|replan|defer|cancelInitiative",
+		"effortAssessment": "S|M|L|XL|XXL",
+		"tags": ["tag1", "tag2"],
+		"status": "open"
+	}]
+}
+```
+
+## Expected Output
+
+Provide:
+1. **Impact Analysis**: Clear assessment of how the issue affects the initiative
+2. **Strategy Evaluation**: Analysis of each resolution strategy with pros/cons
+3. **Recommendation**: Selected strategy with detailed rationale
+4. **Tool Usage**: Commands to document the issue and recommendation
+5. **Next Steps**: Clear guidance for implementing the chosen strategy
+
+Remember: You are only recommending strategies, not implementing them. The goal is informed decision-making with proper documentation in the knowledge base.

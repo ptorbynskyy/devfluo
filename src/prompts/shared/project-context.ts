@@ -2,6 +2,8 @@
 
 import type { Decision } from "../../domain/decision-schema.js";
 import { loadDecisions } from "../../domain/decisions.js";
+import type { Issue } from "../../domain/initiative/issue-schema.js";
+import { loadIssues } from "../../domain/initiative/issues.js";
 import {
 	loadInitiativeDecisions,
 	loadInitiativePatterns,
@@ -26,6 +28,7 @@ export interface ProjectContext {
 export interface InitiativeContext extends ProjectContext {
 	initiative: InitiativeWithOverview;
 	tasks: Task[];
+	issues: Issue[];
 	initiativeDecisions: Decision[];
 	initiativeSolutions: Solution[];
 	initiativePatterns: Pattern[];
@@ -53,12 +56,14 @@ export async function loadInitiativeContext(
 	const [
 		projectContext,
 		tasks,
+		issues,
 		initiativeDecisions,
 		initiativeSolutions,
 		initiativePatterns,
 	] = await Promise.all([
 		loadProjectContext(),
 		loadTasks(initiative.id),
+		loadIssues(initiative.id),
 		loadInitiativeDecisions(initiative.id),
 		loadInitiativeSolutions(initiative.id),
 		loadInitiativePatterns(initiative.id),
@@ -68,6 +73,7 @@ export async function loadInitiativeContext(
 		...projectContext,
 		initiative,
 		tasks,
+		issues,
 		initiativeDecisions,
 		initiativeSolutions,
 		initiativePatterns,

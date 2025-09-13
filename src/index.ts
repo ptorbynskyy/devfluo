@@ -8,6 +8,7 @@ import { config } from "./config.js";
 import { setupBacklogSpecificationPrompt } from "./prompts/backlog-specification.js";
 import { setupInitiativeCompletionPrompt } from "./prompts/initiative-completion.js";
 import { setupInitiativePlanningPrompt } from "./prompts/initiative-planning.js";
+import { setupInitiativeScopeChangePrompt } from "./prompts/initiative-scope-change.js";
 import { setupInitiativeSpecificationPrompt } from "./prompts/initiative-specification.js";
 import { setupInitiativeTaskExecutionPrompt } from "./prompts/initiative-task-execution.js";
 import { setupBacklogResources } from "./resources/backlog.js";
@@ -63,6 +64,7 @@ async function runServer(): Promise<void> {
 	setupInitiativeSpecificationPrompt(server);
 	setupInitiativePlanningPrompt(server);
 	setupInitiativeTaskExecutionPrompt(server);
+	setupInitiativeScopeChangePrompt(server);
 	setupInitiativeCompletionPrompt(server);
 
 	const transport = new StdioServerTransport();
