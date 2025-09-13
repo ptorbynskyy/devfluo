@@ -1,0 +1,289 @@
+# Complete Initiative: <%= it.context.initiative.name %>
+
+You are completing the following initiative and consolidating its knowledge into the project knowledge base:
+
+**Initiative ID:** <%= it.context.initiative.id %>
+**Initiative Name:** <%= it.context.initiative.name %>
+**Current State:** <%= it.context.initiative.state %>
+
+<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
+
+<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
+
+<%= it.context.initiative.spec %>
+
+<% } %><%~ include('partials/project-context', it) %>
+
+## Stage 1: Task Validation ✓
+
+All tasks in this initiative have been completed:
+
+<% it.context.tasks.forEach(function(task) { %>- ✅ **<%= task.id %>: <%= task.name %>** (Phase <%= task.phase %>, Order <%= task.order %>) - Status: <%= task.status %>
+<% }); %>
+
+**Total Tasks:** <%= it.context.tasks.length %>
+**Completed Tasks:** <%= it.context.tasks.filter(t => t.status === 'done').length %>
+
+## Stage 2: Knowledge Extraction
+
+### Initiative Knowledge Summary
+
+<% if (it.context.initiativeDecisions.length > 0) { %>#### Initiative Decisions (<%= it.context.initiativeDecisions.length %>)
+<% it.context.initiativeDecisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %> `[<%= d.tags.join(', ') %>]`
+<% }); %>
+
+<% } else { %>#### Initiative Decisions
+No decisions recorded for this initiative.
+
+<% } %><% if (it.context.initiativeSolutions.length > 0) { %>#### Initiative Solutions (<%= it.context.initiativeSolutions.length %>)
+<% it.context.initiativeSolutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %> `[<%= s.tags.join(', ') %>]`<% if (s.codeReferences && s.codeReferences.length > 0) { %> *(References: <%= s.codeReferences.join(', ') %>)*<% } %>
+<% }); %>
+
+<% } else { %>#### Initiative Solutions
+No solutions recorded for this initiative.
+
+<% } %><% if (it.context.initiativePatterns.length > 0) { %>#### Initiative Patterns (<%= it.context.initiativePatterns.length %>)
+<% it.context.initiativePatterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %> `[<%= p.tags.join(', ') %>]` *(Snippet: <%= p.snippetFilename %>)*<% if (p.codeReferences && p.codeReferences.length > 0) { %> *(References: <%= p.codeReferences.join(', ') %>)*<% } %>
+<% }); %>
+
+<% } else { %>#### Initiative Patterns
+No patterns recorded for this initiative.
+
+<% } %>### Git Analysis Instructions
+
+To extract additional knowledge from the development process:
+
+1. **Run git log analysis** to understand the scope of changes:
+   ```bash
+   git log --oneline --since="<initiative-start-date>" --until="now" --grep="<%= it.context.initiative.id %>" --all
+   ```
+
+2. **Analyze commit patterns** to identify:
+   - Major architectural decisions not captured in knowledge items
+   - Refactoring patterns that emerged during development
+   - Technical debt solutions implemented
+   - Integration patterns with existing codebase
+
+3. **Review file changes** for significant modifications:
+   ```bash
+   git diff --name-status <initial-commit>..<final-commit>
+   ```
+
+## Stage 3: Knowledge Quality Filtering & Promotion
+
+Apply the following criteria to determine which knowledge items should be promoted to the project knowledge base:
+
+### Decision Promotion Criteria
+
+**Promote decisions that:**
+- ✅ Apply beyond this initiative (architectural impact)
+- ✅ Are tagged with "**" (importance marker)
+- ✅ Set precedents for future development
+- ✅ Solve recurring organizational problems
+- ✅ Have scope beyond "local" implementation
+
+**Current Decision Analysis:**
+<% if (it.context.initiativeDecisions.length > 0) { %>
+<% it.context.initiativeDecisions.forEach(function(d) { %>**<%= d.name %>**:
+- Description: <%= d.description %>
+- Tags: <%= d.tags.join(', ') %>
+- **Promotion Assessment**: 
+  - Architectural impact: <%= d.tags.includes('architecture') || d.tags.includes('**') ? '✅ YES' : '❌ Local only' %>
+  - Sets precedent: <%= d.tags.includes('precedent') || d.tags.includes('pattern') ? '✅ YES' : '❌ One-time decision' %>
+  - Reusable: <%= d.tags.includes('reusable') || d.description.length > 100 ? '✅ YES' : '❌ Specific to initiative' %>
+  - **Recommendation**: <%= (d.tags.includes('architecture') || d.tags.includes('**') || d.tags.includes('precedent') || d.tags.includes('reusable')) ? '🔄 PROMOTE to project decisions' : '📁 KEEP in initiative only' %>
+
+<% }); %>
+<% } else { %>No decisions to analyze for promotion.
+<% } %>
+
+### Solution Promotion Criteria
+
+**Promote solutions that:**
+- ✅ Address non-trivial problems (>50 char description)
+- ✅ Have clear code references
+- ✅ Are tagged as "validated" or "reusable"
+- ✅ Address common development problems
+- ✅ Can be applied to other areas of the codebase
+
+**Current Solution Analysis:**
+<% if (it.context.initiativeSolutions.length > 0) { %>
+<% it.context.initiativeSolutions.forEach(function(s) { %>**<%= s.problem %>**:
+- Solution: <%= s.solution %>
+- Tags: <%= s.tags.join(', ') %>
+- Code References: <%= s.codeReferences ? s.codeReferences.join(', ') : 'None' %>
+- **Promotion Assessment**:
+  - Non-trivial: <%= s.solution.length > 50 ? '✅ YES (' + s.solution.length + ' chars)' : '❌ Too simple (' + s.solution.length + ' chars)' %>
+  - Has references: <%= s.codeReferences && s.codeReferences.length > 0 ? '✅ YES (' + s.codeReferences.length + ' refs)' : '❌ No code references' %>
+  - Validated/Reusable: <%= s.tags.includes('validated') || s.tags.includes('reusable') ? '✅ YES' : '❌ Not marked as validated' %>
+  - **Recommendation**: <%= (s.solution.length > 50 && s.codeReferences && s.codeReferences.length > 0 && (s.tags.includes('validated') || s.tags.includes('reusable'))) ? '🔄 PROMOTE to project solutions' : '📁 KEEP in initiative only' %>
+
+<% }); %>
+<% } else { %>No solutions to analyze for promotion.
+<% } %>
+
+### Pattern Promotion Criteria
+
+**Promote patterns that:**
+- ✅ Were used 3+ times within initiative
+- ✅ Have complete code examples
+- ✅ Are tagged as "structured" and "validated"
+- ✅ Demonstrate reusable implementation approach
+- ✅ Apply to multiple components/modules
+
+**Current Pattern Analysis:**
+<% if (it.context.initiativePatterns.length > 0) { %>
+<% it.context.initiativePatterns.forEach(function(p) { %>**<%= p.name %>**:
+- Description: <%= p.description %>
+- Tags: <%= p.tags.join(', ') %>
+- Snippet File: <%= p.snippetFilename %>
+- Code References: <%= p.codeReferences ? p.codeReferences.join(', ') : 'None' %>
+- **Promotion Assessment**:
+  - Multiple uses: <%= p.codeReferences && p.codeReferences.length >= 3 ? '✅ YES (' + p.codeReferences.length + ' refs)' : '❌ Used < 3 times' %>
+  - Structured: <%= p.tags.includes('structured') ? '✅ YES' : '❌ Not marked structured' %>
+  - Validated: <%= p.tags.includes('validated') ? '✅ YES' : '❌ Not validated' %>
+  - **Recommendation**: <%= (p.codeReferences && p.codeReferences.length >= 3 && p.tags.includes('structured') && p.tags.includes('validated')) ? '🔄 PROMOTE to project patterns' : '📁 KEEP in initiative only' %>
+
+<% }); %>
+<% } else { %>No patterns to analyze for promotion.
+<% } %>
+
+## Stage 4: Execute Knowledge Base Updates
+
+Based on the quality filtering analysis above, execute the following tool calls to promote valuable knowledge:
+
+### Step 1: Update Project Knowledge Base
+
+Execute this tool call to promote approved knowledge items:
+
+```json
+{
+  "name": "update_knowledge",
+  "arguments": {
+    <% 
+    const promotableDecisions = it.context.initiativeDecisions.filter(d => 
+      d.tags.includes('architecture') || d.tags.includes('**') || 
+      d.tags.includes('precedent') || d.tags.includes('reusable')
+    );
+    const promotableSolutions = it.context.initiativeSolutions.filter(s => 
+      s.solution.length > 50 && s.codeReferences && s.codeReferences.length > 0 && 
+      (s.tags.includes('validated') || s.tags.includes('reusable'))
+    );
+    const promotablePatterns = it.context.initiativePatterns.filter(p => 
+      p.codeReferences && p.codeReferences.length >= 3 && 
+      p.tags.includes('structured') && p.tags.includes('validated')
+    );
+    %>
+    <% if (promotableDecisions.length > 0) { %>"decisions": {
+      "create": [
+        <% promotableDecisions.forEach(function(d, index) { %>{
+          "name": "<%= d.name %>",
+          "description": "<%= d.description.replace(/"/g, '\\"') %>",
+          "tags": <%= JSON.stringify(d.tags) %>
+        }<%= index < promotableDecisions.length - 1 ? ',' : '' %>
+        <% }); %>
+      ]
+    }<%= (promotableSolutions.length > 0 || promotablePatterns.length > 0) ? ',' : '' %>
+    <% } %>
+    <% if (promotableSolutions.length > 0) { %>"solutions": {
+      "create": [
+        <% promotableSolutions.forEach(function(s, index) { %>{
+          "problem": "<%= s.problem.replace(/"/g, '\\"') %>",
+          "solution": "<%= s.solution.replace(/"/g, '\\"') %>",
+          "tags": <%= JSON.stringify(s.tags) %><%= s.codeReferences ? ',' : '' %>
+          <% if (s.codeReferences) { %>"codeReferences": <%= JSON.stringify(s.codeReferences) %><% } %>
+        }<%= index < promotableSolutions.length - 1 ? ',' : '' %>
+        <% }); %>
+      ]
+    }<%= promotablePatterns.length > 0 ? ',' : '' %>
+    <% } %>
+    <% if (promotablePatterns.length > 0) { %>"patterns": {
+      "create": [
+        <% promotablePatterns.forEach(function(p, index) { %>{
+          "name": "<%= p.name %>",
+          "description": "<%= p.description.replace(/"/g, '\\"') %>",
+          "tags": <%= JSON.stringify(p.tags) %>,
+          "snippetFilename": "<%= p.snippetFilename %>",
+          "snippetContent": "// Pattern code from <%= it.context.initiative.id %> initiative\n// TODO: Extract actual pattern implementation"<%= p.codeReferences ? ',' : '' %>
+          <% if (p.codeReferences) { %>"codeReferences": <%= JSON.stringify(p.codeReferences) %><% } %>
+        }<%= index < promotablePatterns.length - 1 ? ',' : '' %>
+        <% }); %>
+      ]
+    }
+    <% } %>
+    <% if (promotableDecisions.length === 0 && promotableSolutions.length === 0 && promotablePatterns.length === 0) { %>
+    // No knowledge items met the promotion criteria
+    "decisions": {"create": []},
+    "solutions": {"create": []},
+    "patterns": {"create": []}
+    <% } %>
+  }
+}
+```
+
+### Step 2: Analyze Architecture & Codebase Impact
+
+Review if this initiative's changes require updates to the main project knowledge files:
+
+**Architecture.md Updates Needed?**
+- Did this initiative introduce new architectural components?
+- Did it establish new patterns or constraints?
+- Did it change how systems interact?
+
+**Codebase.md Updates Needed?**
+- Did this initiative add new major modules?
+- Did it refactor significant portions of the codebase?
+- Did it change the project structure?
+
+If architecture or codebase updates are needed, include them in the `update_knowledge` tool call above with:
+```json
+{
+  "architectureContent": "Updated architecture content...",
+  "codebaseContent": "Updated codebase content..."
+}
+```
+
+## Stage 5: Complete the Initiative
+
+After successfully updating the knowledge base, mark the initiative as complete:
+
+```json
+{
+  "name": "initiative_update",
+  "arguments": {
+    "id": "<%= it.context.initiative.id %>",
+    "state": "completed"
+  }
+}
+```
+
+## Completion Workflow Summary
+
+1. ✅ **Validate** - All tasks confirmed completed
+2. 🔍 **Extract** - Knowledge items identified and analyzed  
+3. 🎯 **Filter** - Quality criteria applied to determine promotions
+4. 📚 **Update** - Project knowledge base updated with valuable items
+5. 🏁 **Complete** - Initiative marked as completed
+
+## Guidelines for Execution
+
+### Knowledge Promotion Best Practices
+- **Be selective**: Only promote knowledge that truly benefits the entire project
+- **Maintain quality**: Ensure promoted items have clear descriptions and proper tags
+- **Update references**: Make sure code references are accurate and helpful
+- **Document rationale**: Include tags that explain why items were promoted
+
+### Tool Execution Order
+1. First execute `update_knowledge` with all approved items
+2. Then execute `initiative_update` to mark as completed
+3. Confirm both operations succeeded before declaring completion
+
+### Final Validation
+After tool execution:
+- Verify knowledge base was updated correctly
+- Confirm initiative status changed to "completed" 
+- Check that no errors occurred during the process
+
+---
+
+**Ready to Execute**: You now have all the context and tools needed to complete this initiative successfully. Begin with the knowledge base updates, then mark the initiative as complete.

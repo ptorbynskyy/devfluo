@@ -6,6 +6,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "./config.js";
 import { setupBacklogSpecificationPrompt } from "./prompts/backlog-specification.js";
+import { setupInitiativeCompletionPrompt } from "./prompts/initiative-completion.js";
 import { setupInitiativePlanningPrompt } from "./prompts/initiative-planning.js";
 import { setupInitiativeSpecificationPrompt } from "./prompts/initiative-specification.js";
 import { setupInitiativeTaskExecutionPrompt } from "./prompts/initiative-task-execution.js";
@@ -62,6 +63,7 @@ async function runServer(): Promise<void> {
 	setupInitiativeSpecificationPrompt(server);
 	setupInitiativePlanningPrompt(server);
 	setupInitiativeTaskExecutionPrompt(server);
+	setupInitiativeCompletionPrompt(server);
 
 	const transport = new StdioServerTransport();
 	await server.connect(transport);

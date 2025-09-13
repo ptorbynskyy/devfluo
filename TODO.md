@@ -1,52 +1,69 @@
-# Tasks execution prompt
-Create an MCP Server Prompt that orchestrates task execution within an initiative. The prompt receives a task list as input - either a single task identifier, comma-separated task list, or task range specified with hyphens. Validate the format and verify all tasks exist, are not already completed, and are executable. Check that there are no unfinished predecessors for these tasks, focusing on external predecessors outside the specified task range. If three interconnected tasks are all included in execution, their internal dependencies can be ignored since they'll execute in proper order naturally. Only external predecessors outside the task list that aren't completed and would block execution matter. Load Project Context similar to other prompts, including initiative context with its decisions, solutions, patterns, overview, specification, and full task list as Markdown table. During execution, track emerging solutions, patterns, problems, and solutions found, saving them for the initiative using Tool Initiative Update for potential future consolidation into project knowledge. Mark all completed tasks as finished after successful execution using Initiative Update Tool to update state.
+# Initiative completion
+- prompt for initiative completion with merge knowledge from initative context and global context
+  
+Create a prompt for MCP server that completes initiative execution. It should load global project context and current initiative context. Verify all initiative tasks are completed. Then start knowledge collection process. Knowledge is based on completed tasks and git log history from the initiative (usually separate branch with commits). Analyze all decisions, solutions, and patterns from this initiative to determine if they should be merged with project knowledge base. Validate each decision, solution, and pattern, then decide whether to merge based on criteria. After collecting merge candidates, update project knowledge base using Update knowledge tool. Analyze how initiative changes affected main project knowledge artifacts like Architecture Markdown and Codebase Markdown documents. Update these documents if necessary, carefully considering changes since they impact the entire project and codebase.
 
-### Validation
- - Validate task range
-   - t001
-   - t001,t002
-   - t003-t005
- - Task(s) should not be started or completted
- - Validate that group of task don't have not completted predessors
-### Context
- - load project context
- - load initiative context 
-   - decisions, solutions, patterns, 
-   - overview, 
-   - spec 
-   - full task list - generateTasksMarkdownReport 
+### Stage 1: Validation Check
+- All tasks done?
 
-### Task Execution
-**Work on task using:**
-- Relevant decisions from knowledge base
-- Architecture constraints
-- Similar solutions
-- Established patterns
+### Stage 2: Knowledge Extraction
 
-**Track(initiative update tool) in current session:**
-- Decisions made (key: value format)
-- Problems solved (problem → solution)
-- Patterns applied
+**Key Achievements:**
+ - From completed tasks
+ - From git log major changes
+ - From decisions architectural choices
 
-### Code Quality Checks
-- Follow existing patterns
-- Maintain consistency
-- Update documentation
+### Stage 3: Promote to Knowledge Base
 
-### Update State
-After execution:
-- Update task status to completted(done) - initiative update tool
+**Quality Filtering Process:**
+
+```python
+# Evaluate each decision/solution for promotion
+def should_promote(item, type):
+    if type == "decision":
+        # Promote if:
+        # - Applies to multiple features/modules
+        # - Sets architectural precedent
+        # - Solves recurring problem
+        # - Has tag "**" (important marker)
+        return (
+            item.get("scope", "local") != "local" or
+            "**" in item.get("key", "") or
+            item.get("reusable", False)
+        )
+    elif type == "solution":
+        # Promote if:
+        # - Used 3+ times
+        # - Tagged as "structured" and "validated"
+        # - Has clear file references
+        # - Not a trivial fix (>50 chars description)
+        return (
+            item.get("usage_count", 1) >= 3 or
+            "structured" in item.get("tags", []) or
+            len(item.get("solution", "")) > 50
+        )
+```
+
+**Best Decisions → project knowledge decisions:**
+#### Only add decisions that pass quality filter:
+- Apply beyond this initiative (scope: "global")
+- Solve fundamental problems (tagged with "**")
+- Set precedents (marked as "reusable": true)
+- Have been validated in practice
+
+**Reusable Solutions → project knowledge solutions:**
+#### Only add solutions that pass quality filter:
+- Fixed non-trivial problems (>50 char description)
+- Can apply to other areas (tagged "reusable")
+- Have clear file references
+- Used multiple times or tagged "validated"
+
+
+**Patterns → project knowledge patterns:**
+ - Only add patterns used 3+ times:
 
 
 
-
-- prompt for tasks execution with create tasks based on context
-    - global context
-        - decisions, solutions, patterns (filter by tags)
-        - arhitecture.md
-        - codebase.md
-    - initative context
-        - overview.md
 
 ---
 # Collect knowledge
@@ -55,10 +72,6 @@ After execution:
 ---
 # Initiative issue review
 - prompt for initiative review with merge knowledge from initative context and global context
-
----
-# Initiative completion
-- prompt for initiative completion with merge knowledge from initative context and global context
 
 ---
 
