@@ -11,6 +11,7 @@ import { setupInitiativePlanningPrompt } from "./prompts/initiative-planning.js"
 import { setupInitiativeScopeChangePrompt } from "./prompts/initiative-scope-change.js";
 import { setupInitiativeSpecificationPrompt } from "./prompts/initiative-specification.js";
 import { setupInitiativeTaskExecutionPrompt } from "./prompts/initiative-task-execution.js";
+import { setupIssueResolutionPrompt } from "./prompts/issue-resolution.js";
 import { setupBacklogResources } from "./resources/backlog.js";
 import { setupDecisionsResource } from "./resources/decisions.js";
 import { setupInitiativeResources } from "./resources/initiative.js";
@@ -65,6 +66,7 @@ async function runServer(): Promise<void> {
 	setupInitiativePlanningPrompt(server);
 	setupInitiativeTaskExecutionPrompt(server);
 	setupInitiativeScopeChangePrompt(server);
+	setupIssueResolutionPrompt(server);
 	setupInitiativeCompletionPrompt(server);
 
 	const transport = new StdioServerTransport();

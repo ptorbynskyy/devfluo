@@ -1,0 +1,311 @@
+# Issue Resolution: <%= it.issue.name %>
+
+You are resolving an issue within the following initiative:
+
+**Initiative ID:** <%= it.context.initiative.id %>
+**Initiative Name:** <%= it.context.initiative.name %>
+**Initiative State:** <%= it.context.initiative.state %>
+<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
+
+<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
+
+<%= it.context.initiative.spec %>
+
+<% } %><%~ include('partials/project-context', it) %>
+
+<% if (it.context.initiativeDecisions.length > 0) { %>## Initiative Decisions
+<% it.context.initiativeDecisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
+<% }); %>
+
+<% } %><% if (it.context.initiativeSolutions.length > 0) { %>## Initiative Solutions
+<% it.context.initiativeSolutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
+<% }); %>
+
+<% } %><% if (it.context.initiativePatterns.length > 0) { %>## Initiative Patterns
+<% it.context.initiativePatterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
+<% }); %>
+
+<% } %>## Current Initiative Tasks
+
+<%= it.generateTasksMarkdownReport(it.context.tasks) %>
+
+## Issue Details
+
+**Issue ID:** <%= it.issue.id %>
+**Issue Name:** <%= it.issue.name %>
+**Status:** <%= it.issue.status %>
+**Description:** <%= it.issue.description %>
+<% if (it.issue.tags && it.issue.tags.length > 0) { %>**Tags:** <%= it.issue.tags.join(', ') %>
+<% } %><% if (it.issue.recommendedStrategy) { %>**Recommended Strategy:** <%= it.issue.recommendedStrategy %>
+<% } %><% if (it.issue.effortAssessment) { %>**Effort Assessment:** <%= it.issue.effortAssessment %>
+<% } %><% if (it.issue.summary) { %>**Previous Analysis Summary:** <%= it.issue.summary %>
+<% } %>
+
+<% if (it.userChoice) { %>## User Selected Strategy: <%= it.userChoice %>
+
+You have selected to resolve this issue using the **<%= it.userChoice %>** strategy. Implement this strategy by following the appropriate process below:
+
+<% if (it.userChoice === 'embed') { %>### Embed Strategy Implementation
+
+1. **Add Tasks to Current Initiative Plan**
+   - Use the `initiative_update` tool to add new tasks that address this issue
+   - Integrate these tasks into the existing task plan without major disruption
+   - Update the task order/phases as needed to accommodate the new work
+
+2. **Update Issue Status**
+   - Use the `issue_management` tool to update the issue with:
+     - `actualStrategy`: "embed"
+     - `status`: "closed"
+     - `summary`: Brief explanation of how the issue was embedded and what tasks were added
+
+**Example Tools Usage:**
+```json
+// First, add tasks to handle the issue
+{
+  "id": "<%= it.context.initiative.id %>",
+  "tasks": {
+    "create": [
+      {
+        "id": "fix-<%= it.issue.id %>",
+        "name": "Fix <%= it.issue.name %>",
+        "description": "Address the issue by implementing necessary changes",
+        "effort": "<%= it.issue.effortAssessment || 'M' %>",
+        "status": "new",
+        "order": [appropriate_order],
+        "phase": [current_phase]
+      }
+    ]
+  }
+}
+
+// Then, close the issue
+{
+  "initiativeId": "<%= it.context.initiative.id %>",
+  "update": {
+    "<%= it.issue.id %>": {
+      "actualStrategy": "embed",
+      "status": "closed",
+      "summary": "Embedded fix into current task plan by adding [describe tasks added]"
+    }
+  }
+}
+```
+
+<% } else if (it.userChoice === 'replan') { %>### Replan Strategy Implementation
+
+1. **Substantial Task Plan Rescheduling**
+   - Use the `initiative_update` tool to modify the existing task list significantly
+   - May require updating/deleting existing tasks and adding new ones
+   - Reorder tasks and phases to properly address the issue
+   - Consider dependencies and how the replanning affects the overall timeline
+
+2. **Update Issue Status**
+   - Use the `issue_management` tool to update the issue with:
+     - `actualStrategy`: "replan"
+     - `status`: "closed"
+     - `summary`: Explanation of how the task plan was restructured
+
+**Example Tools Usage:**
+```json
+// Replan tasks significantly
+{
+  "id": "<%= it.context.initiative.id %>",
+  "tasks": {
+    "update": {
+      // Update existing tasks as needed
+      "existing-task-id": {
+        "description": "Updated to account for new requirements",
+        "order": [new_order]
+      }
+    },
+    "create": [
+      {
+        "id": "replan-<%= it.issue.id %>-1",
+        "name": "Address <%= it.issue.name %> - Part 1",
+        "description": "First part of addressing the replanning issue",
+        "effort": "L",
+        "status": "new",
+        "order": [new_order],
+        "phase": [appropriate_phase]
+      }
+    ],
+    "delete": ["outdated-task-id"] // if any tasks become obsolete
+  }
+}
+
+// Then, close the issue
+{
+  "initiativeId": "<%= it.context.initiative.id %>",
+  "update": {
+    "<%= it.issue.id %>": {
+      "actualStrategy": "replan",
+      "status": "closed",
+      "summary": "Replanned initiative tasks to address [describe changes made]"
+    }
+  }
+}
+```
+
+<% } else if (it.userChoice === 'defer') { %>### Defer Strategy Implementation
+
+1. **Create Backlog Item**
+   - Use the `backlog_management` tool to create a backlog item based on this issue
+   - Include relevant details and context for future planning
+
+2. **Update Issue Status**
+   - Use the `issue_management` tool to update the issue with:
+     - `actualStrategy`: "defer"
+     - `status`: "closed"
+     - `summary`: Explanation of why it was deferred and how it was captured in backlog
+
+**Example Tools Usage:**
+```json
+// Create backlog item
+{
+  "create": [
+    {
+      "id": "deferred-<%= it.issue.id %>",
+      "name": "<%= it.issue.name %> (Deferred from <%= it.context.initiative.name %>)",
+      "description": "<%= it.issue.description %>\\n\\nThis issue was encountered during the '<%= it.context.initiative.name %>' initiative but deferred to maintain focus on the primary deliverables.",
+      "effort": "<%= it.issue.effortAssessment || 'M' %>",
+    }
+  ]
+}
+
+// Then, close the issue
+{
+  "initiativeId": "<%= it.context.initiative.id %>",
+  "update": {
+    "<%= it.issue.id %>": {
+      "actualStrategy": "defer",
+      "status": "closed",
+      "summary": "Deferred to backlog as item 'deferred-<%= it.issue.id %>' for future planning"
+    }
+  }
+}
+```
+
+<% } else if (it.userChoice === 'cancelInitiative') { %>### Cancel Initiative Strategy Implementation
+
+1. **Cancel the Entire Initiative**
+   - Use the `initiative_update` tool to set the initiative state to "cancelled"
+   - This is a drastic action that terminates the entire initiative
+
+2. **Update Issue Status**
+   - Use the `issue_management` tool to update the issue with:
+     - `actualStrategy`: "cancelInitiative"
+     - `status`: "closed"
+     - `summary`: Explanation of why the issue led to initiative cancellation
+
+**Example Tools Usage:**
+```json
+// Cancel the initiative
+{
+  "id": "<%= it.context.initiative.id %>",
+  "state": "cancelled"
+}
+
+// Then, close the issue
+{
+  "initiativeId": "<%= it.context.initiative.id %>",
+  "update": {
+    "<%= it.issue.id %>": {
+      "actualStrategy": "cancelInitiative",
+      "status": "closed",
+      "summary": "Issue was determined to be fatal, leading to initiative cancellation because [explain reasoning]"
+    }
+  }
+}
+```
+
+<% } else { %>### Close as Non-Issue Strategy Implementation
+
+1. **Close Issue Without Action**
+   - No changes to initiative or tasks are needed
+   - The issue is determined to be expected behavior or not actually a problem
+
+2. **Update Issue Status**
+   - Use the `issue_management` tool to update the issue with:
+     - `actualStrategy`: "close" (note: this should be one of the valid strategies)
+     - `status`: "closed"
+     - `summary`: Explanation of why this was determined to be a non-issue
+
+**Example Tools Usage:**
+```json
+// Close the issue as non-issue
+{
+  "initiativeId": "<%= it.context.initiative.id %>",
+  "update": {
+    "<%= it.issue.id %>": {
+      "status": "closed",
+      "summary": "Determined to be expected behavior/not actually a problem because [explain reasoning]"
+    }
+  }
+}
+```
+
+<% } %>
+<% } else { %>## Resolution Strategy Selection
+
+Based on the issue analysis, you need to select one of the following resolution strategies. <% if (it.issue.recommendedStrategy) { %>The recommended strategy is **<%= it.issue.recommendedStrategy %>**<% if (it.issue.summary) { %> based on the previous analysis: "<%= it.issue.summary %>"<% } %>.<% } %>
+
+### Available Resolution Strategies
+
+#### 1. Embed Strategy
+**Best for:** Small problems that can be integrated into current task plan
+- **Process:** Add new tasks to current initiative to address the issue
+- **Timeline Impact:** Minimal to moderate extension
+- **Pros:** Maintains current initiative focus, unified deliverable
+- **Cons:** May cause scope creep, timeline extension
+- **Effort:** Typically adds 1-3 tasks to existing plan
+
+#### 2. Replan Strategy
+**Best for:** Serious changes requiring significant task list updates
+- **Process:** Substantially modify existing task plan, may update/delete existing tasks
+- **Timeline Impact:** Moderate to significant extension
+- **Pros:** Proper handling of complex scope changes
+- **Cons:** Major timeline impact, potential rework of completed tasks
+- **Effort:** May require restructuring multiple phases of work
+
+#### 3. Defer Strategy
+**Best for:** Non-critical issues that don't block initiative completion
+- **Process:** Create backlog item for future planning as separate initiative
+- **Timeline Impact:** None for current initiative
+- **Pros:** Maintains focus on current deliverables, clear separation of concerns
+- **Cons:** Issue may resurface later, potential technical debt
+- **Effort:** Documentation and backlog creation only
+
+#### 4. Cancel Initiative Strategy
+**Best for:** Fatal issues questioning entire initiative viability
+- **Process:** Terminate current initiative execution completely
+- **Timeline Impact:** Complete halt of current work
+- **Pros:** Prevents further investment in fundamentally flawed approach
+- **Cons:** Complete loss of initiative investment
+- **Effort:** Cleanup and knowledge preservation activities
+
+#### 5. Close as Non-Issue Strategy
+**Best for:** Issues that are actually expected behavior or misunderstandings
+- **Process:** Document analysis and close without action
+- **Timeline Impact:** None
+- **Pros:** No disruption to current plan
+- **Cons:** Risk of dismissing legitimate concerns
+- **Effort:** Documentation only
+
+## Decision Process
+
+Please provide your choice by running this prompt again with the `userChoice` parameter set to one of:
+- `embed`
+- `replan`
+- `defer`
+- `cancelInitiative`
+
+Or specify that you want to close this as a non-issue by explaining your reasoning.
+
+Consider the following factors in your decision:
+1. **Criticality:** How important is this issue for the current initiative's success?
+2. **Complexity:** How much work is required to properly address this issue?
+3. **Timeline:** What is the acceptable impact on the current initiative timeline?
+4. **Dependencies:** Does this issue block other important work?
+5. **Learning Value:** What can be learned and preserved regardless of the chosen strategy?
+
+<% } %>

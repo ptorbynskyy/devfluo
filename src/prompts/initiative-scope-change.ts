@@ -25,9 +25,7 @@ export const ScopeChangeInputSchema = z.object({
 	issueDescription: z
 		.string()
 		.min(1)
-		.describe(
-			"Description of the new issue to analyze",
-		),
+		.describe("Description of the new issue to analyze"),
 });
 
 export type ScopeChangeInput = z.infer<typeof ScopeChangeInputSchema>;
