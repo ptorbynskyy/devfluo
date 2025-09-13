@@ -24,7 +24,32 @@ All tasks in this initiative have been completed:
 **Total Tasks:** <%= it.context.tasks.length %>
 **Completed Tasks:** <%= it.context.tasks.filter(t => t.status === 'done').length %>
 
-## Stage 2: Knowledge Extraction
+## Stage 1.5: Issue Validation & Analysis
+
+### Initiative Issues Summary
+
+<% if (it.context.issues.length > 0) { %>**Total Issues:** <%= it.context.issues.length %>
+**Closed Issues:** <%= it.context.issues.filter(i => i.status === 'closed').length %>
+**Open Issues:** <%= it.context.issues.filter(i => i.status === 'open').length %>
+
+#### Issue Details
+<% it.context.issues.forEach(function(issue) { %>- <%= issue.status === 'closed' ? '✅' : '🟡' %> **<%= issue.id %>: <%= issue.name %>** 
+  - Status: <%= issue.status %>
+  - Strategy: <%= issue.actualStrategy || issue.recommendedStrategy || 'TBD' %>
+  <% if (issue.summary) { %>- Summary: <%= issue.summary %><% } %>
+  <% if (issue.tags.length > 0) { %>- Tags: `[<%= issue.tags.join(', ') %>]`<% } %>
+<% }); %>
+
+#### Issues Knowledge Extraction
+<% it.context.issues.filter(i => i.status === 'closed' && i.summary).forEach(function(issue) { %>**<%= issue.name %>**:
+- Problem: <%= issue.description %>
+- Resolution Strategy: <%= issue.actualStrategy %>
+- Outcome: <%= issue.summary %>
+- Knowledge Value: <%= issue.summary.length > 50 && issue.actualStrategy ? 'High - Consider for solutions knowledge base' : 'Low - Initiative-specific' %>
+
+<% }); %><% } else { %>**No issues recorded for this initiative.**
+
+<% } %>## Stage 2: Knowledge Extraction
 
 ### Initiative Knowledge Summary
 
@@ -107,6 +132,8 @@ Apply the following criteria to determine which knowledge items should be promot
 - ✅ Can be applied to other areas of the codebase
 
 **Current Solution Analysis:**
+
+**Initiative Solutions:**
 <% if (it.context.initiativeSolutions.length > 0) { %>
 <% it.context.initiativeSolutions.forEach(function(s) { %>**<%= s.problem %>**:
 - Solution: <%= s.solution %>
@@ -119,7 +146,24 @@ Apply the following criteria to determine which knowledge items should be promot
   - **Recommendation**: <%= (s.solution.length > 50 && s.codeReferences && s.codeReferences.length > 0 && (s.tags.includes('validated') || s.tags.includes('reusable'))) ? '🔄 PROMOTE to project solutions' : '📁 KEEP in initiative only' %>
 
 <% }); %>
-<% } else { %>No solutions to analyze for promotion.
+<% } else { %>No initiative solutions to analyze for promotion.
+<% } %>
+
+**Issue-Derived Solutions:**
+<% const closedIssues = it.context.issues.filter(i => i.status === 'closed' && i.summary); %>
+<% if (closedIssues.length > 0) { %>
+<% closedIssues.forEach(function(issue) { %>**<%= issue.name %>**:
+- Problem: <%= issue.description %>
+- Resolution: <%= issue.summary %>
+- Strategy: <%= issue.actualStrategy %>
+- Tags: <%= issue.tags.join(', ') %>
+- **Promotion Assessment**:
+  - Non-trivial: <%= issue.summary.length > 50 ? '✅ YES (' + issue.summary.length + ' chars)' : '❌ Too simple (' + issue.summary.length + ' chars)' %>
+  - Has strategy: <%= issue.actualStrategy ? '✅ YES (' + issue.actualStrategy + ')' : '❌ No strategy recorded' %>
+  - **Recommendation**: <%= (issue.summary.length > 50 && issue.actualStrategy) ? '🔄 PROMOTE to project solutions (issue resolution)' : '📁 KEEP in initiative only' %>
+
+<% }); %>
+<% } else { %>No issue resolutions to analyze for promotion.
 <% } %>
 
 ### Pattern Promotion Criteria
@@ -169,6 +213,9 @@ Execute this tool call to promote approved knowledge items:
       s.solution.length > 50 && s.codeReferences && s.codeReferences.length > 0 && 
       (s.tags.includes('validated') || s.tags.includes('reusable'))
     );
+    const promotableIssueSolutions = it.context.issues.filter(i => 
+      i.status === 'closed' && i.summary && i.summary.length > 50 && i.actualStrategy
+    );
     const promotablePatterns = it.context.initiativePatterns.filter(p => 
       p.codeReferences && p.codeReferences.length >= 3 && 
       p.tags.includes('structured') && p.tags.includes('validated')
@@ -185,14 +232,20 @@ Execute this tool call to promote approved knowledge items:
       ]
     }<%= (promotableSolutions.length > 0 || promotablePatterns.length > 0) ? ',' : '' %>
     <% } %>
-    <% if (promotableSolutions.length > 0) { %>"solutions": {
+    <% if (promotableSolutions.length > 0 || promotableIssueSolutions.length > 0) { %>"solutions": {
       "create": [
         <% promotableSolutions.forEach(function(s, index) { %>{
           "problem": "<%= s.problem.replace(/"/g, '\\"') %>",
           "solution": "<%= s.solution.replace(/"/g, '\\"') %>",
           "tags": <%= JSON.stringify(s.tags) %><%= s.codeReferences ? ',' : '' %>
           <% if (s.codeReferences) { %>"codeReferences": <%= JSON.stringify(s.codeReferences) %><% } %>
-        }<%= index < promotableSolutions.length - 1 ? ',' : '' %>
+        }<%= (index < promotableSolutions.length - 1 || promotableIssueSolutions.length > 0) ? ',' : '' %>
+        <% }); %>
+        <% promotableIssueSolutions.forEach(function(issue, index) { %>{
+          "problem": "<%= issue.description.replace(/"/g, '\\"') %>",
+          "solution": "<%= issue.summary.replace(/"/g, '\\"') %>",
+          "tags": <%= JSON.stringify([...issue.tags, 'issue-resolution', issue.actualStrategy]) %>
+        }<%= index < promotableIssueSolutions.length - 1 ? ',' : '' %>
         <% }); %>
       ]
     }<%= promotablePatterns.length > 0 ? ',' : '' %>
@@ -211,7 +264,7 @@ Execute this tool call to promote approved knowledge items:
       ]
     }
     <% } %>
-    <% if (promotableDecisions.length === 0 && promotableSolutions.length === 0 && promotablePatterns.length === 0) { %>
+    <% if (promotableDecisions.length === 0 && promotableSolutions.length === 0 && promotableIssueSolutions.length === 0 && promotablePatterns.length === 0) { %>
     // No knowledge items met the promotion criteria
     "decisions": {"create": []},
     "solutions": {"create": []},
