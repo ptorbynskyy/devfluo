@@ -1,13 +1,14 @@
 {
-	"name": "dev-flow-mcp",
+	"name": "devfluo",
 	"version": "0.1.0",
 	"description": "A Model Context Protocol server for development workflow assistance",
 	"type": "module",
 	"main": "build/index.js",
 	"bin": {
-		"dev-flow-mcp": "build/index.js"
+		"devfluo": "build/index.js"
 	},
 	"scripts": {
+		"prebuild": "npm run lint && npm run clean",
 		"build": "tsc && node scripts/build.js",
 		"watch": "tsc --watch",
 		"start": "node build/index.js",

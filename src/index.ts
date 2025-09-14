@@ -32,7 +32,7 @@ import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
 function createServer(): McpServer {
 	return new McpServer(
 		{
-			name: "dev-flow-mcp",
+			name: "devfluo",
 			version: "0.1.0",
 		},
 		{
