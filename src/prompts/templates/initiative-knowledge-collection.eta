@@ -1,6 +1,7 @@
 # Collect Knowledge from Initiative Work: <%= it.initiativeId %>
 
 You are tasked with collecting valuable knowledge (decisions, solutions, and patterns) that emerged during manual work or agent guidance within initiative **<%= it.initiativeId %>**.
+Think.
 
 ## Data Sources for Analysis
 

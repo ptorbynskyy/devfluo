@@ -14,6 +14,7 @@ import { setupInitiativeSpecificationPrompt } from "./prompts/initiative-specifi
 import { setupInitiativeTaskExecutionPrompt } from "./prompts/initiative-task-execution.js";
 import { setupIssueResolutionPrompt } from "./prompts/issue-resolution.js";
 import { setupProjectInitializationPrompt } from "./prompts/project-initialization.js";
+import { setupProjectKnowledgeValidationPrompt } from "./prompts/project-knowledge-validation.js";
 import { setupBacklogResources } from "./resources/backlog.js";
 import { setupDecisionsResource } from "./resources/decisions.js";
 import { setupInitiativeResources } from "./resources/initiative.js";
@@ -72,6 +73,7 @@ async function runServer(): Promise<void> {
 	setupIssueResolutionPrompt(server);
 	setupInitiativeCompletionPrompt(server);
 	setupProjectInitializationPrompt(server);
+	setupProjectKnowledgeValidationPrompt(server);
 
 	const transport = new StdioServerTransport();
 	await server.connect(transport);

@@ -1,6 +1,6 @@
 # Create Specification for Initiative: <%= it.initiative.name %>
 
-You are helping create a detailed specification for the following initiative:
+You are helping create a detailed specification for the following initiative (think hard):
 
 **ID:** <%= it.initiative.id %>
 **Name:** <%= it.initiative.name %>

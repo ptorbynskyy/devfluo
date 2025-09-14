@@ -1,6 +1,6 @@
 # Create Specification for Backlog Item: <%= it.backlogItem.name %>
 
-You are helping create a detailed specification for the following backlog item:
+You are helping create a detailed specification for the following backlog item (think hard):
 
 **ID:** <%= it.backlogItem.id %>
 **Name:** <%= it.backlogItem.name %>
