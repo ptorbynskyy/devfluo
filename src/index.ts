@@ -28,12 +28,13 @@ import { setupInitiativeUpdateTool } from "./tools/initiative-update.js";
 import { setupIssueManagementTool } from "./tools/issue-management.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
+import { VERSION } from "./version.js";
 
 function createServer(): McpServer {
 	return new McpServer(
 		{
 			name: "devfluo",
-			version: "0.1.0",
+			version: VERSION,
 		},
 		{
 			capabilities: {
