@@ -80,6 +80,27 @@ Create comprehensive `codebase.md` content covering:
 #### Save Documentation
 **Use the `update_knowledge` tool** with both `architectureContent` and `codebaseContent` parameters to save your comprehensive documentation to the knowledge base.
 
+## Update Knowledge Tool Usage Examples
+
+### Basic Usage Structure
+
+When you have completed your comprehensive analysis and documentation, use the `update_knowledge` tool with the following structure:
+
+```json
+{
+  "architectureContent": "[Complete architecture documentation content]",
+  "codebaseContent": "[Complete codebase documentation content]"
+}
+```
+
+### Usage Notes
+
+- **Complete Content**: Both `architectureContent` and `codebaseContent` must contain the full documentation text as single strings
+- **Markdown Format**: Content should be well-formatted markdown with proper headers, code blocks, and lists
+- **Evidence-Based**: Include specific file references and concrete details from your codebase analysis
+- **Comprehensive Coverage**: Address all sections outlined in the documentation requirements above
+- **JSON Escaping**: Ensure proper escaping of quotes and newlines in JSON strings (use `\n` for line breaks)
+
 ## Quality Requirements
 
 - **Thoroughness**: Leave no stone unturned in your analysis
