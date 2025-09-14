@@ -1,0 +1,150 @@
+# Collect Knowledge from Initiative Work: <%= it.initiativeId %>
+
+You are tasked with collecting valuable knowledge (decisions, solutions, and patterns) that emerged during manual work or agent guidance within initiative **<%= it.initiativeId %>**.
+
+## Data Sources for Analysis
+
+Analyze the following sources to extract knowledge:
+
+### 1. Git WorkTree Changes
+- Use `git status` to see current changes
+- Use `git diff` to analyze modifications
+- Use `git log --oneline -10` to review recent commits
+- Look for patterns in code changes, new files, and modifications
+
+### 2. Agent Communication Session
+- Review the current conversation history
+- Identify key decisions made during the session
+- Note problems encountered and solutions implemented
+- Extract patterns that emerged from the work
+
+## Knowledge Collection Framework
+
+Extract and categorize insights into three types:
+
+### Decisions
+Key technical or design choices made during the work:
+- **Format**: Decision name and rationale
+- **Examples**: 
+  - `database-migration-strategy: Use incremental migrations with rollback support`
+  - `error-handling-approach: Centralized error boundaries with user-friendly messages`
+
+### Solutions  
+Problems encountered and how they were resolved:
+- **Format**: Problem description → Solution approach
+- **Examples**:
+  - `Type errors in legacy code → Added incremental TypeScript migration with @ts-ignore comments`
+  - `Performance issues with data fetching → Implemented caching layer with React Query`
+
+### Patterns
+Reusable implementation approaches or architectural patterns:
+- **Format**: Pattern name, description, and optional code references
+- **Examples**:
+  - `api-error-handling: Standardized error response format with consistent status codes`
+  - `component-composition: HOC pattern for cross-cutting concerns like authentication`
+
+## Resource Links
+
+Use these resources if you need additional context that wasn't previously loaded in the session:
+
+### Project-Level Resources
+- **Project Knowledge**: `project://knowledge` - Combined architecture and codebase knowledge
+- **Architecture Knowledge**: `project://knowledge/architecture` - Project architecture documentation
+- **Codebase Knowledge**: `project://knowledge/codebase` - Codebase-specific knowledge
+- **Project Decisions**: `project://decisions` - Global architectural decisions
+- **Project Solutions**: `project://solutions` - Documented problem-solution pairs  
+- **Project Patterns**: `project://patterns` - Established code patterns with snippets
+- **Backlog Items**: `project://backlog/list` - Product backlog with feature requests
+
+### Initiative-Specific Resources  
+- **Initiative Overview**: `project://initiative/item/<%= it.initiativeId %>` - Full initiative details with tasks
+- **Initiative Issues**: `project://initiative/issues/<%= it.initiativeId %>` - Issues within this initiative
+- **All Initiatives**: `project://initiative/list` - List of all initiatives for context
+
+### Individual Item Resources (if needed)
+- **Specific Decision**: `project://decisions/item/{name}` - Individual decision details
+- **Specific Solution**: `project://solutions/item/{key}` - Individual solution details
+- **Specific Pattern**: `project://patterns/item/{name}` - Individual pattern with code snippet
+- **Specific Backlog Item**: `project://backlog/item/{id}` - Individual backlog item details
+- **Specific Issue**: `project://initiative/issues/<%= it.initiativeId %>/{issueId}` - Individual issue details
+
+*Note: If you haven't previously loaded project or initiative context in this session, use the above resources to gather necessary background information.*
+
+## Analysis Process
+
+1. **Git Analysis**
+   - Review all changes in the working tree
+   - Identify new files, modified files, and deleted files
+   - Look for patterns in the types of changes made
+   - Note any architectural or design decisions reflected in code
+
+2. **Session Analysis**
+   - Review conversation history for explicit decisions
+   - Identify problems that were discussed and solved
+   - Extract patterns that were implemented or recommended
+   - Note any deviations from original plans and why they occurred
+
+3. **Knowledge Extraction**
+   - Categorize findings into decisions, solutions, and patterns
+   - Ensure each item has clear description and appropriate tags
+   - For patterns, include code references if specific implementations exist
+   - Focus on insights that would be valuable for future work
+
+## Knowledge Update Process
+
+Use the `initiative_update` tool to store collected knowledge:
+
+```json
+{
+	"id": "<%= it.initiativeId %>",
+	"decisions": {
+		"create": [
+			{
+				"name": "decision-identifier",
+				"description": "Clear description of the decision and its rationale",
+				"tags": ["relevant", "tags", "here"]
+			}
+		]
+	},
+	"solutions": {
+		"create": [
+			{
+				"problem": "Description of the problem that was encountered",
+				"solution": "How the problem was solved or addressed",
+				"tags": ["problem-domain", "solution-type"],
+				"codeReferences": ["path/to/file.ts:123-145", "other/file.js:67"]
+			}
+		]
+	},
+	"patterns": {
+		"create": [
+			{
+				"name": "pattern-identifier",
+				"description": "Description of the reusable pattern",
+				"tags": ["pattern-type", "architectural"],
+				"snippetFilename": "pattern-name.example",
+				"snippetContent": "// Example code implementing the pattern\nconst example = () => {\n  // Implementation details\n};",
+				"codeReferences": ["src/components/Example.tsx:45-60"]
+			}
+		]
+	}
+}
+```
+
+## Quality Guidelines
+
+- **Be Specific**: Provide concrete, actionable descriptions
+- **Add Context**: Include why decisions were made, not just what was decided  
+- **Tag Appropriately**: Use relevant tags for future searchability
+- **Include References**: Add code references where patterns/solutions are implemented
+- **Focus on Value**: Only capture knowledge that would benefit future work
+
+## Execution Instructions
+
+1. **Start with Git analysis** to understand the scope of changes
+2. **Review session history** for decisions and problem-solving discussions  
+3. **Extract valuable insights** using the framework above
+4. **Update the initiative** using the initiative_update tool
+5. **Provide a summary** of knowledge collected and stored
+
+Begin your analysis now and collect all valuable knowledge from this initiative work session.
