@@ -65,7 +65,8 @@ export function setupInitiativeKnowledgeCollectionPrompt(
 				await validateInitiativeForKnowledgeCollection(initiativeId);
 
 				// Generate the prompt
-				const promptText = await generateKnowledgeCollectionPrompt(initiativeId);
+				const promptText =
+					await generateKnowledgeCollectionPrompt(initiativeId);
 
 				return {
 					messages: [

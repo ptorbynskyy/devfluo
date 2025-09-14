@@ -1,0 +1,101 @@
+# Project Initialization: Comprehensive Codebase Analysis & Knowledge Base Setup
+
+You are tasked with initializing the project knowledge base through comprehensive analysis and documentation creation. This process establishes the **essential foundation** for all future project work.
+Think harder.
+
+## Critical Mission
+
+Create accurate, thorough architectural and codebase documentation that will serve as the primary reference for ongoing development. The quality and completeness of this initialization is crucial for project success.
+
+## Three-Step Workflow
+
+### Step 1: Initialize Project Structure
+
+**Use the `project_init` tool first** to create the knowledge base file structure:
+- Creates base directory structure
+- Sets up initial template files for architecture.md and codebase.md
+- Establishes the foundation for knowledge storage
+
+### Step 2: Comprehensive Codebase Analysis
+
+Conduct **extremely thorough** analysis of the existing codebase. Study every aspect with meticulous attention to detail:
+
+#### Directory Structure & Organization
+- Examine the complete directory tree and folder hierarchy
+- Identify organizational patterns and grouping strategies
+- Note configuration directories, source code organization, and build/deployment structure
+
+#### Dependencies & Technology Stack
+- Analyze package.json, requirements.txt, or equivalent dependency files
+- Identify all major frameworks, libraries, and tools in use
+- Understand version constraints and dependency relationships
+- Note development vs. production dependencies
+
+#### Entry Points & Core Architecture
+- Identify main entry files (index.js, main.py, app.js, etc.)
+- Trace application initialization and bootstrap processes
+- Map out core modules and their relationships
+- Understand system boundaries and major components
+
+#### Code Patterns & Conventions
+- Study existing code style, naming conventions, and patterns
+- Identify architectural patterns (MVC, microservices, layered, etc.)
+- Note error handling approaches, logging strategies, and testing patterns
+- Understand data flow and state management approaches
+
+#### Configuration & Environment
+- Examine configuration files, environment variable usage
+- Understand build processes, deployment configurations
+- Note development tools, linting rules, and formatting standards
+
+### Step 3: Create & Save Comprehensive Documentation
+
+Generate two critical documents with **extreme thoroughness and accuracy**:
+
+#### Architecture Documentation
+Create comprehensive `architecture.md` content covering:
+- **System Overview**: High-level description of the system's purpose and core functionality
+- **Key Components**: Major modules, services, or subsystems and their responsibilities
+- **Architectural Patterns**: Design patterns, architectural styles, and structural decisions
+- **Technology Stack**: Frameworks, libraries, databases, and tools with rationale for choices
+- **System Boundaries**: Interfaces, APIs, external dependencies, and integration points
+- **Data Flow**: How information moves through the system
+- **Security Considerations**: Authentication, authorization, data protection approaches
+- **Performance Considerations**: Scalability patterns, optimization strategies
+- **Deployment Architecture**: How the system is deployed and configured
+
+#### Codebase Documentation
+Create comprehensive `codebase.md` content covering:
+- **Project Structure**: Detailed directory organization with explanations
+- **Key Files & Modules**: Important files, their purposes, and relationships
+- **Entry Points**: Main application entry files and initialization flow
+- **Coding Standards**: Style guidelines, naming conventions, and patterns in use
+- **Dependencies**: Key libraries and frameworks with their roles and purposes
+- **Configuration**: How configuration is managed and environment setup
+- **Build Process**: How the project is built, tested, and deployed
+- **Development Workflow**: How developers should work with this codebase
+- **Testing Strategy**: Testing approach, frameworks, and conventions
+- **Common Patterns**: Recurring code patterns and implementation approaches
+
+#### Save Documentation
+**Use the `update_knowledge` tool** with both `architectureContent` and `codebaseContent` parameters to save your comprehensive documentation to the knowledge base.
+
+## Quality Requirements
+
+- **Thoroughness**: Leave no stone unturned in your analysis
+- **Accuracy**: Verify all statements and descriptions against actual code
+- **Completeness**: Cover all major aspects of the system and codebase
+- **Clarity**: Write clear, well-organized documentation
+- **Self-Verification**: Double-check your analysis and documentation for correctness
+
+## Success Criteria
+
+Your initialization is successful when:
+1. Project structure is properly initialized with `project_init`
+2. Every significant aspect of the codebase has been analyzed
+3. Architecture documentation comprehensively describes system design
+4. Codebase documentation thoroughly explains structure and conventions
+5. Both documents are saved using `update_knowledge` tool
+6. Documentation serves as reliable reference for future development work
+
+**Remember**: These documents form the cornerstone of project knowledge. Future agents and developers will rely on this foundation. Excellence and accuracy are non-negotiable.
