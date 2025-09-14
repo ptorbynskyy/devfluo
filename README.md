@@ -30,22 +30,25 @@ The server implements a comprehensive knowledge management system with several k
 - Node.js ≥22.0.0
 - npm or equivalent package manager
 
-### Quick Setup
+### Installation
 
-1. Clone and install dependencies:
+#### Global Installation (Recommended)
 ```bash
-git clone <repository-url>
+npm install -g devfluo
+```
+
+#### Using npx (No Installation Required)
+```bash
+npx devfluo
+```
+
+#### Local Development Setup
+For contributing or local development:
+```bash
+git clone https://github.com/your-username/devfluo.git
 cd devfluo
 npm install
-```
-
-2. Build the project:
-```bash
 npm run build
-```
-
-3. Run the server:
-```bash
 npm run start
 ```
 
@@ -55,10 +58,28 @@ For detailed usage instructions, MCP client integration, workflow examples, and 
 
 ### Quick Start
 
-1. Configure your MCP client to use this server with stdio transport
-2. Set the `PROJECT_ROOT` environment variable to your knowledge base directory
-3. Initialize your project with the `project_init` tool
-4. Create initiatives and manage your development workflow
+1. **Install the package globally:**
+   ```bash
+   npm install -g devfluo
+   ```
+
+2. **Configure your MCP client** (Claude Desktop, Continue, etc.) to use this server:
+   ```json
+   {
+     "mcpServers": {
+       "devfluo": {
+         "command": "devfluo",
+         "env": {
+           "PROJECT_ROOT": "/path/to/your/project/knowledge-base"
+         }
+       }
+     }
+   }
+   ```
+
+3. **Initialize your project** using the `project_init` tool in your MCP client
+
+4. **Start managing your development workflow** with initiatives, tasks, and knowledge tracking
 
 ## Development
 
