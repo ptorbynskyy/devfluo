@@ -6,63 +6,7 @@ You are tasked with validating and updating the existing project knowledge base 
 
 Validate all existing knowledge artifacts against the current codebase reality and make evidence-based updates to maintain knowledge base integrity. The accuracy and currency of this validation is crucial for reliable project development decisions.
 
-## Current Project Knowledge Context
-
-### Architecture & Codebase Knowledge
-*Source: project://knowledge resource*
-
-```
-<%= projectContext.knowledge %>
-```
-
-### Current Decisions
-*Source: project://decisions resource*
-
-<% if (projectContext.decisions.length > 0) { %>
-<% projectContext.decisions.forEach((decision) => { %>
-**<%= decision.name %>**
-- Description: <%= decision.description %>
-- Tags: <%= decision.tags.join(', ') %>
-
-<% }) %>
-<% } else { %>
-*No decisions currently defined.*
-<% } %>
-
-### Current Solutions
-*Source: project://solutions resource*
-
-<% if (projectContext.solutions.length > 0) { %>
-<% projectContext.solutions.forEach((solution) => { %>
-**Problem:** <%= solution.problem %>
-- Solution: <%= solution.solution %>
-- Tags: <%= solution.tags.join(', ') %>
-<% if (solution.codeReferences && solution.codeReferences.length > 0) { %>
-- Code References: <%= solution.codeReferences.join(', ') %>
-<% } %>
-
-<% }) %>
-<% } else { %>
-*No solutions currently defined.*
-<% } %>
-
-### Current Patterns
-*Source: project://patterns resource*
-
-<% if (projectContext.patterns.length > 0) { %>
-<% projectContext.patterns.forEach((pattern) => { %>
-**<%= pattern.name %>**
-- Description: <%= pattern.description %>
-- Tags: <%= pattern.tags.join(', ') %>
-- Snippet File: <%= pattern.snippetFilename %>
-<% if (pattern.codeReferences && pattern.codeReferences.length > 0) { %>
-- Code References: <%= pattern.codeReferences.join(', ') %>
-<% } %>
-
-<% }) %>
-<% } else { %>
-*No patterns currently defined.*
-<% } %>
+<%- include('partials/project-context', it) %>
 
 ## Three-Phase Validation Workflow
 

@@ -1,23 +1,57 @@
-## Project Context
-### Resources
- - Architecture - project://knowledge/architecture
- - Codebase - project://knowledge/codebase
- - Desition - project://decisions/item/{name}
- - Solution - project://solutions/item/{key}
- - Pattern - project://patterns/item/{name}
+## Current Project Knowledge Context
 
+### Architecture & Codebase Knowledge
+*Source: project://knowledge resource*
+
+```
 <%= it.context.knowledge %>
+```
 
-<% if (it.context.decisions.length > 0) { %>## Project Decisions
-<% it.context.decisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
-<% }); %>
+### Current Decisions
+*Source: project://decisions resource*
 
-<% } %><% if (it.context.solutions.length > 0) { %>## Project Solutions
-<% it.context.solutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
-<% }); %>
+<% if (it.context.decisions.length > 0) { %>
+<% it.context.decisions.forEach((decision) => { %>
+**<%= decision.name %>**
+- Description: <%= decision.description %>
+- Tags: <%= decision.tags.join(', ') %>
 
-<% } %><% if (it.context.patterns.length > 0) { %>## Project Patterns
-<% it.context.patterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
-<% }); %>
+<% }) %>
+<% } else { %>
+*No decisions currently defined.*
+<% } %>
 
+### Current Solutions
+*Source: project://solutions resource*
+
+<% if (it.context.solutions.length > 0) { %>
+<% it.context.solutions.forEach((solution) => { %>
+**Problem:** <%= solution.problem %>
+- Solution: <%= solution.solution %>
+- Tags: <%= solution.tags.join(', ') %>
+<% if (solution.codeReferences && solution.codeReferences.length > 0) { %>
+- Code References: <%= solution.codeReferences.join(', ') %>
+<% } %>
+
+<% }) %>
+<% } else { %>
+*No solutions currently defined.*
+<% } %>
+
+### Current Patterns
+*Source: project://patterns resource*
+
+<% if (it.context.patterns.length > 0) { %>
+<% it.context.patterns.forEach((pattern) => { %>
+**<%= pattern.name %>**
+- Description: <%= pattern.description %>
+- Tags: <%= pattern.tags.join(', ') %>
+- Snippet File: <%= pattern.snippetFilename %>
+<% if (pattern.codeReferences && pattern.codeReferences.length > 0) { %>
+- Code References: <%= pattern.codeReferences.join(', ') %>
+<% } %>
+
+<% }) %>
+<% } else { %>
+*No patterns currently defined.*
 <% } %>
