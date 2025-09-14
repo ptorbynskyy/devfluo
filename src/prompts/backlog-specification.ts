@@ -5,6 +5,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { loadBacklogItem, loadBacklogItems } from "../domain/backlog.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	loadProjectContext,
@@ -64,6 +65,9 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 						.min(1)
 						.describe("ID of the backlog item to create a specification for"),
 					async (backlogItemId): Promise<string[]> => {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const items = await loadBacklogItems();
 						if (!backlogItemId) {
 							return items.map((item) => item.id);
@@ -79,6 +83,9 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 		},
 		async ({ backlogItemId }: { backlogItemId: string }) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				// Validate backlog item exists and doesn't already have a spec
 				const backlogItem = await validateBacklogItemForSpec(backlogItemId);
 

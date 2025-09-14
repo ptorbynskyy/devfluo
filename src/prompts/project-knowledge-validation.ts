@@ -3,6 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import { loadProjectContext } from "./shared/project-context.js";
 
@@ -31,6 +32,9 @@ export function setupProjectKnowledgeValidationPrompt(server: McpServer): void {
 		},
 		async (_args: ProjectKnowledgeValidationInput) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				// Generate the prompt
 				const promptText = await generateProjectKnowledgeValidationPrompt();
 

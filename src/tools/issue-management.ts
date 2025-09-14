@@ -6,6 +6,7 @@ import { z } from "zod";
 import { loadInitiative } from "../domain/initiative/index.js";
 import { IssueOperationsSchema } from "../domain/initiative/issue-schema.js";
 import { processIssueOperations } from "../domain/initiative/issues.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 const IssueManagementToolBaseSchema = z.object({
 	initiativeId: z
@@ -28,6 +29,9 @@ export async function handleIssueManagementTool(
 	input: IssueManagementToolInput,
 ) {
 	try {
+		// Ensure project is initialized
+		await ensureProjectInitialized();
+
 		// Validate input using the full schema with refine validation
 		const validatedInput = IssueManagementToolSchema.parse(input);
 		const { initiativeId, create, update, delete: deleteOps } = validatedInput;

@@ -14,9 +14,13 @@ import {
 	processInitiativeSolutions,
 } from "../domain/initiative/knowledge.js";
 import { processTaskOperations } from "../domain/initiative/tasks.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 	try {
+		// Ensure project is initialized
+		await ensureProjectInitialized();
+
 		// Validate input
 		const validatedInput = InitiativeUpdateSchema.parse(input);
 

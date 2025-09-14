@@ -5,6 +5,7 @@ import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { processBacklogOperations } from "../domain/backlog.js";
 import { BacklogOperationsSchema } from "../domain/backlog-schema.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 const BacklogManagementToolSchema = BacklogOperationsSchema.refine(
 	(data) => data.create || data.update || data.delete,
@@ -19,6 +20,9 @@ export async function handleBacklogManagementTool(
 	input: BacklogManagementToolInput,
 ) {
 	try {
+		// Ensure project is initialized
+		await ensureProjectInitialized();
+
 		// Validate input using the full schema with refine validation
 		const validatedInput = BacklogManagementToolSchema.parse(input);
 		const { create, update, delete: deleteOps } = validatedInput;

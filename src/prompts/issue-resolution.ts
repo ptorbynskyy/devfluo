@@ -9,6 +9,7 @@ import {
 } from "../domain/initiative/index.js";
 import { IssueStrategies } from "../domain/initiative/issue-schema.js";
 import { loadIssues } from "../domain/initiative/issues.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
@@ -111,6 +112,9 @@ export function setupIssueResolutionPrompt(server: McpServer): void {
 		},
 		async ({ initiativeId, issueId, userChoice }: IssueResolutionInput) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				// Validate initiative and issue
 				const { initiative } = await validateIssueForResolution(
 					initiativeId,

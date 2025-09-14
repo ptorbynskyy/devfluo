@@ -4,6 +4,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { loadInitiative } from "../domain/initiative/index.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
@@ -61,6 +62,9 @@ export function setupInitiativeKnowledgeCollectionPrompt(
 		},
 		async ({ initiativeId }: KnowledgeCollectionInput) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				// Validate initiative exists
 				await validateInitiativeForKnowledgeCollection(initiativeId);
 

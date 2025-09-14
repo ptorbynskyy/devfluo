@@ -11,6 +11,7 @@ import {
 	loadPatterns,
 	patternsPath,
 } from "../domain/patterns.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export function setupPatternsResource(server: McpServer): void {
 	// Static resource: List of all patterns
@@ -24,6 +25,9 @@ export function setupPatternsResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const patterns = await loadPatterns();
 				return {
 					contents: [
@@ -49,6 +53,9 @@ export function setupPatternsResource(server: McpServer): void {
 		new ResourceTemplate("project://patterns/item/{name}", {
 			list: async () => {
 				try {
+					// Ensure project is initialized
+					await ensureProjectInitialized();
+
 					const patternIds = await getPatternIds();
 					return {
 						resources: patternIds.map((name) => ({
@@ -67,6 +74,9 @@ export function setupPatternsResource(server: McpServer): void {
 			complete: {
 				name: async (value) => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const patternIds = await getPatternIds();
 						return patternIds.filter((name) => name.startsWith(value || ""));
 					} catch (error) {
@@ -91,6 +101,9 @@ export function setupPatternsResource(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const pattern = await loadPattern(name);
 
 				if (!pattern) {

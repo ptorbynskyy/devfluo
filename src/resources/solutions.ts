@@ -8,6 +8,7 @@ import {
 	loadSolution,
 	loadSolutions,
 } from "../domain/solutions.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export function setupSolutionsResource(server: McpServer): void {
 	// Static resource: List of all solutions
@@ -21,6 +22,9 @@ export function setupSolutionsResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const solutions = await loadSolutions();
 				return {
 					contents: [
@@ -46,6 +50,9 @@ export function setupSolutionsResource(server: McpServer): void {
 		new ResourceTemplate("project://solutions/item/{key}", {
 			list: async () => {
 				try {
+					// Ensure project is initialized
+					await ensureProjectInitialized();
+
 					const solutionIds = await getSolutionIds();
 					return {
 						resources: solutionIds.map((key) => ({
@@ -64,6 +71,9 @@ export function setupSolutionsResource(server: McpServer): void {
 			complete: {
 				key: async (value) => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const solutionIds = await getSolutionIds();
 						return solutionIds.filter((key) => key.startsWith(value || ""));
 					} catch (error) {
@@ -88,6 +98,9 @@ export function setupSolutionsResource(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const solution = await loadSolution(key);
 
 				if (!solution) {

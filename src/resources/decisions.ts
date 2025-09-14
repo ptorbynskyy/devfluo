@@ -8,6 +8,7 @@ import {
 	loadDecision,
 	loadDecisions,
 } from "../domain/decisions.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export function setupDecisionsResource(server: McpServer): void {
 	// Static resource: List of all decisions
@@ -21,6 +22,9 @@ export function setupDecisionsResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const decisions = await loadDecisions();
 				return {
 					contents: [
@@ -46,6 +50,9 @@ export function setupDecisionsResource(server: McpServer): void {
 		new ResourceTemplate("project://decisions/item/{name}", {
 			list: async () => {
 				try {
+					// Ensure project is initialized
+					await ensureProjectInitialized();
+
 					const decisionIds = await getDecisionIds();
 					return {
 						resources: decisionIds.map((name) => ({
@@ -64,6 +71,9 @@ export function setupDecisionsResource(server: McpServer): void {
 			complete: {
 				name: async (value) => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const decisionIds = await getDecisionIds();
 						return decisionIds.filter((name) => name.startsWith(value || ""));
 					} catch (error) {
@@ -88,6 +98,9 @@ export function setupDecisionsResource(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const decision = await loadDecision(name);
 
 				if (!decision) {

@@ -8,9 +8,13 @@ import {
 	type InitiativeDeleteInput,
 	InitiativeDeleteSchema,
 } from "../domain/initiative/index.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export async function handleInitiativeDeleteTool(input: InitiativeDeleteInput) {
 	try {
+		// Ensure project is initialized
+		await ensureProjectInitialized();
+
 		// Validate input
 		const validatedInput = InitiativeDeleteSchema.parse(input);
 

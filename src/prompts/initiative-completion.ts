@@ -6,6 +6,7 @@ import { z } from "zod";
 import { loadInitiative } from "../domain/initiative/index.js";
 import type { Task } from "../domain/initiative/task-schema.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
@@ -97,6 +98,9 @@ export function setupInitiativeCompletionPrompt(server: McpServer): void {
 		},
 		async ({ initiativeId }: InitiativeCompletionInput) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				// Validate initiative and tasks
 				const { initiative } =
 					await validateInitiativeForCompletion(initiativeId);

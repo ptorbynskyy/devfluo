@@ -6,6 +6,7 @@ import {
 	getArchitectureKnowledge,
 	getCodebaseKnowledge,
 } from "../domain/base-knowledge.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export async function getProjectKnowledge(): Promise<string> {
 	const architectureContent = (await getArchitectureKnowledge()) ?? "";
@@ -33,6 +34,9 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const knowledge = await getProjectKnowledge();
 				return {
 					contents: [
@@ -63,6 +67,9 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const architectureContent = (await getArchitectureKnowledge()) ?? "";
 				return {
 					contents: [
@@ -93,6 +100,9 @@ export function setupProjectKnowledgeResource(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const codebaseContent = (await getCodebaseKnowledge()) ?? "";
 				return {
 					contents: [

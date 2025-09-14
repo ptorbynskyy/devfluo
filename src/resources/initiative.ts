@@ -15,6 +15,7 @@ import {
 	loadIssues,
 } from "../domain/initiative/issues.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export function setupInitiativeResources(server: McpServer): void {
 	// Static resource: List of all initiatives
@@ -28,6 +29,9 @@ export function setupInitiativeResources(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const initiatives = await loadInitiatives();
 
 				// Return list format without overview/spec content
@@ -63,6 +67,9 @@ export function setupInitiativeResources(server: McpServer): void {
 		new ResourceTemplate("project://initiative/item/{id}", {
 			list: async () => {
 				try {
+					// Ensure project is initialized
+					await ensureProjectInitialized();
+
 					const initiativeIds = await getInitiativeIds();
 					return {
 						resources: initiativeIds.map((id) => ({
@@ -81,6 +88,9 @@ export function setupInitiativeResources(server: McpServer): void {
 			complete: {
 				id: async (value) => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const initiativeIds = await getInitiativeIds();
 						return initiativeIds.filter((id) => id.startsWith(value || ""));
 					} catch (error) {
@@ -107,6 +117,9 @@ export function setupInitiativeResources(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const initiative = await loadInitiative(id);
 
 				if (!initiative) {
@@ -178,6 +191,9 @@ export function setupInitiativeResources(server: McpServer): void {
 		new ResourceTemplate("project://initiative/issues/{initiativeId}", {
 			list: async () => {
 				try {
+					// Ensure project is initialized
+					await ensureProjectInitialized();
+
 					const initiativeIds = await getInitiativeIds();
 					return {
 						resources: initiativeIds.map((id) => ({
@@ -196,6 +212,9 @@ export function setupInitiativeResources(server: McpServer): void {
 			complete: {
 				initiativeId: async (value) => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const initiativeIds = await getInitiativeIds();
 						return initiativeIds.filter((id) => id.startsWith(value || ""));
 					} catch (error) {
@@ -220,6 +239,9 @@ export function setupInitiativeResources(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const issues = await loadIssues(initiativeId);
 
 				return {
@@ -248,6 +270,9 @@ export function setupInitiativeResources(server: McpServer): void {
 			{
 				list: async () => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const initiativeIds = await getInitiativeIds();
 						const resources = [];
 
@@ -273,6 +298,9 @@ export function setupInitiativeResources(server: McpServer): void {
 				complete: {
 					initiativeId: async (value) => {
 						try {
+							// Ensure project is initialized
+							await ensureProjectInitialized();
+
 							const initiativeIds = await getInitiativeIds();
 							return initiativeIds.filter((id) => id.startsWith(value || ""));
 						} catch (error) {
@@ -282,6 +310,9 @@ export function setupInitiativeResources(server: McpServer): void {
 					},
 					issueId: async (value, context) => {
 						try {
+							// Ensure project is initialized
+							await ensureProjectInitialized();
+
 							const initiativeId = context?.arguments?.initiativeId;
 							if (typeof initiativeId !== "string") {
 								return [];
@@ -320,6 +351,9 @@ export function setupInitiativeResources(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const issue = await loadIssue(initiativeId, issueId);
 
 				if (!issue) {

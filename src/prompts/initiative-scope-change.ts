@@ -7,6 +7,7 @@ import {
 	generateTasksMarkdownReport,
 	loadInitiative,
 } from "../domain/initiative/index.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
@@ -77,6 +78,9 @@ export function setupInitiativeScopeChangePrompt(server: McpServer): void {
 		},
 		async ({ initiativeId, issueDescription }: ScopeChangeInput) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				// Validate initiative
 				const { initiative } =
 					await validateInitiativeForScopeChange(initiativeId);

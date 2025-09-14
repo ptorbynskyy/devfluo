@@ -3,6 +3,7 @@
 import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import { z } from "zod";
 import { getInitiativeIds } from "../../domain/initiative/index.js";
+import { ensureProjectInitialized } from "../../utils/project-validation.js";
 
 // Shared Zod schema for initiative ID validation
 export const initiativeIdSchema = z
@@ -21,6 +22,9 @@ export function createCompletableInitiativeId(description?: string) {
 	return completable(
 		description ? initiativeIdSchema.describe(description) : initiativeIdSchema,
 		async (initiativeId): Promise<string[]> => {
+			// Ensure project is initialized
+			await ensureProjectInitialized();
+
 			const initiativeIds = await getInitiativeIds();
 			if (!initiativeId) {
 				return initiativeIds;

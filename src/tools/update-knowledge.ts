@@ -13,6 +13,7 @@ import { PatternOperationsSchema } from "../domain/pattern-schema.js";
 import { processPatternOperations } from "../domain/patterns.js";
 import { SolutionOperationsSchema } from "../domain/solution-schema.js";
 import { processSolutionOperations } from "../domain/solutions.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 const UpdateKnowledgeToolBaseSchema = z.object({
 	architectureContent: z
@@ -53,6 +54,9 @@ export async function handleUpdateKnowledgeTool(
 	input: UpdateKnowledgeToolInput,
 ) {
 	try {
+		// Ensure project is initialized
+		await ensureProjectInitialized();
+
 		// Validate input using the full schema with refine validation
 		const validatedInput = UpdateKnowledgeToolZodSchema.parse(input);
 		const {

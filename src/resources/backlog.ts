@@ -8,6 +8,7 @@ import {
 	loadBacklogItem,
 	loadBacklogItems,
 } from "../domain/backlog.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export function setupBacklogResources(server: McpServer): void {
 	// Static resource: List of all backlog items
@@ -21,6 +22,9 @@ export function setupBacklogResources(server: McpServer): void {
 		},
 		async (uri: URL) => {
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const items = await loadBacklogItems();
 
 				// Return list format without spec content
@@ -56,6 +60,9 @@ export function setupBacklogResources(server: McpServer): void {
 		new ResourceTemplate("project://backlog/item/{id}", {
 			list: async () => {
 				try {
+					// Ensure project is initialized
+					await ensureProjectInitialized();
+
 					const itemIds = await getBacklogItemIds();
 					return {
 						resources: itemIds.map((id) => ({
@@ -74,6 +81,9 @@ export function setupBacklogResources(server: McpServer): void {
 			complete: {
 				id: async (value) => {
 					try {
+						// Ensure project is initialized
+						await ensureProjectInitialized();
+
 						const itemIds = await getBacklogItemIds();
 						return itemIds.filter((id) => id.startsWith(value || ""));
 					} catch (error) {
@@ -100,6 +110,9 @@ export function setupBacklogResources(server: McpServer): void {
 			}
 
 			try {
+				// Ensure project is initialized
+				await ensureProjectInitialized();
+
 				const item = await loadBacklogItem(id);
 
 				if (!item) {

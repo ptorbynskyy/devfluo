@@ -3,6 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import { ensureProjectNotInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 
 // Zod schema for project initialization input validation
@@ -27,6 +28,9 @@ export function setupProjectInitializationPrompt(server: McpServer): void {
 		},
 		async (_args: ProjectInitializationInput) => {
 			try {
+				// Ensure project is not already initialized
+				await ensureProjectNotInitialized();
+
 				// Generate the prompt
 				const promptText = await generateProjectInitializationPrompt();
 
