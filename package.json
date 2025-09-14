@@ -7,7 +7,11 @@
 	"bin": {
 		"devfluo": "build/index.js"
 	},
+	"files": [
+		"build/"
+	],
 	"scripts": {
+		"prepare": "npm run build",
 		"prebuild": "npm run lint && npm run clean",
 		"build": "tsc && node scripts/build.js",
 		"watch": "tsc --watch",
