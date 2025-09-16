@@ -134,7 +134,7 @@ export function setupIssueManagementTool(server: McpServer): void {
 		{
 			title: "Issue Management",
 			description:
-				"Create, update, or delete issues within an initiative. Supports CRUD operations for tracking problems encountered during development. At least one operation (create/update/delete) must be specified.",
+				"Create, update, or delete issues within an initiative. Supports CRUD operations for tracking problems encountered during development.",
 			inputSchema: IssueManagementToolBaseSchema.shape,
 			annotations: {
 				readOnlyHint: false,

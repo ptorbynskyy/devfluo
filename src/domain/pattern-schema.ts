@@ -40,7 +40,7 @@ export const PatternOperationsSchema = z.object({
 		.array(PatternCreateSchema)
 		.optional()
 		.describe(
-			'Array of complete pattern objects with content to create. The codeReferences should contain 2-3 examples of where this pattern is well-implemented in the target codebase. Example: [{"name": "error-handling", "description": "Standard error handling pattern", "tags": ["error", "handling"], "snippetFilename": "error-pattern.ts", "snippetContent": "// Pattern code here...", "codeReferences": ["src/api/userService.ts:45-52", "src/components/DataTable.tsx:123"]}]',
+			"Array of complete pattern objects with content to create. The codeReferences should contain 2-3 examples of where this pattern is well-implemented in the target codebase.",
 		),
 	update: z
 		.record(
@@ -54,14 +54,12 @@ export const PatternOperationsSchema = z.object({
 		)
 		.optional()
 		.describe(
-			'Object with pattern names as keys and partial pattern objects as values for updates. The codeReferences should contain 2-3 examples of where this pattern is well-implemented. Example: {"pattern-crud": {"description": "Updated description", "snippetContent": "// Updated pattern code...", "codeReferences": ["src/services/api.ts:67-74", "src/utils/database.ts:125"]}}',
+			"Object with pattern names as keys and partial pattern objects as values for updates. The codeReferences should contain 2-3 examples of where this pattern is well-implemented.",
 		),
 	delete: z
 		.array(z.string())
 		.optional()
-		.describe(
-			'Array of pattern names to delete. Example: ["old-pattern", "deprecated-pattern"]',
-		),
+		.describe("Array of pattern names to delete."),
 });
 
 export type Pattern = z.infer<typeof PatternSchema>;

@@ -23,15 +23,8 @@ export const IssueSchema = z.object({
 			/^[a-z0-9-]+$/,
 			"Issue ID must contain only lowercase letters, numbers, and hyphens",
 		)
-		.describe(
-			"Unique identifier for the issue within initiative. Example: 'oauth-redirect-bug'",
-		),
-	name: z
-		.string()
-		.min(1)
-		.describe(
-			"Human readable name of the issue. Example: 'OAuth redirect bug'",
-		),
+		.describe("Unique identifier for the issue within initiative."),
+	name: z.string().min(1).describe("Human readable name of the issue."),
 	description: z
 		.string()
 		.min(1)
@@ -39,15 +32,11 @@ export const IssueSchema = z.object({
 	recommendedStrategy: z
 		.enum(IssueStrategies)
 		.optional()
-		.describe(
-			"Recommended resolution strategy. Options: embed/replan/defer/cancelInitiative",
-		),
+		.describe("Recommended resolution strategy."),
 	effortAssessment: z
 		.enum(EffortLevels)
 		.optional()
-		.describe(
-			"Effort assessment for resolving the issue. Options: S/M/L/XL/XXL",
-		),
+		.describe("Effort assessment for resolving the issue."),
 	tags: z
 		.array(z.string())
 		.default([])
@@ -55,12 +44,12 @@ export const IssueSchema = z.object({
 	status: z
 		.enum(IssueStatuses)
 		.default("open")
-		.describe("Current status of the issue. Options: open/closed"),
+		.describe("Current status of the issue."),
 	actualStrategy: z
 		.enum(IssueStrategies)
 		.optional()
 		.describe(
-			"The strategy that was actually implemented to resolve this issue. Options: embed/replan/defer/cancelInitiative",
+			"The strategy that was actually implemented to resolve this issue.",
 		),
 	summary: z
 		.string()
@@ -75,21 +64,17 @@ export const IssueOperationsSchema = z.object({
 	create: z
 		.array(IssueSchema)
 		.optional()
-		.describe(
-			'Array of complete issue objects to create. Example: [{"id": "oauth-bug", "name": "OAuth redirect issue", "description": "Google OAuth redirects to wrong URL", "tags": ["oauth", "google"], "status": "open", "actualStrategy": "embed", "summary": "Decided to embed fix directly in current sprint as it blocks user registration"}]',
-		),
+		.describe("Array of complete issue objects to create."),
 	update: z
 		.record(z.string(), IssueSchema.omit({ id: true }).partial())
 		.optional()
 		.describe(
-			'Object with issue IDs as keys and partial issue objects as values for updates. Example: {"oauth-bug": {"recommendedStrategy": "embed", "actualStrategy": "embed", "status": "closed", "summary": "Successfully embedded OAuth fix in authentication module"}}',
+			"Object with issue IDs as keys and partial issue objects as values for updates.",
 		),
 	delete: z
 		.array(z.string())
 		.optional()
-		.describe(
-			'Array of issue IDs to delete. Example: ["oauth-bug", "performance-issue"]',
-		),
+		.describe("Array of issue IDs to delete."),
 });
 
 export type Issue = z.infer<typeof IssueSchema>;

@@ -30,20 +30,18 @@ export const SolutionOperationsSchema = z.object({
 		.array(SolutionSchema)
 		.optional()
 		.describe(
-			'Array of complete solution objects to create. The codeReferences should contain 2-3 examples of where this solution is well-implemented in the target codebase. Example: [{"problem": "Memory leaks in React components", "solution": "Use useEffect cleanup functions and AbortController", "tags": ["react", "memory", "performance"], "codeReferences": ["src/components/DataTable.tsx:45-52", "src/hooks/useApi.ts:123"]}]',
+			"Array of complete solution objects to create. The codeReferences should contain 2-3 examples of where this solution is well-implemented in the target codebase.",
 		),
 	update: z
 		.record(z.string(), SolutionSchema.partial())
 		.optional()
 		.describe(
-			'Object with solution identifiers as keys and partial solution objects as values for updates. The codeReferences should contain 2-3 examples of where this solution is well-implemented. Example: {"memory-leak-fix": {"solution": "Updated solution description", "codeReferences": ["src/services/api.ts:67-74", "src/utils/database.ts:125"]}}',
+			"Object with solution identifiers as keys and partial solution objects as values for updates. The codeReferences should contain 2-3 examples of where this solution is well-implemented.",
 		),
 	delete: z
 		.array(z.string())
 		.optional()
-		.describe(
-			'Array of solution identifiers to delete. Example: ["old-solution", "deprecated-fix"]',
-		),
+		.describe("Array of solution identifiers to delete."),
 });
 
 export type Solution = z.infer<typeof SolutionSchema>;

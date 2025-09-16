@@ -114,7 +114,7 @@ export function setupBacklogManagementTool(server: McpServer): void {
 		{
 			title: "Backlog Management",
 			description:
-				"Create, update, or delete backlog items. Supports CRUD operations with optional specification files. At least one operation (create/update/delete) must be specified.",
+				"Create, update, or delete backlog items. Supports CRUD operations with optional specification files.",
 			inputSchema: BacklogOperationsSchema.shape,
 			annotations: {
 				readOnlyHint: false,

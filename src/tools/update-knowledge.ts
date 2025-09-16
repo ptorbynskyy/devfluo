@@ -143,7 +143,7 @@ export function setupUpdateKnowledgeTool(server: McpServer): void {
 		{
 			title: "Update Project Knowledge Base",
 			description:
-				"Replace entire architecture.md and/or codebase.md files with new content, and perform decision/pattern/solution operations (create/update/delete). At least one operation must be specified.",
+				"Replace entire architecture.md and/or codebase.md files with new content, and perform decision/pattern/solution operations (create/update/delete).",
 			inputSchema: UpdateKnowledgeToolBaseSchema.shape,
 			annotations: {
 				readOnlyHint: false,

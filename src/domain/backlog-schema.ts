@@ -15,14 +15,9 @@ export const BacklogItemSchema = z.object({
 			"ID must contain only lowercase letters, numbers, and hyphens",
 		)
 		.describe(
-			"Unique identifier for the backlog item (used for folder creation). Example: 'dashboard-redesign'",
+			"Unique identifier for the backlog item (used for folder creation).",
 		),
-	name: z
-		.string()
-		.min(1)
-		.describe(
-			"Human readable name of the backlog item. Example: 'Dashboard redesign'",
-		),
+	name: z.string().min(1).describe("Human readable name of the backlog item."),
 	description: z
 		.string()
 		.min(1)
@@ -30,7 +25,7 @@ export const BacklogItemSchema = z.object({
 	effort: z
 		.enum(EffortLevels)
 		.optional()
-		.describe("Effort estimation for the backlog item. Options: S/M/L/XL/XXL"),
+		.describe("Effort estimation for the backlog item."),
 });
 
 // Backlog item with spec content included
@@ -58,9 +53,7 @@ export const BacklogOperationsSchema = z.object({
 			}),
 		)
 		.optional()
-		.describe(
-			'Array of complete backlog item objects to create. Example: [{"id": "user-auth", "name": "User Authentication", "description": "Implement OAuth login system", "effort": "L", "spec": "# User Authentication\\n\\n## Requirements\\n..."}]',
-		),
+		.describe("Array of complete backlog item objects to create."),
 	update: z
 		.record(
 			z.string(),
@@ -77,14 +70,12 @@ export const BacklogOperationsSchema = z.object({
 		)
 		.optional()
 		.describe(
-			'Object with backlog item IDs as keys and partial backlog item objects as values for updates. Example: {"user-auth": {"name": "Updated User Authentication", "spec": "# Updated spec content"}}',
+			"Object with backlog item IDs as keys and partial backlog item objects as values for updates.",
 		),
 	delete: z
 		.array(z.string())
 		.optional()
-		.describe(
-			'Array of backlog item IDs to delete. Example: ["old-feature", "deprecated-item"]',
-		),
+		.describe("Array of backlog item IDs to delete."),
 });
 
 export type BacklogItem = z.infer<typeof BacklogItemSchema>;

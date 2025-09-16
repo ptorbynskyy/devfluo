@@ -15,13 +15,8 @@ export const TaskSchema = z.object({
 			/^t\d+$/,
 			"Task ID must start with 't' followed by numbers (e.g., t001, t123)",
 		)
-		.describe(
-			"Unique identifier for the task within initiative. Example: 't001'",
-		),
-	name: z
-		.string()
-		.min(1)
-		.describe("Human readable name of the task. Example: 'Create test'"),
+		.describe("Unique identifier for the task within initiative."),
+	name: z.string().min(1).describe("Human readable name of the task."),
 	description: z
 		.string()
 		.min(1)
@@ -58,7 +53,7 @@ export const TaskSchema = z.object({
 				),
 		)
 		.describe(
-			"Array of task IDs that must be completed before this task can start. Use empty array [] if no predecessors. Example: ['t001', 't002']",
+			"Array of task IDs that must be completed before this task can start. Use empty array [] if no predecessors.",
 		),
 });
 
@@ -67,19 +62,17 @@ export const TaskOperationsSchema = z.object({
 	create: z
 		.array(TaskSchema)
 		.optional()
-		.describe(
-			'Array of complete task objects to create. Example: [{"id": "t001", "name": "Setup authentication", "description": "Setup OAuth system", "effort": "L", "status": "new", "order": 1, "phase": 1, "predecessors": []}]',
-		),
+		.describe("Array of complete task objects to create."),
 	update: z
 		.record(z.string(), TaskSchema.omit({ id: true }).partial())
 		.optional()
 		.describe(
-			'Object with task IDs as keys and partial task objects as values for updates. Example: {"t001": {"name": "Updated task name", "status": "done", "predecessors": ["t002"]}}',
+			"Object with task IDs as keys and partial task objects as values for updates.",
 		),
 	delete: z
 		.array(z.string())
 		.optional()
-		.describe('Array of task IDs to delete. Example: ["t001", "t002"]'),
+		.describe("Array of task IDs to delete."),
 });
 
 export type Task = z.infer<typeof TaskSchema>;

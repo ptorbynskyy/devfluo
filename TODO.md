@@ -7,15 +7,9 @@
    - front
    - back
    - glue
-
 ---
-publish mcp
- - update readme
- - add workflow diagramm
- - remove shell-doc
- - add license
- - manually configure publish to npm 
-
-
+workflow diagramm
+readme
+publish with token not work
 ---
-try to diable tools by default and enable while prompt call if need
+try to disable tools by default and enable while prompt call if need

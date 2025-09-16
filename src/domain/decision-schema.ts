@@ -20,21 +20,17 @@ export const DecisionOperationsSchema = z.object({
 	create: z
 		.array(DecisionSchema)
 		.optional()
-		.describe(
-			'Array of complete decision objects to create. Example: [{"name": "use-typescript", "description": "Use TypeScript for type safety", "tags": ["language", "types"]}]',
-		),
+		.describe("Array of complete decision objects to create."),
 	update: z
 		.record(z.string(), DecisionSchema.partial())
 		.optional()
 		.describe(
-			'Object with decision names as keys and partial decision objects as values for updates. Example: {"use-typescript": {"description": "Updated description"}}',
+			"Object with decision names as keys and partial decision objects as values for updates.",
 		),
 	delete: z
 		.array(z.string())
 		.optional()
-		.describe(
-			'Array of decision names to delete. Example: ["old-decision", "deprecated-choice"]',
-		),
+		.describe("Array of decision names to delete."),
 });
 
 export type Decision = z.infer<typeof DecisionSchema>;
