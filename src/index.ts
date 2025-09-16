@@ -38,6 +38,7 @@ function createServer(): McpServer {
 		},
 		{
 			capabilities: {
+				completions: {},
 				resources: {},
 				tools: {},
 				prompts: {},
