@@ -50,6 +50,7 @@
 	"dependencies": {
 		"@modelcontextprotocol/sdk": "^1.17.4",
 		"eta": "^3.5.0",
+		"gray-matter": "^4.0.3",
 		"zod": "^3.22.4"
 	},
 	"devDependencies": {

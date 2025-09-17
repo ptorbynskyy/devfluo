@@ -80,3 +80,13 @@ export function getIssueDirectoryPath(
 ): string {
 	return path.join(getInitiativeIssuesPath(initiativeId), issueId);
 }
+
+// Helper function to get memory cards directory path for an initiative
+export function getInitiativeMemoryCardsPath(id: string): string {
+	return path.join(getInitiativePath(id), "memory-cards");
+}
+
+// Helper function to get specific memory card file path for an initiative
+export function getInitiativeMemoryCardPath(id: string, name: string): string {
+	return path.join(getInitiativeMemoryCardsPath(id), `${name}.md`);
+}
