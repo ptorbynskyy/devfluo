@@ -1,30 +1,6 @@
-Need to add a search tool for memory cards using semantic search. Memory cards support two scope types: one global scope (single instance) and initiative-specific scopes (multiple, depending on initiative count).
-
-Use ChromaDB vector database (cromadb-ts, Context7) locally, storing data in the knowledge base root under `<root>/chromadb/` subfolder. Re-index cards immediately after changes (deletion, addition, or updates).
-
-Use ChromaDB attributes to store FrontMatter metadata. Add scope identifier attribute to filter between global search and initiative-specific search. Use ChromaDB's default embedding model for simpler implementation.
-
-search
-	domain
-		CromaDB to index the cards
-			use scope attribute to separate the gloabal and initiative cards
-			reindex after remove or update cards
-		semantic search method
-return arrays of MemoryCard
-			scope
-				"global"
-				initiativeId
-			query
-			number of results
-	mcp tools
-		memory_cards_search
-Return:
-list of memory card with full content
-			scope
-				"global"
-				initiativeId
-			query
-			number of results
+--------
+handle changing of embedding model
+add reindex tool or reindex on start if no index but cards exists
 ---
 # Remove duplicates in templates
 

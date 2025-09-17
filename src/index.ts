@@ -5,6 +5,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "./config.js";
+import { ensureMemoryCardsCollection } from "./domain/memory-card-search.js";
 import { setupBacklogSpecificationPrompt } from "./prompts/backlog-specification.js";
 import { setupInitiativeCompletionPrompt } from "./prompts/initiative-completion.js";
 import { setupInitiativeKnowledgeCollectionPrompt } from "./prompts/initiative-knowledge-collection.js";
@@ -54,6 +55,19 @@ function createServer(): McpServer {
 async function runServer(): Promise<void> {
 	// Initialize configuration
 	console.error(`Using PROJECT_ROOT: ${config.PROJECT_ROOT}`);
+	console.error(`Using VECTOR_INDEX_PATH: ${config.VECTOR_INDEX_PATH}`);
+
+	// Initialize vector search system
+	console.error("🚀 Initializing vector search system...");
+	try {
+		await ensureMemoryCardsCollection();
+		console.error("✅ Vector search system initialized");
+	} catch (error) {
+		console.error(
+			"⚠️ Vector search initialization failed, using fallback:",
+			error,
+		);
+	}
 
 	const server = createServer();
 
