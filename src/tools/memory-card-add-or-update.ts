@@ -8,6 +8,7 @@ import {
 	MemoryCardAddOrUpdateSchema,
 	MemoryCardSchema,
 } from "../domain/memory-card-schema.js";
+import { indexMemoryCard } from "../domain/memory-card-search.js";
 import {
 	loadGlobalMemoryCard,
 	loadInitiativeMemoryCard,
@@ -45,6 +46,15 @@ export async function handleMemoryCardAddOrUpdateTool(
 
 			// Save global memory card
 			await saveGlobalMemoryCard(memoryCard);
+
+			// Index in ChromaDB
+			try {
+				await indexMemoryCard(memoryCard, "global");
+			} catch (indexError) {
+				console.error("Failed to index global memory card:", indexError);
+				// Don't fail the operation if indexing fails
+			}
+
 			scopeDescription = "global scope";
 		} else {
 			// Initiative scope
@@ -59,6 +69,15 @@ export async function handleMemoryCardAddOrUpdateTool(
 
 			// Save initiative memory card
 			await saveInitiativeMemoryCard(initiativeId, memoryCard);
+
+			// Index in ChromaDB
+			try {
+				await indexMemoryCard(memoryCard, initiativeId);
+			} catch (indexError) {
+				console.error("Failed to index initiative memory card:", indexError);
+				// Don't fail the operation if indexing fails
+			}
+
 			scopeDescription = `initiative '${initiativeId}'`;
 		}
 

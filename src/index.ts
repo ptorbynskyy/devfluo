@@ -29,6 +29,7 @@ import { setupInitiativeUpdateTool } from "./tools/initiative-update.js";
 import { setupIssueManagementTool } from "./tools/issue-management.js";
 import { setupMemoryCardAddOrUpdateTool } from "./tools/memory-card-add-or-update.js";
 import { setupMemoryCardRemoveTool } from "./tools/memory-card-remove.js";
+import { setupMemoryCardSearchTool } from "./tools/memory-card-search.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
 import { VERSION } from "./version.js";
@@ -72,6 +73,7 @@ async function runServer(): Promise<void> {
 	setupIssueManagementTool(server);
 	setupMemoryCardAddOrUpdateTool(server);
 	setupMemoryCardRemoveTool(server);
+	setupMemoryCardSearchTool(server);
 	setupBacklogSpecificationPrompt(server);
 	setupInitiativeSpecificationPrompt(server);
 	setupInitiativePlanningPrompt(server);

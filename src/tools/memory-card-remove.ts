@@ -7,6 +7,7 @@ import {
 	type MemoryCardRemove,
 	MemoryCardRemoveSchema,
 } from "../domain/memory-card-schema.js";
+import { removeFromIndex } from "../domain/memory-card-search.js";
 import {
 	removeGlobalMemoryCard,
 	removeInitiativeMemoryCard,
@@ -27,6 +28,20 @@ export async function handleMemoryCardRemoveTool(input: MemoryCardRemove) {
 		if (validatedInput.scope === "global") {
 			// Remove global memory card
 			removed = await removeGlobalMemoryCard(validatedInput.name);
+
+			// Remove from ChromaDB index
+			if (removed) {
+				try {
+					await removeFromIndex("global", validatedInput.name);
+				} catch (indexError) {
+					console.error(
+						"Failed to remove global memory card from index:",
+						indexError,
+					);
+					// Don't fail the operation if index removal fails
+				}
+			}
+
 			scopeDescription = "global scope";
 		} else {
 			// Initiative scope
@@ -37,6 +52,20 @@ export async function handleMemoryCardRemoveTool(input: MemoryCardRemove) {
 				initiativeId,
 				validatedInput.name,
 			);
+
+			// Remove from ChromaDB index
+			if (removed) {
+				try {
+					await removeFromIndex(initiativeId, validatedInput.name);
+				} catch (indexError) {
+					console.error(
+						"Failed to remove initiative memory card from index:",
+						indexError,
+					);
+					// Don't fail the operation if index removal fails
+				}
+			}
+
 			scopeDescription = `initiative '${initiativeId}'`;
 		}
 

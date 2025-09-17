@@ -21,6 +21,22 @@ export function getGlobalMemoryCardPath(name: string): string {
 	return path.join(globalMemoryCardsPath, `${name}.md`);
 }
 
+// Parse memory card from file content and name
+function parseMemoryCardFromFile(
+	name: string,
+	fileContent: string,
+): MemoryCard {
+	const { data, content } = matter(fileContent);
+
+	return MemoryCardSchema.parse({
+		name,
+		title: data.title,
+		content,
+		contextIncludingPolicy: data.contextIncludingPolicy || "auto",
+		tags: data.tags || [],
+	});
+}
+
 // Load memory cards from a directory
 async function loadMemoryCardsFromPath(dirPath: string): Promise<MemoryCard[]> {
 	try {
@@ -35,16 +51,7 @@ async function loadMemoryCardsFromPath(dirPath: string): Promise<MemoryCard[]> {
 
 				try {
 					const fileContent = await readFile(filePath, "utf-8");
-					const { data, content } = matter(fileContent);
-
-					const memoryCard = MemoryCardSchema.parse({
-						name,
-						title: data.title,
-						content,
-						contextIncludingPolicy: data.contextIncludingPolicy || "auto",
-						tags: data.tags || [],
-					});
-
+					const memoryCard = parseMemoryCardFromFile(name, fileContent);
 					memoryCards.push(memoryCard);
 				} catch (error) {
 					console.error(`Error parsing memory card ${file}:`, error);
@@ -56,6 +63,44 @@ async function loadMemoryCardsFromPath(dirPath: string): Promise<MemoryCard[]> {
 		return memoryCards;
 	} catch (_error) {
 		// Directory doesn't exist or other error
+		return [];
+	}
+}
+
+// Load a single memory card from file path
+async function loadMemoryCardFromPath(
+	filePath: string,
+	name: string,
+): Promise<MemoryCard | null> {
+	try {
+		const fileContent = await readFile(filePath, "utf-8");
+		return parseMemoryCardFromFile(name, fileContent);
+	} catch (_error) {
+		// File doesn't exist or parsing error
+		return null;
+	}
+}
+
+// Remove memory card file at path
+async function removeMemoryCardAtPath(filePath: string): Promise<boolean> {
+	try {
+		await unlink(filePath);
+		return true;
+	} catch (_error) {
+		// File doesn't exist
+		return false;
+	}
+}
+
+// Get memory card names from directory
+async function getMemoryCardNamesFromPath(dirPath: string): Promise<string[]> {
+	try {
+		await mkdir(dirPath, { recursive: true });
+		const files = await readdir(dirPath);
+		return files
+			.filter((file) => file.endsWith(".md"))
+			.map((file) => path.basename(file, ".md"));
+	} catch (_error) {
 		return [];
 	}
 }
@@ -86,22 +131,8 @@ export async function loadGlobalMemoryCards(): Promise<MemoryCard[]> {
 export async function loadGlobalMemoryCard(
 	name: string,
 ): Promise<MemoryCard | null> {
-	try {
-		const filePath = getGlobalMemoryCardPath(name);
-		const fileContent = await readFile(filePath, "utf-8");
-		const { data, content } = matter(fileContent);
-
-		return MemoryCardSchema.parse({
-			name,
-			title: data.title,
-			content,
-			contextIncludingPolicy: data.contextIncludingPolicy || "auto",
-			tags: data.tags || [],
-		});
-	} catch (_error) {
-		// File doesn't exist or parsing error
-		return null;
-	}
+	const filePath = getGlobalMemoryCardPath(name);
+	return loadMemoryCardFromPath(filePath, name);
 }
 
 export async function saveGlobalMemoryCard(
@@ -112,26 +143,12 @@ export async function saveGlobalMemoryCard(
 }
 
 export async function removeGlobalMemoryCard(name: string): Promise<boolean> {
-	try {
-		const filePath = getGlobalMemoryCardPath(name);
-		await unlink(filePath);
-		return true;
-	} catch (_error) {
-		// File doesn't exist
-		return false;
-	}
+	const filePath = getGlobalMemoryCardPath(name);
+	return removeMemoryCardAtPath(filePath);
 }
 
 export async function getGlobalMemoryCardNames(): Promise<string[]> {
-	try {
-		await mkdir(globalMemoryCardsPath, { recursive: true });
-		const files = await readdir(globalMemoryCardsPath);
-		return files
-			.filter((file) => file.endsWith(".md"))
-			.map((file) => path.basename(file, ".md"));
-	} catch (_error) {
-		return [];
-	}
+	return getMemoryCardNamesFromPath(globalMemoryCardsPath);
 }
 
 // Initiative memory cards functions
@@ -146,22 +163,8 @@ export async function loadInitiativeMemoryCard(
 	initiativeId: string,
 	name: string,
 ): Promise<MemoryCard | null> {
-	try {
-		const filePath = getInitiativeMemoryCardPath(initiativeId, name);
-		const fileContent = await readFile(filePath, "utf-8");
-		const { data, content } = matter(fileContent);
-
-		return MemoryCardSchema.parse({
-			name,
-			title: data.title,
-			content,
-			contextIncludingPolicy: data.contextIncludingPolicy || "auto",
-			tags: data.tags || [],
-		});
-	} catch (_error) {
-		// File doesn't exist or parsing error
-		return null;
-	}
+	const filePath = getInitiativeMemoryCardPath(initiativeId, name);
+	return loadMemoryCardFromPath(filePath, name);
 }
 
 export async function saveInitiativeMemoryCard(
@@ -176,27 +179,13 @@ export async function removeInitiativeMemoryCard(
 	initiativeId: string,
 	name: string,
 ): Promise<boolean> {
-	try {
-		const filePath = getInitiativeMemoryCardPath(initiativeId, name);
-		await unlink(filePath);
-		return true;
-	} catch (_error) {
-		// File doesn't exist
-		return false;
-	}
+	const filePath = getInitiativeMemoryCardPath(initiativeId, name);
+	return removeMemoryCardAtPath(filePath);
 }
 
 export async function getInitiativeMemoryCardNames(
 	initiativeId: string,
 ): Promise<string[]> {
-	try {
-		const dirPath = getInitiativeMemoryCardsPath(initiativeId);
-		await mkdir(dirPath, { recursive: true });
-		const files = await readdir(dirPath);
-		return files
-			.filter((file) => file.endsWith(".md"))
-			.map((file) => path.basename(file, ".md"));
-	} catch (_error) {
-		return [];
-	}
+	const dirPath = getInitiativeMemoryCardsPath(initiativeId);
+	return getMemoryCardNamesFromPath(dirPath);
 }
