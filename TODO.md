@@ -1,6 +1,9 @@
 --------
 handle changing of embedding model
 add reindex tool or reindex on start if no index but cards exists
+create context for prompts
+remove old aproach
+check / limit chunk sizes
 ---
 # Remove duplicates in templates
 
