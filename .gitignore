@@ -60,3 +60,6 @@ temp/
 
 *.local.json
 /repomix-output.xml
+
+# Vector search indexes - derived data that should not be committed
+vector/

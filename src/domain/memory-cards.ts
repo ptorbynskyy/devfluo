@@ -92,6 +92,33 @@ async function removeMemoryCardAtPath(filePath: string): Promise<boolean> {
 	}
 }
 
+/**
+ * Get memory card file paths for a scope
+ */
+export async function getMemoryCardPaths(
+	scope: string,
+): Promise<Record<string, string>> {
+	const paths: Record<string, string> = {};
+
+	try {
+		if (scope === "global") {
+			const names = await getGlobalMemoryCardNames();
+			for (const name of names) {
+				paths[name] = getGlobalMemoryCardPath(name);
+			}
+		} else {
+			const names = await getInitiativeMemoryCardNames(scope);
+			for (const name of names) {
+				paths[name] = getInitiativeMemoryCardPath(scope, name);
+			}
+		}
+	} catch (error) {
+		console.error("Failed to get memory card paths:", error);
+	}
+
+	return paths;
+}
+
 // Get memory card names from directory
 async function getMemoryCardNamesFromPath(dirPath: string): Promise<string[]> {
 	try {

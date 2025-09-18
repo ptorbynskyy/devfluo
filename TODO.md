@@ -1,6 +1,7 @@
 --------
-handle changing of embedding model
-add reindex tool or reindex on start if no index but cards exists
+gitignore for "vector"
+- close initiative should remove index
+
 create context for prompts
 remove old aproach
 check / limit chunk sizes
