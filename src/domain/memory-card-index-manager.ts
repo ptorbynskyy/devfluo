@@ -1,12 +1,18 @@
 // ABOUTME: Memory card index orchestration with consistency validation and transparent rebuilding
 
+import type { LocalIndex } from "vectra";
 import { config } from "../config.js";
+import {
+	type ChunkMetadata,
+	createChunkDocumentId,
+	splitText,
+} from "../utils/text-splitter.js";
 import {
 	ensureEmbeddingService,
 	getIndex,
 	indexDocument,
-	removeDocument,
 	removeIndex,
+	removeMemoryCardChunks,
 } from "./memory-card-index-core.js";
 import {
 	createFreshMetadata,
@@ -23,13 +29,6 @@ import {
 
 // Module-level state to prevent concurrent rebuilds
 const rebuildingScopes: Set<string> = new Set();
-
-/**
- * Generate document ID for vector index
- */
-function getDocumentId(scope: string, cardName: string): string {
-	return `${scope}::${cardName}`;
-}
 
 /**
  * Validate index consistency using file hash comparison
@@ -100,6 +99,41 @@ async function validateIndexConsistency(scope: string): Promise<boolean> {
 }
 
 /**
+ * Index a memory card with chunking
+ */
+async function indexMemoryCardChunks(
+	index: LocalIndex,
+	memoryCard: MemoryCard,
+	scope: string,
+): Promise<number> {
+	const searchableContent = `${memoryCard.title}\n\n${memoryCard.content}`;
+	const chunks = splitText(searchableContent);
+
+	// Index each chunk separately
+	for (let i = 0; i < chunks.length; i++) {
+		const chunk = chunks[i];
+		if (!chunk) continue; // Skip empty chunks
+
+		const chunkDocumentId = createChunkDocumentId(scope, memoryCard.name, i);
+		const chunkMetadata: ChunkMetadata &
+			Record<string, string | number | boolean> = {
+			id: chunkDocumentId,
+			cardName: memoryCard.name,
+			scope,
+			title: memoryCard.title ?? "",
+			chunkIndex: i,
+			totalChunks: chunks.length,
+			tags: memoryCard.tags.join(","),
+			contextIncludingPolicy: memoryCard.contextIncludingPolicy,
+		};
+
+		await indexDocument(index, chunkDocumentId, chunk, chunkMetadata);
+	}
+
+	return chunks.length;
+}
+
+/**
  * Rebuild index for a specific scope with hash tracking
  */
 async function rebuildIndexForScope(scope: string): Promise<void> {
@@ -124,19 +158,9 @@ async function rebuildIndexForScope(scope: string): Promise<void> {
 				? await loadGlobalMemoryCards()
 				: await loadInitiativeMemoryCards(scope);
 
-		// Index all cards
+		// Index all cards with chunking
 		for (const card of memoryCards) {
-			const documentId = getDocumentId(scope, card.name);
-			const searchableContent = `${card.title}\n\n${card.content}`;
-
-			await indexDocument(index, documentId, searchableContent, {
-				id: documentId,
-				name: card.name,
-				scope,
-				title: card.title,
-				tags: card.tags.join(","),
-				contextIncludingPolicy: card.contextIncludingPolicy,
-			});
+			await indexMemoryCardChunks(index, card, scope);
 		}
 
 		// Create and save fresh metadata
@@ -198,22 +222,19 @@ export async function indexMemoryCard(
 		await ensureIndexConsistency(scope);
 
 		const index = await getIndex(scope);
-		const documentId = getDocumentId(scope, memoryCard.name);
-		const searchableContent = `${memoryCard.title}\n\n${memoryCard.content}`;
 
-		await indexDocument(index, documentId, searchableContent, {
-			id: documentId,
-			name: memoryCard.name,
-			scope,
-			title: memoryCard.title,
-			tags: memoryCard.tags.join(","),
-			contextIncludingPolicy: memoryCard.contextIncludingPolicy,
-		});
+		// Index memory card chunks
+		const chunkCount = await indexMemoryCardChunks(index, memoryCard, scope);
+		console.error(
+			`Splitting memory card '${memoryCard.name}' into ${chunkCount} chunks`,
+		);
 
 		// Update metadata for individual card
 		await updateMetadataAfterIndexing(scope, memoryCard.name);
 
-		console.error(`Indexed memory card '${memoryCard.name}' in ${scope} scope`);
+		console.error(
+			`Indexed memory card '${memoryCard.name}' in ${scope} scope (${chunkCount} chunks)`,
+		);
 	} catch (error) {
 		console.error("Failed to index memory card:", error);
 		// Don't throw - this allows the calling code to continue
@@ -232,20 +253,24 @@ export async function removeMemoryCardFromIndex(
 		await ensureIndexConsistency(scope);
 
 		const index = await getIndex(scope);
-		const documentId = getDocumentId(scope, name);
 
-		const success = await removeDocument(index, documentId);
+		// Remove all chunks for this memory card
+		const removedCount = await removeMemoryCardChunks(index, scope, name);
 
-		if (success) {
+		if (removedCount > 0) {
 			// Update metadata to reflect removal
 			await updateMetadataAfterRemoval(scope, name);
 
 			console.error(
-				`🗑️ Removed memory card '${name}' from ${scope} scope index`,
+				`🗑️ Removed memory card '${name}' from ${scope} scope index (${removedCount} chunks)`,
 			);
+			return true;
 		}
 
-		return success;
+		console.error(
+			`No chunks found for memory card '${name}' in ${scope} scope`,
+		);
+		return false;
 	} catch (error) {
 		console.error("Failed to remove memory card from index:", error);
 		return false;

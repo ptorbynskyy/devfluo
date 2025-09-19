@@ -3,7 +3,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { searchMemoryCards } from "../domain/memory-card-search.js";
+import { searchMemoryCardsWithExcerpts } from "../domain/memory-card-search.js";
 import {
 	type MemoryCardSearch,
 	MemoryCardSearchSchema,
@@ -18,8 +18,8 @@ export async function handleMemoryCardSearchTool(input: MemoryCardSearch) {
 		// Validate input
 		const validatedInput = MemoryCardSearchSchema.parse(input);
 
-		// Perform semantic search
-		const searchResults = await searchMemoryCards(
+		// Perform semantic search with excerpts
+		const searchResults = await searchMemoryCardsWithExcerpts(
 			validatedInput.scope,
 			validatedInput.query,
 			validatedInput.limit,
@@ -41,17 +41,27 @@ export async function handleMemoryCardSearchTool(input: MemoryCardSearch) {
 			};
 		}
 
-		// Format search results
+		// Format search results with excerpts
 		const resultsText = searchResults
 			.map((result, index) => {
+				const card = result.parentCard;
 				const tagsText =
-					result.tags.length > 0 ? `\nTags: ${result.tags.join(", ")}` : "";
+					card.tags.length > 0 ? `\nTags: ${card.tags.join(", ")}` : "";
 
-				return `**${index + 1}. ${result.title}** (Relevance: ${Math.round(result.relevanceScore * 100)}%)
-Name: ${result.name}${tagsText}
-Context Policy: ${result.contextIncludingPolicy}
+				// Format excerpts
+				const excerptsText =
+					result.excerpts.length > 1
+						? `\n\n**Relevant excerpts:**\n${result.excerpts
+								.map(
+									(excerpt, i) =>
+										`${i + 1}. (Score: ${Math.round(excerpt.score * 100)}%)\n${excerpt.content}`,
+								)
+								.join("\n\n")}`
+						: `\n\n${result.excerpts[0]?.content || ""}`;
 
-${result.content}`;
+				return `**${index + 1}. ${card.title}** (Relevance: ${Math.round(result.relevanceScore * 100)}%)
+Name: ${card.name}${tagsText}
+Context Policy: ${card.contextIncludingPolicy}${excerptsText}`;
 			})
 			.join("\n\n---\n\n");
 

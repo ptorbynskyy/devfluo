@@ -75,6 +75,7 @@ export async function indexDocument(
 		vector: embedding,
 		metadata: {
 			...metadata,
+			content, // Store the content in metadata for retrieval
 		},
 	});
 }
@@ -86,7 +87,16 @@ export async function searchIndex(
 	index: LocalIndex,
 	query: string,
 	limit: number,
-): Promise<Array<{ name: string; scope: string; score: number }>> {
+): Promise<
+	Array<{
+		cardName: string;
+		scope: string;
+		score: number;
+		chunkIndex: number;
+		totalChunks: number;
+		chunkContent: string;
+	}>
+> {
 	if (!isEmbeddingServiceReady()) {
 		throw new Error("Embedding service not ready");
 	}
@@ -96,27 +106,50 @@ export async function searchIndex(
 
 	return results
 		.filter(
-			(result) => result.item?.metadata?.scope && result.item?.metadata?.name,
+			(result) =>
+				result.item?.metadata?.scope && result.item?.metadata?.cardName,
 		)
 		.map((result) => ({
-			name: result.item?.metadata?.name as string,
+			cardName: result.item?.metadata?.cardName as string,
 			scope: result.item?.metadata?.scope as string,
 			score: result.score,
+			chunkIndex: result.item?.metadata?.chunkIndex as number,
+			totalChunks: result.item?.metadata?.totalChunks as number,
+			chunkContent: (result.item?.metadata?.content as string) ?? "",
 		}));
 }
 
 /**
- * Remove a document from vector index
+ * Remove all chunks for a specific memory card
  */
-export async function removeDocument(
+export async function removeMemoryCardChunks(
 	index: LocalIndex,
-	documentId: string,
-): Promise<boolean> {
+	scope: string,
+	cardName: string,
+): Promise<number> {
 	try {
-		await index.deleteItem(documentId);
-		return true;
-	} catch {
-		return false;
+		// Query for all items with matching cardName metadata
+		const allItems = await index.listItems();
+		let removedCount = 0;
+
+		for (const item of allItems) {
+			if (
+				item.metadata?.cardName === cardName &&
+				item.metadata?.scope === scope
+			) {
+				try {
+					await index.deleteItem(item.id);
+					removedCount++;
+				} catch (error) {
+					console.error(`Failed to delete chunk ${item.id}:`, error);
+				}
+			}
+		}
+
+		return removedCount;
+	} catch (error) {
+		console.error(`Failed to remove chunks for card '${cardName}':`, error);
+		return 0;
 	}
 }
 

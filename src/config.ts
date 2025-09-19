@@ -44,7 +44,7 @@ export function loadConfig() {
 			validatedConfig.VECTOR_INDEX_PATH ||
 			path.join(validatedConfig.PROJECT_ROOT, "vector"),
 		EMBEDDING_MODEL:
-			validatedConfig.EMBEDDING_MODEL || "Xenova/all-MiniLM-L6-v2",
+			validatedConfig.EMBEDDING_MODEL || "Xenova/bge-small-en-v1.5",
 		EMBEDDING_CACHE_DIR:
 			validatedConfig.EMBEDDING_CACHE_DIR ||
 			path.join(

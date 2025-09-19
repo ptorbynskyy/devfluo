@@ -19,6 +19,17 @@ import {
 } from "./memory-cards.js";
 
 /**
+ * Enriched chunk result containing parent card and chunk information
+ */
+export interface EnrichedChunkResult {
+	parentCard: MemoryCard;
+	chunkContent: string;
+	chunkIndex: number;
+	totalChunks: number;
+	relevanceScore: number;
+}
+
+/**
  * Get memory cards directory for a given scope
  */
 function getMemoryCardsDir(scope: string): string {
@@ -51,7 +62,40 @@ export async function removeFromIndex(
 }
 
 /**
- * Convert basic search result to full MemoryCardSearchResult
+ * Convert chunk search result to enriched chunk result
+ */
+async function enrichChunkResult(chunkResult: {
+	cardName: string;
+	scope: string;
+	score: number;
+	chunkIndex: number;
+	totalChunks: number;
+	chunkContent: string;
+}): Promise<EnrichedChunkResult | null> {
+	const { cardName, scope, score, chunkIndex, totalChunks, chunkContent } =
+		chunkResult;
+
+	// Load the full memory card data
+	const memoryCard =
+		scope === "global"
+			? await loadGlobalMemoryCard(cardName)
+			: await loadInitiativeMemoryCard(scope, cardName);
+
+	if (!memoryCard) {
+		return null;
+	}
+
+	return {
+		parentCard: memoryCard,
+		chunkContent,
+		chunkIndex,
+		totalChunks,
+		relevanceScore: score,
+	};
+}
+
+/**
+ * Convert basic search result to full MemoryCardSearchResult (fallback compatibility)
  */
 async function enrichSearchResult(basicResult: {
 	name: string;
@@ -77,17 +121,41 @@ async function enrichSearchResult(basicResult: {
 }
 
 /**
- * Search for memory cards using vector similarity
+ * Search result with chunk excerpts for enhanced formatting
  */
-export async function searchMemoryCards(
+export interface SearchResultWithExcerpts {
+	parentCard: MemoryCard;
+	relevanceScore: number;
+	excerpts: Array<{
+		content: string;
+		chunkIndex: number;
+		score: number;
+	}>;
+}
+
+/**
+ * Search for memory cards and return results with chunk excerpts
+ */
+export async function searchMemoryCardsWithExcerpts(
 	scope: string,
 	query: string,
 	limit = 10,
-): Promise<MemoryCardSearchResult[]> {
+): Promise<SearchResultWithExcerpts[]> {
 	try {
 		// If embedding service is not ready, fall back to text search
 		if (!isEmbeddingServiceReady()) {
-			return await fallbackTextSearch(scope, query, limit);
+			const fallbackResults = await fallbackTextSearch(scope, query, limit);
+			return fallbackResults.map((result) => ({
+				parentCard: result,
+				relevanceScore: result.relevanceScore,
+				excerpts: [
+					{
+						content: result.content,
+						chunkIndex: 0,
+						score: result.relevanceScore,
+					},
+				],
+			}));
 		}
 
 		// Ensure index consistency before searching
@@ -95,23 +163,90 @@ export async function searchMemoryCards(
 
 		const index = await getIndex(scope);
 
-		// Use the core search functionality
-		const basicResults = await searchIndex(index, query, limit);
+		// Search with higher limit to get more chunks, then group
+		const chunkResults = await searchIndex(index, query, limit * 5);
 
-		// Enrich results with full memory card data
-		const enrichedResults: MemoryCardSearchResult[] = [];
-		for (const basicResult of basicResults) {
-			const enriched = await enrichSearchResult(basicResult);
+		// Enrich chunk results
+		const enrichedChunks: EnrichedChunkResult[] = [];
+		for (const chunkResult of chunkResults) {
+			const enriched = await enrichChunkResult(chunkResult);
 			if (enriched) {
-				enrichedResults.push(enriched);
+				enrichedChunks.push(enriched);
 			}
 		}
 
-		return enrichedResults;
+		// Group chunks by parent card
+		return groupChunksWithExcerpts(enrichedChunks, limit, scope);
 	} catch (error) {
 		console.error("Vector search failed, falling back to text search:", error);
-		return await fallbackTextSearch(scope, query, limit);
+		const fallbackResults = await fallbackTextSearch(scope, query, limit);
+		return fallbackResults.map((result) => ({
+			parentCard: result,
+			relevanceScore: result.relevanceScore,
+			excerpts: [
+				{
+					content: result.content,
+					chunkIndex: 0,
+					score: result.relevanceScore,
+				},
+			],
+		}));
 	}
+}
+
+/**
+ * Group chunks with excerpts for enhanced search results
+ */
+function groupChunksWithExcerpts(
+	enrichedChunks: EnrichedChunkResult[],
+	limit: number,
+	scope: string,
+): SearchResultWithExcerpts[] {
+	// Group chunks by card name
+	const cardGroups = new Map<string, EnrichedChunkResult[]>();
+
+	for (const chunk of enrichedChunks) {
+		const cardKey = `${chunk.parentCard.name}::${scope}`;
+		if (!cardGroups.has(cardKey)) {
+			cardGroups.set(cardKey, []);
+		}
+		cardGroups.get(cardKey)?.push(chunk);
+	}
+
+	// Create results with excerpts
+	const results: SearchResultWithExcerpts[] = [];
+
+	for (const [, chunks] of cardGroups) {
+		if (results.length >= limit || chunks.length === 0) break;
+
+		// Sort chunks by relevance score
+		chunks.sort((a, b) => b.relevanceScore - a.relevanceScore);
+
+		// Take the first chunk as representative (highest score)
+		const representativeChunk = chunks[0];
+		if (!representativeChunk) continue;
+
+		// Calculate average relevance score
+		const avgScore =
+			chunks.reduce((sum, chunk) => sum + chunk.relevanceScore, 0) /
+			chunks.length;
+
+		// Create excerpts from top scoring chunks
+		const excerpts = chunks.slice(0, 3).map((chunk) => ({
+			content: chunk.chunkContent,
+			chunkIndex: chunk.chunkIndex,
+			score: chunk.relevanceScore,
+		}));
+
+		results.push({
+			parentCard: representativeChunk.parentCard,
+			relevanceScore: avgScore,
+			excerpts,
+		});
+	}
+
+	// Sort final results by relevance score
+	return results.sort((a, b) => b.relevanceScore - a.relevanceScore);
 }
 
 /**
