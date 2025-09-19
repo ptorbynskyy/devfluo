@@ -107,7 +107,7 @@ async function indexMemoryCardChunks(
 	scope: string,
 ): Promise<number> {
 	const searchableContent = `${memoryCard.title}\n\n${memoryCard.content}`;
-	const chunks = splitText(searchableContent);
+	const chunks = await splitText(searchableContent);
 
 	// Index each chunk separately
 	for (let i = 0; i < chunks.length; i++) {

@@ -1,5 +1,7 @@
 // ABOUTME: Text splitting utility for chunking large content to fit embedding model token limits
 
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
+
 /**
  * Configuration for text splitting
  */
@@ -8,27 +10,25 @@ export interface TextSplitterConfig {
 	chunkSize: number;
 	/** Overlap between chunks to preserve context */
 	chunkOverlap: number;
-	/** Separators to use for splitting, in order of preference */
-	separators: string[];
 }
 
 /**
  * Default configuration for memory card chunking
- * Targets ~400 tokens per chunk with some overlap for context preservation
+ * Uses LangChain's optimized defaults for balanced context and granularity
  */
 export const DEFAULT_CONFIG: TextSplitterConfig = {
-	chunkSize: 1600, // ~400 tokens (assuming 4 chars per token)
+	chunkSize: 1000, // ~250 tokens (assuming 4 chars per token)
 	chunkOverlap: 200, // ~50 tokens overlap
-	separators: ["\n\n", "\n", ". ", "! ", "? ", " ", ""],
 };
 
 /**
- * Split text into chunks that respect token limits
+ * Split text into chunks that respect token limits using LangChain's RecursiveCharacterTextSplitter
+ * Uses LangChain's default separators: ["\n\n", "\n", " ", ""] for optimal semantic preservation
  */
-export function splitText(
+export async function splitText(
 	text: string,
 	config: TextSplitterConfig = DEFAULT_CONFIG,
-): string[] {
+): Promise<string[]> {
 	if (!text.trim()) {
 		return [];
 	}
@@ -38,89 +38,14 @@ export function splitText(
 		return [text];
 	}
 
-	const chunks: string[] = [];
-	const splits = recursiveSplit(text, config.separators, config.chunkSize);
+	const splitter = new RecursiveCharacterTextSplitter({
+		chunkSize: config.chunkSize,
+		chunkOverlap: config.chunkOverlap,
+		// Use LangChain's default separators for better semantic coherence
+	});
 
-	let currentChunk = "";
-
-	for (const split of splits) {
-		// If adding this split would exceed chunk size
-		if (currentChunk.length + split.length > config.chunkSize) {
-			// If we have content, save current chunk
-			if (currentChunk.trim()) {
-				chunks.push(currentChunk.trim());
-
-				// Start new chunk with overlap from previous chunk
-				if (
-					config.chunkOverlap > 0 &&
-					currentChunk.length > config.chunkOverlap
-				) {
-					const overlapText = currentChunk.slice(-config.chunkOverlap);
-					currentChunk = overlapText + split;
-				} else {
-					currentChunk = split;
-				}
-			} else {
-				// If split itself is too large, force add it
-				currentChunk = split;
-			}
-		} else {
-			currentChunk += split;
-		}
-	}
-
-	// Add final chunk if it has content
-	if (currentChunk.trim()) {
-		chunks.push(currentChunk.trim());
-	}
-
+	const chunks = await splitter.splitText(text);
 	return chunks.filter((chunk) => chunk.trim().length > 0);
-}
-
-/**
- * Recursively split text using separators in order of preference
- */
-function recursiveSplit(
-	text: string,
-	separators: string[],
-	chunkSize: number,
-): string[] {
-	if (!text) {
-		return [];
-	}
-
-	const separator = separators[0];
-	const otherSeparators = separators.slice(1);
-
-	let splits: string[];
-
-	if (separator === "") {
-		// Final fallback: split by character
-		splits = text.split("");
-	} else if (separator) {
-		splits = text.split(separator);
-	} else {
-		splits = [text];
-	}
-
-	// If we have multiple separators remaining, try to split large pieces further
-	if (otherSeparators.length > 0) {
-		const finalSplits: string[] = [];
-
-		for (const split of splits) {
-			if (split.length > chunkSize) {
-				// This piece is still too large, split it further
-				const subSplits = recursiveSplit(split, otherSeparators, chunkSize);
-				finalSplits.push(...subSplits);
-			} else {
-				finalSplits.push(split);
-			}
-		}
-
-		return finalSplits;
-	}
-
-	return splits;
 }
 
 /**
