@@ -5,12 +5,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { loadBacklogItem, loadBacklogItems } from "../domain/backlog.js";
-import { ensureProjectInitialized } from "../utils/project-validation.js";
-import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	loadProjectContext,
 	type ProjectContext,
-} from "./shared/project-context.js";
+} from "../templates/utils/project-context.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
+import { renderTemplateFile } from "../utils/template-engine.js";
 
 export async function validateBacklogItemForSpec(backlogItemId: string) {
 	const item = await loadBacklogItem(backlogItemId);

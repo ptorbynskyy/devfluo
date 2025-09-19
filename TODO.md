@@ -1,5 +1,7 @@
 --------
-gitignore for "vector"
+- use lib for splitter - @langchain/textsplitters
+- ETA in src/tools/memory-card-search.ts
+
 - close initiative should remove index
 
 create context for prompts

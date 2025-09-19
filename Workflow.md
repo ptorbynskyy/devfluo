@@ -270,7 +270,7 @@ This provides a web interface to interact with all tools, resources, and prompts
 - Verify PROJECT_ROOT permissions
 
 **Prompt Template Errors**:
-- Check template file availability in prompts/templates/
+- Check template file availability in templates/
 - Verify ETA template syntax
 - Ensure required context data is provided
 

@@ -9,16 +9,16 @@ import {
 } from "../domain/initiative/index.js";
 import { IssueStrategies } from "../domain/initiative/issue-schema.js";
 import { loadIssues } from "../domain/initiative/issues.js";
+import {
+	type InitiativeContext,
+	loadInitiativeContext,
+} from "../templates/utils/project-context.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
 	initiativeIdSchema,
 } from "./shared/initiative-id.js";
-import {
-	type InitiativeContext,
-	loadInitiativeContext,
-} from "./shared/project-context.js";
 
 // Zod schema for issue resolution input validation
 export const IssueResolutionInputSchema = z.object({

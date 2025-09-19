@@ -9,16 +9,16 @@ import {
 } from "../domain/initiative/index.js";
 import type { Task } from "../domain/initiative/task-schema.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
+import {
+	type InitiativeContext,
+	loadInitiativeContext,
+} from "../templates/utils/project-context.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
 	initiativeIdSchema,
 } from "./shared/initiative-id.js";
-import {
-	type InitiativeContext,
-	loadInitiativeContext,
-} from "./shared/project-context.js";
 
 // Zod schema for task input validation
 export const TaskExecutionInputSchema = z.object({

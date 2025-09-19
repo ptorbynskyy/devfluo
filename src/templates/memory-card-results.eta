@@ -1,0 +1,14 @@
+<% /* ABOUTME: Template for formatting memory card search results
+Expected data structure:
+- searchResults: MemoryCardSearchResult[]
+- query: string
+- scope: string
+- scopeDescription: string
+*/ %>
+<% if (it.searchResults.length === 0) { -%>
+No memory cards found matching query "<%= it.query %>" in <%= it.scopeDescription %>
+<% } else { -%>
+Found <%= it.searchResults.length %> memory cards matching "<%= it.query %>" in <%= it.scopeDescription %>:
+
+<%~ include('partials/memory-card-items', { searchResults: it.searchResults }) -%>
+<% } -%>

@@ -33,6 +33,7 @@ import { setupMemoryCardRemoveTool } from "./tools/memory-card-remove.js";
 import { setupMemoryCardSearchTool } from "./tools/memory-card-search.js";
 import { setupProjectInitTool } from "./tools/project-init.js";
 import { setupUpdateKnowledgeTool } from "./tools/update-knowledge.js";
+import { getSharedTemplatesDir } from "./utils/template-paths.js";
 import { VERSION } from "./version.js";
 
 function createServer(): McpServer {
@@ -56,6 +57,7 @@ async function runServer(): Promise<void> {
 	// Initialize configuration
 	console.error(`Using PROJECT_ROOT: ${config.PROJECT_ROOT}`);
 	console.error(`Using VECTOR_INDEX_PATH: ${config.VECTOR_INDEX_PATH}`);
+	console.error(`Templates path: ${getSharedTemplatesDir()}`);
 
 	// Initialize vector search system
 	console.error("🚀 Initializing vector search system...");

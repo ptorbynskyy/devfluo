@@ -1,0 +1,6 @@
+<% it.searchResults.forEach((result, index) => { -%>
+<%~ include('memory-card-item', { result: result, index: index }) -%>
+<% if (index < it.searchResults.length - 1) { %>
+---
+<% } -%>
+<% }) -%>

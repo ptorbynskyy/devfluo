@@ -10,14 +10,9 @@ const buildFilePath = path.join(process.cwd(), "build", "index.js");
 // Template categories configuration
 const templateCategories = [
 	{
-		name: "markdown templates",
+		name: "shared templates",
 		sourceDir: path.join(process.cwd(), "src", "templates"),
 		buildDir: path.join(process.cwd(), "build", "templates"),
-	},
-	{
-		name: "prompt templates",
-		sourceDir: path.join(process.cwd(), "src", "prompts", "templates"),
-		buildDir: path.join(process.cwd(), "build", "prompts", "templates"),
 	},
 ];
 

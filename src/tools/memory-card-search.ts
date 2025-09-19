@@ -9,6 +9,7 @@ import {
 	MemoryCardSearchSchema,
 } from "../domain/memory-card-search-schema.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
+import { renderTemplateFile } from "../utils/template-engine.js";
 
 export async function handleMemoryCardSearchTool(input: MemoryCardSearch) {
 	try {
@@ -25,56 +26,24 @@ export async function handleMemoryCardSearchTool(input: MemoryCardSearch) {
 			validatedInput.limit,
 		);
 
-		if (searchResults.length === 0) {
-			const scopeDescription =
-				validatedInput.scope === "global"
-					? "global scope"
-					: `initiative '${validatedInput.scope}'`;
-
-			return {
-				content: [
-					{
-						type: "text" as const,
-						text: `No memory cards found matching query "${validatedInput.query}" in ${scopeDescription}`,
-					},
-				],
-			};
-		}
-
-		// Format search results with excerpts
-		const resultsText = searchResults
-			.map((result, index) => {
-				const card = result.parentCard;
-				const tagsText =
-					card.tags.length > 0 ? `\nTags: ${card.tags.join(", ")}` : "";
-
-				// Format excerpts
-				const excerptsText =
-					result.excerpts.length > 1
-						? `\n\n**Relevant excerpts:**\n${result.excerpts
-								.map(
-									(excerpt, i) =>
-										`${i + 1}. (Score: ${Math.round(excerpt.score * 100)}%)\n${excerpt.content}`,
-								)
-								.join("\n\n")}`
-						: `\n\n${result.excerpts[0]?.content || ""}`;
-
-				return `**${index + 1}. ${card.title}** (Relevance: ${Math.round(result.relevanceScore * 100)}%)
-Name: ${card.name}${tagsText}
-Context Policy: ${card.contextIncludingPolicy}${excerptsText}`;
-			})
-			.join("\n\n---\n\n");
-
 		const scopeDescription =
 			validatedInput.scope === "global"
 				? "global scope"
 				: `initiative '${validatedInput.scope}'`;
 
+		// Render results using template
+		const resultsText = await renderTemplateFile("memory-card-results.eta", {
+			searchResults,
+			query: validatedInput.query,
+			scope: validatedInput.scope,
+			scopeDescription,
+		});
+
 		return {
 			content: [
 				{
 					type: "text" as const,
-					text: `Found ${searchResults.length} memory cards matching "${validatedInput.query}" in ${scopeDescription}:\n\n${resultsText}`,
+					text: resultsText,
 				},
 			],
 		};

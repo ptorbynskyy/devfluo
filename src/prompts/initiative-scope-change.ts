@@ -7,16 +7,16 @@ import {
 	generateTasksMarkdownReport,
 	loadInitiative,
 } from "../domain/initiative/index.js";
+import {
+	type InitiativeContext,
+	loadInitiativeContext,
+} from "../templates/utils/project-context.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 import {
 	createCompletableInitiativeId,
 	initiativeIdSchema,
 } from "./shared/initiative-id.js";
-import {
-	type InitiativeContext,
-	loadInitiativeContext,
-} from "./shared/project-context.js";
 
 // Zod schema for scope change input validation
 export const ScopeChangeInputSchema = z.object({

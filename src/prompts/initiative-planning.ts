@@ -4,13 +4,13 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { loadInitiative } from "../domain/initiative/index.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
-import { ensureProjectInitialized } from "../utils/project-validation.js";
-import { renderTemplateFile } from "../utils/template-engine.js";
-import { createCompletableInitiativeId } from "./shared/initiative-id.js";
 import {
 	loadProjectContext,
 	type ProjectContext,
-} from "./shared/project-context.js";
+} from "../templates/utils/project-context.js";
+import { ensureProjectInitialized } from "../utils/project-validation.js";
+import { renderTemplateFile } from "../utils/template-engine.js";
+import { createCompletableInitiativeId } from "./shared/initiative-id.js";
 
 export async function validateInitiativeForPlanning(initiativeId: string) {
 	const initiative = await loadInitiative(initiativeId);

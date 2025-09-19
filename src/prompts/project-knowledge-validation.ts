@@ -3,9 +3,9 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import { loadProjectContext } from "../templates/utils/project-context.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
-import { loadProjectContext } from "./shared/project-context.js";
 
 // Zod schema for project knowledge validation input validation
 export const ProjectKnowledgeValidationInputSchema = z.object({});
