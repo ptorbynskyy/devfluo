@@ -1,57 +1,20 @@
+<project-context>
 ## Current Project Knowledge Context
 
-### Architecture & Codebase Knowledge
-*Source: project://knowledge resource*
-
-```
-<%= it.context.knowledge %>
-```
-
-### Current Decisions
-*Source: project://decisions resource*
-
-<% if (it.context.decisions.length > 0) { %>
-<% it.context.decisions.forEach((decision) => { %>
-**<%= decision.name %>**
-- Description: <%= decision.description %>
-- Tags: <%= decision.tags.join(', ') %>
-
+<architcture>
+### Architecture
+<%= it.context.architecture %>
+</architcture>
+<codebase>
+### Codebase
+<%= it.context.codebase %>
+</codebase>
+<memory-cards>
+<% if (it.context.memoryCards.length > 0) {%>
+### Memory Context
+<% it.context.memoryCards.forEach(card => {%>
+<%~ include('memory-card', { card }) -%>
 <% }) %>
-<% } else { %>
-*No decisions currently defined.*
 <% } %>
-
-### Current Solutions
-*Source: project://solutions resource*
-
-<% if (it.context.solutions.length > 0) { %>
-<% it.context.solutions.forEach((solution) => { %>
-**Problem:** <%= solution.problem %>
-- Solution: <%= solution.solution %>
-- Tags: <%= solution.tags.join(', ') %>
-<% if (solution.codeReferences && solution.codeReferences.length > 0) { %>
-- Code References: <%= solution.codeReferences.join(', ') %>
-<% } %>
-
-<% }) %>
-<% } else { %>
-*No solutions currently defined.*
-<% } %>
-
-### Current Patterns
-*Source: project://patterns resource*
-
-<% if (it.context.patterns.length > 0) { %>
-<% it.context.patterns.forEach((pattern) => { %>
-**<%= pattern.name %>**
-- Description: <%= pattern.description %>
-- Tags: <%= pattern.tags.join(', ') %>
-- Snippet File: <%= pattern.snippetFilename %>
-<% if (pattern.codeReferences && pattern.codeReferences.length > 0) { %>
-- Code References: <%= pattern.codeReferences.join(', ') %>
-<% } %>
-
-<% }) %>
-<% } else { %>
-*No patterns currently defined.*
-<% } %>
+</memory-cards>
+</project-context>

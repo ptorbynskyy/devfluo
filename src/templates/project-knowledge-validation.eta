@@ -6,7 +6,7 @@ You are tasked with validating and updating the existing project knowledge base 
 
 Validate all existing knowledge artifacts against the current codebase reality and make evidence-based updates to maintain knowledge base integrity. The accuracy and currency of this validation is crucial for reliable project development decisions.
 
-<%- include('partials/project-context', it) %>
+<%~ include('partials/project-context', it) %>
 
 ## Three-Phase Validation Workflow
 
@@ -46,9 +46,7 @@ Conduct **thorough analysis** of the current codebase state to identify changes 
 - **Coding Standards**: Ensure documented conventions match current code patterns
 
 #### Knowledge Artifact Validation
-- **Decisions**: Assess if documented decisions are still relevant and being followed
-- **Solutions**: Verify documented solutions address current problems and are well-implemented
-- **Patterns**: Check if documented patterns are actively used and have good code references
+- **Memory cards**: Verify if the statements in memory cards are still relevant
 - **Evidence Collection**: For each artifact, gather specific file/line references that prove or disprove relevance
 
 ### Phase 3: Evidence-Based Knowledge Updates
@@ -65,139 +63,13 @@ Conduct **thorough analysis** of the current codebase state to identify changes 
 Use the `update_knowledge` tool with appropriate parameters:
 - **Architecture Content**: Update `architectureContent` only if significant inaccuracies found
 - **Codebase Content**: Update `codebaseContent` only if structural changes require documentation updates
-- **Decisions**: Use decision operations (create/update/delete) with concrete justification
-- **Solutions**: Update solution operations only when solutions are proven irrelevant or better examples found
-- **Patterns**: Modify pattern operations only when patterns are demonstrably unused or better references available
+Use the `memory_card_add_or_update`, `memory_card_remove` tools to update memory cards.
 
 #### Evidence Documentation
 For every change made, document:
 - **What was changed**: Specific content modified or removed
 - **Why it was changed**: Concrete evidence from codebase analysis  
 - **Supporting references**: File paths and line numbers that justify the change
-
-## Update Knowledge Tool Usage Examples
-
-### Updating Architecture/Codebase Documentation
-
-**Complete Architecture Documentation Update:**
-```json
-{
-  "architectureContent": "# System Architecture\n\n## Updated Overview\nBased on analysis of current codebase at src/main.ts:1-50, the system has evolved to use microservices architecture...\n\n[Complete new architecture content]"
-}
-```
-
-**Complete Codebase Documentation Update:**
-```json
-{
-  "codebaseContent": "# Codebase Structure\n\n## Project Organization\nAnalysis shows the project structure has changed significantly:\n\n- `/src/services/` - New microservices (evidence: directory exists with 5 service files)\n- `/src/api/` - REST endpoints (evidence: src/api/routes.ts:1-200)\n\n[Complete new codebase content]"
-}
-```
-
-**Combined Architecture and Codebase Update:**
-```json
-{
-  "architectureContent": "[Updated architecture content with evidence]",
-  "codebaseContent": "[Updated codebase content with evidence]"
-}
-```
-
-### Updating Structured Knowledge Artifacts
-
-**Decision Operations:**
-```json
-{
-  "decisions": {
-    "create": [
-      {
-        "name": "use-microservices",
-        "description": "Adopt microservices architecture for better scalability. Evidence: src/services/ directory with 5 independent services implemented.",
-        "tags": ["architecture", "scalability", "services"]
-      }
-    ],
-    "update": {
-      "use-typescript": {
-        "description": "Updated: TypeScript adoption is complete across all modules. Evidence: package.json shows @types/* dependencies, tsconfig.json exists, all .js files converted to .ts"
-      }
-    },
-    "delete": ["use-jquery"]
-  }
-}
-```
-
-**Solution Operations:**
-```json
-{
-  "solutions": {
-    "create": [
-      {
-        "problem": "Database connection pooling for improved performance",
-        "solution": "Implement connection pooling using pg-pool with configurable pool size and timeout settings",
-        "tags": ["database", "performance", "postgresql"],
-        "codeReferences": ["src/database/pool.ts:15-45", "src/config/database.ts:8-20"]
-      }
-    ],
-    "update": {
-      "error-handling": {
-        "solution": "Updated to use structured error handling with custom error classes and centralized error middleware",
-        "codeReferences": ["src/middleware/errorHandler.ts:1-50", "src/utils/errors.ts:10-80"]
-      }
-    },
-    "delete": ["old-logging-solution"]
-  }
-}
-```
-
-**Pattern Operations:**
-```json
-{
-  "patterns": {
-    "create": [
-      {
-        "name": "service-factory",
-        "description": "Factory pattern for creating service instances with dependency injection",
-        "tags": ["factory", "dependency-injection", "services"],
-        "snippetFilename": "service-factory.ts",
-        "snippetContent": "export class ServiceFactory {\n  static create<T>(ServiceClass: new (...args: any[]) => T, dependencies: any[]): T {\n    return new ServiceClass(...dependencies);\n  }\n}",
-        "codeReferences": ["src/services/UserService.ts:5-15", "src/services/ProductService.ts:8-18"]
-      }
-    ],
-    "update": {
-      "api-response": {
-        "description": "Updated to include standardized error responses with error codes",
-        "snippetContent": "interface ApiResponse<T> {\n  success: boolean;\n  data?: T;\n  error?: { code: string; message: string; };\n}",
-        "codeReferences": ["src/api/responses.ts:1-20", "src/controllers/BaseController.ts:25-40"]
-      }
-    },
-    "delete": ["old-validation-pattern"]
-  }
-}
-```
-
-**Combined Operations Example:**
-```json
-{
-  "architectureContent": "[Updated architecture with microservices documentation]",
-  "decisions": {
-    "create": [
-      {
-        "name": "microservices-adoption",
-        "description": "Migrate to microservices architecture. Evidence: src/services/ contains 5 independent services with separate databases",
-        "tags": ["architecture", "microservices"]
-      }
-    ]
-  },
-  "solutions": {
-    "create": [
-      {
-        "problem": "Service communication in microservices",
-        "solution": "Use message queues with Redis for async communication between services",
-        "tags": ["microservices", "messaging", "redis"],
-        "codeReferences": ["src/messaging/queue.ts:1-100", "src/services/*/messaging.ts"]
-      }
-    ]
-  }
-}
-```
 
 ### Evidence-Based Update Guidelines
 
@@ -232,7 +104,7 @@ Your validation is successful when:
 1. **Thorough Analysis Complete**: Current codebase state is comprehensively understood
 2. **Evidence-Based Comparison**: All knowledge claims validated against actual implementation  
 3. **Justified Updates Made**: Only necessary changes made with concrete supporting evidence
-4. **Knowledge Base Updated**: All updates persisted using `update_knowledge` tool with proper justification
+4. **Knowledge Base Updated**: All updates persisted using `update_knowledge`,`memory_card_add_or_update`, `memory_card_remove` tools with proper justification
 5. **Integrity Maintained**: Knowledge base remains reliable foundation for future development
 
 ## Critical Guidelines

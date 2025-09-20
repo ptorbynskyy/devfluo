@@ -15,7 +15,9 @@ export type ProjectKnowledgeValidationInput = z.infer<
 >;
 
 export async function generateProjectKnowledgeValidationPrompt(): Promise<string> {
-	const projectContext = await loadProjectContext();
+	const projectContext = await loadProjectContext({
+		includeAllMemoryCards: true,
+	});
 	return await renderTemplateFile("project-knowledge-validation.eta", {
 		context: projectContext,
 	});

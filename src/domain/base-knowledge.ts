@@ -18,8 +18,7 @@ export async function saveCodebaseMarkdown(content: string): Promise<void> {
 
 export async function getArchitectureKnowledge(): Promise<string | null> {
 	try {
-		const architectureContent = await readFile(architecturePath, "utf-8");
-		return architectureContent;
+		return await readFile(architecturePath, "utf-8");
 	} catch (_error) {
 		return null;
 	}
@@ -27,8 +26,7 @@ export async function getArchitectureKnowledge(): Promise<string | null> {
 
 export async function getCodebaseKnowledge(): Promise<string | null> {
 	try {
-		const codebaseContent = await readFile(codebasePath, "utf-8");
-		return codebaseContent;
+		return await readFile(codebasePath, "utf-8");
 	} catch (_error) {
 		return null;
 	}

@@ -1,7 +1,10 @@
 // ABOUTME: Shared project context loading functionality for specification prompts
 
+import {
+	getArchitectureKnowledge,
+	getCodebaseKnowledge,
+} from "../../domain/base-knowledge.js";
 import type { Decision } from "../../domain/decision-schema.js";
-import { loadDecisions } from "../../domain/decisions.js";
 import type { Issue } from "../../domain/initiative/issue-schema.js";
 import { loadIssues } from "../../domain/initiative/issues.js";
 import {
@@ -12,17 +15,15 @@ import {
 import type { InitiativeWithOverview } from "../../domain/initiative/schema.js";
 import type { Task } from "../../domain/initiative/task-schema.js";
 import { loadTasks } from "../../domain/initiative/tasks.js";
+import type { MemoryCard } from "../../domain/memory-card-schema.js";
+import { loadGlobalMemoryCards } from "../../domain/memory-cards.js";
 import type { Pattern } from "../../domain/pattern-schema.js";
-import { loadPatterns } from "../../domain/patterns.js";
 import type { Solution } from "../../domain/solution-schema.js";
-import { loadSolutions } from "../../domain/solutions.js";
-import { getProjectKnowledge } from "../../resources/knowledge.js";
 
 export interface ProjectContext {
-	knowledge: string;
-	decisions: Decision[];
-	solutions: Solution[];
-	patterns: Pattern[];
+	architecture: string;
+	codebase: string;
+	memoryCards: MemoryCard[];
 }
 
 export interface InitiativeContext extends ProjectContext {
@@ -34,19 +35,23 @@ export interface InitiativeContext extends ProjectContext {
 	initiativePatterns: Pattern[];
 }
 
-export async function loadProjectContext(): Promise<ProjectContext> {
-	const [knowledge, decisions, solutions, patterns] = await Promise.all([
-		getProjectKnowledge(),
-		loadDecisions(),
-		loadSolutions(),
-		loadPatterns(),
+export async function loadProjectContext(options?: {
+	includeAllMemoryCards?: boolean;
+}): Promise<ProjectContext> {
+	const [architecture, codebase, memoryCards] = await Promise.all([
+		getArchitectureKnowledge(),
+		getCodebaseKnowledge(),
+		loadGlobalMemoryCards(),
 	]);
 
 	return {
-		knowledge,
-		decisions,
-		solutions,
-		patterns,
+		architecture: architecture ?? "",
+		codebase: codebase ?? "",
+		memoryCards: memoryCards.filter(
+			(i) =>
+				i.contextIncludingPolicy === "always" ||
+				options?.includeAllMemoryCards === true,
+		),
 	};
 }
 

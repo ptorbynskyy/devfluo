@@ -2,15 +2,9 @@
 
 import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-	ErrorCode,
-	McpError,
-} from "@modelcontextprotocol/sdk/types.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import {
-	loadBacklogItem,
-	loadBacklogItems,
-} from "../domain/backlog.js";
+import { loadBacklogItem, loadBacklogItems } from "../domain/backlog.js";
 import {
 	loadProjectContext,
 	type ProjectContext,
