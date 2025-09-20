@@ -120,3 +120,8 @@ Your initialization is successful when:
 6. Documentation serves as reliable reference for future development work
 
 **Remember**: These documents form the cornerstone of project knowledge. Future agents and developers will rely on this foundation. Excellence and accuracy are non-negotiable.
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>>

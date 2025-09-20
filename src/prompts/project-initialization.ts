@@ -4,17 +4,23 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { ensureProjectNotInitialized } from "../utils/project-validation.js";
-import { renderTemplateFile } from "../utils/template-engine.js";
+import { renderTemplateFile } from "../utils/template-engine.js"; // Zod schema for project initialization input validation
 
 // Zod schema for project initialization input validation
-export const ProjectInitializationInputSchema = z.object({});
+export const ProjectInitializationInputSchema = z.object({
+	comments: z.string().optional().describe("Additional comments"),
+});
 
 export type ProjectInitializationInput = z.infer<
 	typeof ProjectInitializationInputSchema
 >;
 
-export async function generateProjectInitializationPrompt(): Promise<string> {
-	return await renderTemplateFile("project-initialization.eta", {});
+export async function generateProjectInitializationPrompt(
+	comments: string | undefined,
+): Promise<string> {
+	return await renderTemplateFile("project-initialization.eta", {
+		comments,
+	});
 }
 
 export function setupProjectInitializationPrompt(server: McpServer): void {
@@ -26,13 +32,13 @@ export function setupProjectInitializationPrompt(server: McpServer): void {
 				"Initialize project with comprehensive codebase analysis and knowledge base setup. Creates architecture and codebase documentation.",
 			argsSchema: {},
 		},
-		async (_args: ProjectInitializationInput) => {
+		async ({ comments }: ProjectInitializationInput) => {
 			try {
 				// Ensure project is not already initialized
 				await ensureProjectNotInitialized();
 
 				// Generate the prompt
-				const promptText = await generateProjectInitializationPrompt();
+				const promptText = await generateProjectInitializationPrompt(comments);
 
 				return {
 					messages: [
