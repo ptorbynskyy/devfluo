@@ -1,20 +1,23 @@
 // ABOUTME: Tool for adding or updating memory cards by scope and name
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import {
+	ErrorCode,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import {
 	type MemoryCardAddOrUpdate,
 	MemoryCardAddOrUpdateSchema,
 	MemoryCardSchema,
-} from "../domain/memory-card-schema.js";
-import { indexMemoryCard } from "../domain/memory-card-search.js";
+} from "../domain/memory/memory-card-schema.js";
+import { indexMemoryCard } from "../domain/memory/memory-card-search.js";
 import {
 	loadGlobalMemoryCard,
 	loadInitiativeMemoryCard,
 	saveGlobalMemoryCard,
 	saveInitiativeMemoryCard,
-} from "../domain/memory-cards.js";
+} from "../domain/memory/memory-cards.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export async function handleMemoryCardAddOrUpdateTool(

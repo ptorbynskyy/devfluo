@@ -8,11 +8,6 @@ import {
 	InitiativeUpdateSchema,
 	updateInitiative,
 } from "../domain/initiative/index.js";
-import {
-	processInitiativeDecisions,
-	processInitiativePatterns,
-	processInitiativeSolutions,
-} from "../domain/initiative/knowledge.js";
 import { processTaskOperations } from "../domain/initiative/tasks.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 
@@ -44,33 +39,6 @@ export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 			taskResults = await processTaskOperations(
 				validatedInput.id,
 				validatedInput.tasks,
-			);
-		}
-
-		// Process decision operations if provided
-		let decisionResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
-		if (validatedInput.decisions) {
-			decisionResults = await processInitiativeDecisions(
-				validatedInput.id,
-				validatedInput.decisions,
-			);
-		}
-
-		// Process solution operations if provided
-		let solutionResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
-		if (validatedInput.solutions) {
-			solutionResults = await processInitiativeSolutions(
-				validatedInput.id,
-				validatedInput.solutions,
-			);
-		}
-
-		// Process pattern operations if provided
-		let patternResults = { insertCount: 0, updateCount: 0, deleteCount: 0 };
-		if (validatedInput.patterns) {
-			patternResults = await processInitiativePatterns(
-				validatedInput.id,
-				validatedInput.patterns,
 			);
 		}
 
@@ -112,9 +80,6 @@ export async function handleInitiativeUpdateTool(input: InitiativeUpdateInput) {
 
 		// Add entity changes to the changes list
 		changes.push(...formatEntityChanges("task", taskResults));
-		changes.push(...formatEntityChanges("decision", decisionResults));
-		changes.push(...formatEntityChanges("solution", solutionResults));
-		changes.push(...formatEntityChanges("pattern", patternResults));
 
 		const changesText =
 			changes.length > 0 ? ` (updated: ${changes.join(", ")})` : "";

@@ -1,0 +1,8 @@
+<% if (it.memoryCards.length > 0) {%>
+<memory-cards>
+### Memory Context
+<% it.memoryCards.forEach(card => {%>
+<%~ include('memory-card', { card }) -%>
+<% }) %>
+</memory-cards>
+<% } %>

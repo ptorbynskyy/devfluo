@@ -5,7 +5,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { config } from "./config.js";
-import { ensureEmbeddingService } from "./domain/memory-card-index-core.js";
+import { ensureEmbeddingService } from "./domain/memory/memory-card-index-core.js";
 import { setupBacklogSpecificationPrompt } from "./prompts/backlog-specification.js";
 import { setupInitiativeCompletionPrompt } from "./prompts/initiative-completion.js";
 import { setupInitiativeKnowledgeCollectionPrompt } from "./prompts/initiative-knowledge-collection.js";
@@ -17,12 +17,9 @@ import { setupIssueResolutionPrompt } from "./prompts/issue-resolution.js";
 import { setupProjectInitializationPrompt } from "./prompts/project-initialization.js";
 import { setupProjectKnowledgeValidationPrompt } from "./prompts/project-knowledge-validation.js";
 import { setupBacklogResources } from "./resources/backlog.js";
-import { setupDecisionsResource } from "./resources/decisions.js";
 import { setupInitiativeResources } from "./resources/initiative.js";
 import { setupProjectKnowledgeResource } from "./resources/knowledge.js";
 import { setupMemoryCardsResources } from "./resources/memory-cards.js";
-import { setupPatternsResource } from "./resources/patterns.js";
-import { setupSolutionsResource } from "./resources/solutions.js";
 import { setupBacklogManagementTool } from "./tools/backlog-management.js";
 import { setupInitiativeCreateTool } from "./tools/initiative-create.js";
 import { setupInitiativeDeleteTool } from "./tools/initiative-delete.js";
@@ -74,9 +71,6 @@ async function runServer(): Promise<void> {
 	const server = createServer();
 
 	setupProjectKnowledgeResource(server);
-	setupDecisionsResource(server);
-	setupPatternsResource(server);
-	setupSolutionsResource(server);
 	setupBacklogResources(server);
 	setupInitiativeResources(server);
 	setupMemoryCardsResources(server);

@@ -1,9 +1,13 @@
 // ABOUTME: Index metadata management with hash-based consistency validation
 
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import {
+	mkdir,
+	readFile,
+	writeFile,
+} from "node:fs/promises";
 import path from "node:path";
-import { config } from "../config.js";
+import { config } from "../../config.js";
 
 /**
  * Index metadata structure

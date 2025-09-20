@@ -5,7 +5,7 @@ import {
 	type FeatureExtractionPipeline,
 	pipeline,
 } from "@xenova/transformers";
-import { config } from "../config.js";
+import { config } from "../../config.js";
 
 // Configuration for embedding model
 const EMBEDDING_CONFIG = {

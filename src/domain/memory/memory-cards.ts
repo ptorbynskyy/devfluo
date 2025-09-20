@@ -1,14 +1,23 @@
 // ABOUTME: Domain module for managing memory cards with CRUD operations
 
-import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
+import {
+	mkdir,
+	readdir,
+	readFile,
+	unlink,
+	writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import matter from "gray-matter";
-import { baseKnowledgePath } from "./base-knowledge.js";
+import { baseKnowledgePath } from "../base-knowledge.js";
 import {
 	getInitiativeMemoryCardPath,
 	getInitiativeMemoryCardsPath,
-} from "./initiative/paths.js";
-import { type MemoryCard, MemoryCardSchema } from "./memory-card-schema.js";
+} from "../initiative/paths.js";
+import {
+	type MemoryCard,
+	MemoryCardSchema,
+} from "./memory-card-schema.js";
 
 // Global memory cards paths
 export const globalMemoryCardsPath = path.join(

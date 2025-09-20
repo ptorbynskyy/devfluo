@@ -1,12 +1,16 @@
-import { splitText } from "../utils/text-splitter.js";
+import { splitText } from "../../utils/text-splitter.js";
 import type { MemoryCard } from "./memory-card-schema.js";
 import { searchMemoryCardsWithExcerpts } from "./memory-card-search.js";
 import type { MemoryCardSearchResult } from "./memory-card-search-schema.js";
+import {
+	loadGlobalMemoryCards,
+	loadInitiativeMemoryCards,
+} from "./memory-cards.js";
 
 /**
  * Aggregate and deduplicate semantic search results from multiple queries
  */
-export async function aggregateSemanticMemoryCards(
+async function aggregateSemanticMemoryCards(
 	semanticQueries: string[],
 	alwaysCards: MemoryCard[],
 	scope: string,
@@ -59,4 +63,35 @@ export async function aggregateSemanticMemoryCards(
 	return Array.from(foundCards.values())
 		.sort((a, b) => b.relevanceScore - a.relevanceScore)
 		.map(({ relevanceScore, ...card }) => card);
+}
+
+export async function getContextMemoryCards(
+	scope: string,
+	options?: {
+		includeAllMemoryCards?: boolean;
+		semanticQueries?: string[];
+	},
+) {
+	const allMemoryCards =
+		scope === "global"
+			? await loadGlobalMemoryCards()
+			: await loadInitiativeMemoryCards(scope);
+
+	// Start with "always" cards or all cards if includeAllMemoryCards is true
+	let contextMemoryCards = allMemoryCards.filter(
+		(card) =>
+			card.contextIncludingPolicy === "always" ||
+			options?.includeAllMemoryCards === true,
+	);
+
+	// Add semantically relevant cards if semantic queries provided
+	if (options?.semanticQueries && options.semanticQueries.length > 0) {
+		const semanticCards = await aggregateSemanticMemoryCards(
+			options.semanticQueries,
+			contextMemoryCards,
+			"global",
+		);
+		contextMemoryCards = [...contextMemoryCards, ...semanticCards];
+	}
+	return contextMemoryCards;
 }

@@ -1,13 +1,16 @@
 // ABOUTME: Tool for searching memory cards using semantic search
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import {
+	ErrorCode,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { searchMemoryCardsWithExcerpts } from "../domain/memory-card-search.js";
+import { searchMemoryCardsWithExcerpts } from "../domain/memory/memory-card-search.js";
 import {
 	type MemoryCardSearch,
 	MemoryCardSearchSchema,
-} from "../domain/memory-card-search-schema.js";
+} from "../domain/memory/memory-card-search-schema.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 

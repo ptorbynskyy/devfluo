@@ -10,6 +10,8 @@ You are helping create a detailed specification for the following initiative (th
 
 <%~ include('partials/project-context', it) %>
 
+<%~ include('partials/memory-cards', { memoryCards: it.initiativeMemoryCards }) -%>
+
 <%~ include('partials/specification-base', {
 	entityType: 'initiative',
 	entityName: it.initiative.name,

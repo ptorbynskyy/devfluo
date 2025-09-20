@@ -1,17 +1,20 @@
 // ABOUTME: Tool for removing memory cards by scope and name
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import {
+	ErrorCode,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import {
 	type MemoryCardRemove,
 	MemoryCardRemoveSchema,
-} from "../domain/memory-card-schema.js";
-import { removeFromIndex } from "../domain/memory-card-search.js";
+} from "../domain/memory/memory-card-schema.js";
+import { removeFromIndex } from "../domain/memory/memory-card-search.js";
 import {
 	removeGlobalMemoryCard,
 	removeInitiativeMemoryCard,
-} from "../domain/memory-cards.js";
+} from "../domain/memory/memory-cards.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export async function handleMemoryCardRemoveTool(input: MemoryCardRemove) {

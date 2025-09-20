@@ -10,19 +10,11 @@ You are executing specific tasks within the following initiative:
 
 <%= it.context.initiative.spec %>
 
-<% } %><%~ include('partials/project-context', it) %>
+<% } %>
 
-<% if (it.context.initiativeDecisions.length > 0) { %>## Initiative Decisions
-<% it.context.initiativeDecisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
-<% }); %>
+<%~ include('partials/project-context', it) %>
 
-<% } %><% if (it.context.initiativeSolutions.length > 0) { %>## Initiative Solutions
-<% it.context.initiativeSolutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
-<% }); %>
-
-<% } %><% if (it.context.initiativePatterns.length > 0) { %>## Initiative Patterns
-<% it.context.initiativePatterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
-<% }); %>
+<%~ include('partials/memory-cards', { memoryCards: it.initiativeMemoryCards }) %>
 
 <% } %>## Current Initiative Tasks
 
@@ -51,7 +43,7 @@ You are specifically assigned to execute the following tasks:
 3. **Maintain Quality**: Follow established coding standards and practices
 4. **Test Thoroughly**: Ensure all changes work correctly and don't break existing functionality
 
-### Knowledge Tracking
+### Knowledge Tracking (initiative memory cards)
 During execution, capture emerging insights for the initiative:
 
 **Decisions Made**: Track key technical or design decisions you make
@@ -77,7 +69,7 @@ For each task you complete:
 
 ### Status Updates
 
-After completing tasks, update their status using the initiative_update tool:
+ - After completing tasks, update their status using the `initiative_update` tool:
 
 ```json
 {
@@ -86,24 +78,11 @@ After completing tasks, update their status using the initiative_update tool:
 		"update": {
 			"<task-id>": {"status": "done"}
 		}
-	},
-	"decisions": {
-		"create": [
-			{"name": "decision-name", "description": "Decision description", "tags": ["tag1", "tag2"]}
-		]
-	},
-	"solutions": {
-		"create": [
-			{"problem": "Problem statement", "solution": "Solution description", "tags": ["tag1", "tag2"]}
-		]
-	},
-	"patterns": {
-		"create": [
-			{"name": "pattern-name", "description": "Pattern description", "tags": ["tag1", "tag2"]}
-		]
 	}
 }
 ```
+
+ - Initiative memory cards craete/update/remove using the `memory_card_add_or_update`/`memory_card_remove` tool
 
 ### Code Quality Requirements
 

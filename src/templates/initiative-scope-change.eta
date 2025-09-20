@@ -11,19 +11,11 @@ You are analyzing a scope change situation for the following initiative (think h
 
 <%= it.context.initiative.spec %>
 
-<% } %><%~ include('partials/project-context', it) %>
+<% } %>
 
-<% if (it.context.initiativeDecisions.length > 0) { %>## Initiative Decisions
-<% it.context.initiativeDecisions.forEach(function(d) { %>- **<%= d.name %>**: <%= d.description %>
-<% }); %>
+<%~ include('partials/project-context', it) %>
 
-<% } %><% if (it.context.initiativeSolutions.length > 0) { %>## Initiative Solutions
-<% it.context.initiativeSolutions.forEach(function(s) { %>- **<%= s.problem %>**: <%= s.solution %>
-<% }); %>
-
-<% } %><% if (it.context.initiativePatterns.length > 0) { %>## Initiative Patterns
-<% it.context.initiativePatterns.forEach(function(p) { %>- **<%= p.name %>**: <%= p.description %>
-<% }); %>
+<%~ include('partials/memory-cards', { memoryCards: it.initiativeMemoryCards }) %>
 
 <% } %>## Current Initiative Tasks
 

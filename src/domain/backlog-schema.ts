@@ -30,10 +30,7 @@ export const BacklogItemSchema = z.object({
 
 // Backlog item with spec content included
 export const BacklogItemWithSpecSchema = BacklogItemSchema.extend({
-	spec: z
-		.string()
-		.optional()
-		.describe("Markdown content of the specification file (spec.md)"),
+	spec: z.string().optional().describe("Markdown content of the specification"),
 	hasSpec: z
 		.boolean()
 		.describe("Indicates whether spec.md file exists for this item"),
@@ -48,7 +45,7 @@ export const BacklogOperationsSchema = z.object({
 					.string()
 					.optional()
 					.describe(
-						"Optional markdown content for spec.md file. User should provide the content directly.",
+						"Optional markdown content for specification. User should provide the content directly.",
 					),
 			}),
 		)
@@ -64,7 +61,7 @@ export const BacklogOperationsSchema = z.object({
 						.string()
 						.optional()
 						.describe(
-							"Optional markdown content for spec.md file. Provide directly by user or produced by brainstorming flow.",
+							"Optional markdown content for specification. Provide directly by user or produced by brainstorming flow.",
 						),
 				}),
 		)

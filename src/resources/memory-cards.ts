@@ -2,7 +2,10 @@
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import {
+	ErrorCode,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
 import {
 	getGlobalMemoryCardNames,
 	getInitiativeMemoryCardNames,
@@ -10,7 +13,7 @@ import {
 	loadGlobalMemoryCards,
 	loadInitiativeMemoryCard,
 	loadInitiativeMemoryCards,
-} from "../domain/memory-cards.js";
+} from "../domain/memory/memory-cards.js";
 import { ensureProjectInitialized } from "../utils/project-validation.js";
 
 export function setupMemoryCardsResources(server: McpServer): void {

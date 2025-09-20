@@ -19,7 +19,7 @@ Analyze the following sources to extract knowledge:
 - Note problems encountered and solutions implemented
 - Extract patterns that emerged from the work
 
-## Knowledge Collection Framework
+## Knowledge Collection Framework (initiative memory cards)
 
 Extract and categorize insights into three types:
 
@@ -49,23 +49,18 @@ Reusable implementation approaches or architectural patterns:
 Use these resources if you need additional context that wasn't previously loaded in the session:
 
 ### Project-Level Resources
-- **Project Knowledge**: `project://knowledge` - Combined architecture and codebase knowledge
 - **Architecture Knowledge**: `project://knowledge/architecture` - Project architecture documentation
 - **Codebase Knowledge**: `project://knowledge/codebase` - Codebase-specific knowledge
-- **Project Decisions**: `project://decisions` - Global architectural decisions
-- **Project Solutions**: `project://solutions` - Documented problem-solution pairs  
-- **Project Patterns**: `project://patterns` - Established code patterns with snippets
+- **Project Memory cards**: `project://memory-cards`, `project://memory-cards/item/{name}` - Global knowledge memory cards
 - **Backlog Items**: `project://backlog/list` - Product backlog with feature requests
 
 ### Initiative-Specific Resources  
 - **Initiative Overview**: `project://initiative/item/<%= it.initiativeId %>` - Full initiative details with tasks
+- **Initiative Memory Cards**: `project://initiatives/<%= it.initiativeId %>/memory-cards`, `project://initiatives/<%= it.initiativeId %>/memory-cards/{name}` - Initiative-specific knowledge memory cards
 - **Initiative Issues**: `project://initiative/issues/<%= it.initiativeId %>` - Issues within this initiative
 - **All Initiatives**: `project://initiative/list` - List of all initiatives for context
 
 ### Individual Item Resources (if needed)
-- **Specific Decision**: `project://decisions/item/{name}` - Individual decision details
-- **Specific Solution**: `project://solutions/item/{key}` - Individual solution details
-- **Specific Pattern**: `project://patterns/item/{name}` - Individual pattern with code snippet
 - **Specific Backlog Item**: `project://backlog/item/{id}` - Individual backlog item details
 - **Specific Issue**: `project://initiative/issues/<%= it.initiativeId %>/{issueId}` - Individual issue details
 
@@ -93,42 +88,16 @@ Use these resources if you need additional context that wasn't previously loaded
 
 ## Knowledge Update Process
 
-Use the `initiative_update` tool to store collected knowledge:
+Use the `memory_card_add_or_update` tools to store collected knowledge:
 
 ```json
 {
-	"id": "<%= it.initiativeId %>",
-	"decisions": {
-		"create": [
-			{
-				"name": "decision-identifier",
-				"description": "Clear description of the decision and its rationale",
-				"tags": ["relevant", "tags", "here"]
-			}
-		]
-	},
-	"solutions": {
-		"create": [
-			{
-				"problem": "Description of the problem that was encountered",
-				"solution": "How the problem was solved or addressed",
-				"tags": ["problem-domain", "solution-type"],
-				"codeReferences": ["path/to/file.ts:123-145", "other/file.js:67"]
-			}
-		]
-	},
-	"patterns": {
-		"create": [
-			{
-				"name": "pattern-identifier",
-				"description": "Description of the reusable pattern",
-				"tags": ["pattern-type", "architectural"],
-				"snippetFilename": "pattern-name.example",
-				"snippetContent": "// Example code implementing the pattern\nconst example = () => {\n  // Implementation details\n};",
-				"codeReferences": ["src/components/Example.tsx:45-60"]
-			}
-		]
-	}
+    "scope": "<%= it.initiativeId %>",
+    "name": "card-identifier",
+    "title": "card-title",
+    "content": "Clear description in Markdown format, can include code snippets and links.",
+    "tags": ["relevant", "tags", "here"],
+    "contextIncludingPolicy": "auto/always"
 }
 ```
 

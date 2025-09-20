@@ -9,12 +9,5 @@
 ### Codebase
 <%= it.context.codebase %>
 </codebase>
-<memory-cards>
-<% if (it.context.memoryCards.length > 0) {%>
-### Memory Context
-<% it.context.memoryCards.forEach(card => {%>
-<%~ include('memory-card', { card }) -%>
-<% }) %>
-<% } %>
-</memory-cards>
+<%~ include('memory-cards', { memoryCards: it.context.memoryCards }) -%>
 </project-context>

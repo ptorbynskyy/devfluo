@@ -1,12 +1,12 @@
 // ABOUTME: Memory card index orchestration with consistency validation and transparent rebuilding
 
 import type { LocalIndex } from "vectra";
-import { config } from "../config.js";
+import { config } from "../../config.js";
 import {
 	type ChunkMetadata,
 	createChunkDocumentId,
 	splitText,
-} from "../utils/text-splitter.js";
+} from "../../utils/text-splitter.js";
 import {
 	ensureEmbeddingService,
 	getIndex,
