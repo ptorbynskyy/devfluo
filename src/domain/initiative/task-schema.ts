@@ -1,5 +1,6 @@
 // ABOUTME: Zod schemas for validating task data structure within initiatives
 
+import matter from "gray-matter";
 import { z } from "zod";
 import { EffortLevels } from "../backlog-schema.js";
 
@@ -20,7 +21,9 @@ export const TaskSchema = z.object({
 	description: z
 		.string()
 		.min(1)
-		.describe("Detailed description of what the task involves"),
+		.describe(
+			"Detailed description of what the task involves in markdown format",
+		),
 	effort: z
 		.enum(EffortLevels)
 		.optional()
@@ -78,3 +81,33 @@ export const TaskOperationsSchema = z.object({
 export type Task = z.infer<typeof TaskSchema>;
 export type TaskOperations = z.infer<typeof TaskOperationsSchema>;
 export type TaskStatus = (typeof TaskStatuses)[number];
+
+// Parse task from Markdown file content with front matter
+export function parseTaskFromFile(taskId: string, fileContent: string): Task {
+	const { data, content } = matter(fileContent);
+
+	return TaskSchema.parse({
+		id: taskId,
+		name: data.name,
+		description: content.trim(),
+		effort: data.effort,
+		status: data.status || "new",
+		order: data.order,
+		phase: data.phase,
+		predecessors: data.predecessors || [],
+	});
+}
+
+// Generate Markdown file content with front matter from task
+export function taskToMarkdownContent(task: Task): string {
+	const frontmatter = {
+		name: task.name,
+		effort: task.effort,
+		status: task.status,
+		order: task.order,
+		phase: task.phase,
+		predecessors: task.predecessors,
+	};
+
+	return matter.stringify(task.description, frontmatter);
+}

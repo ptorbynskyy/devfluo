@@ -1,8 +1,15 @@
 // ABOUTME: CRUD operations for tasks within initiatives
 
-import { readFile, unlink, writeFile } from "node:fs/promises";
-import { getInitiativeTasksPath } from "./paths.js";
-import { type Task, type TaskOperations, TaskSchema } from "./task-schema.js";
+import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { getInitiativeTasksPath, getTaskFilePath } from "./paths.js";
+import {
+	parseTaskFromFile,
+	type Task,
+	type TaskOperations,
+	TaskSchema,
+	taskToMarkdownContent,
+} from "./task-schema.js"; // Validate that all predecessor task IDs exist in the task list
 
 // Validate that all predecessor task IDs exist in the task list
 function validatePredecessors(
@@ -62,51 +69,80 @@ function detectCircularDependencies(tasks: Task[]): void {
 
 // Load all tasks for a specific initiative
 export async function loadTasks(initiativeId: string): Promise<Task[]> {
-	try {
-		const tasksPath = getInitiativeTasksPath(initiativeId);
-		const data = await readFile(tasksPath, "utf-8");
-		const tasks = JSON.parse(data);
+	const tasksDir = getInitiativeTasksPath(initiativeId);
 
-		// Validate each task
-		return tasks.map((task: unknown) => TaskSchema.parse(task));
+	try {
+		const files = await readdir(tasksDir);
+		const tasks: Task[] = [];
+
+		for (const file of files) {
+			if (file.endsWith(".md")) {
+				const taskId = path.basename(file, ".md");
+				const filePath = path.join(tasksDir, file);
+
+				try {
+					const fileContent = await readFile(filePath, "utf-8");
+					const task = parseTaskFromFile(taskId, fileContent);
+					tasks.push(task);
+				} catch (error) {
+					console.error(`Error parsing task file ${file}:`, error);
+					// Skip invalid files
+				}
+			}
+		}
+
+		return tasks;
 	} catch (error) {
 		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
-			// tasks.json doesn't exist, return empty array
+			// Directory doesn't exist, return empty array
 			return [];
 		}
 		throw error;
 	}
 }
 
-// Save tasks to file
-export async function saveTasks(
+// Delete individual task file
+async function deleteTaskFile(
 	initiativeId: string,
-	tasks: Task[],
+	taskId: string,
 ): Promise<void> {
-	const tasksPath = getInitiativeTasksPath(initiativeId);
-
-	// Validate all tasks before saving
-	const validatedTasks = tasks.map((task) => TaskSchema.parse(task));
-
-	// Sort tasks by phase, then by order
-	const sortedTasks = validatedTasks.sort((a, b) => {
-		if (a.phase !== b.phase) {
-			return a.phase - b.phase;
-		}
-		return a.order - b.order;
-	});
-
-	await writeFile(tasksPath, JSON.stringify(sortedTasks, null, "\t"));
-}
-
-// Delete tasks file for an initiative
-export async function deleteTasks(initiativeId: string): Promise<void> {
 	try {
-		const tasksPath = getInitiativeTasksPath(initiativeId);
-		await unlink(tasksPath);
+		const filePath = getTaskFilePath(initiativeId, taskId);
+		await unlink(filePath);
 	} catch (error) {
 		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
-			// tasks.json doesn't exist, nothing to delete
+			// File doesn't exist, nothing to delete
+			return;
+		}
+		throw error;
+	}
+}
+
+// Delete all tasks for an initiative
+export async function deleteTasks(initiativeId: string): Promise<void> {
+	try {
+		const tasksDir = getInitiativeTasksPath(initiativeId);
+		const files = await readdir(tasksDir);
+
+		// Delete all task files
+		for (const file of files) {
+			if (file.endsWith(".md")) {
+				await unlink(path.join(tasksDir, file));
+			}
+		}
+
+		// Remove the directory if it's empty
+		try {
+			const remainingFiles = await readdir(tasksDir);
+			if (remainingFiles.length === 0) {
+				await unlink(tasksDir);
+			}
+		} catch {
+			// Directory might not be empty or other error, ignore
+		}
+	} catch (error) {
+		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+			// Directory doesn't exist, nothing to delete
 			return;
 		}
 		throw error;
@@ -118,11 +154,37 @@ export async function processTaskOperations(
 	initiativeId: string,
 	operations: TaskOperations,
 ): Promise<{ insertCount: number; updateCount: number; deleteCount: number }> {
-	// Load existing tasks
+	// Load existing tasks for validation
 	const existingTasks = await loadTasks(initiativeId);
 	let insertCount = 0;
 	let updateCount = 0;
 	let deleteCount = 0;
+
+	// Process deletes first to avoid dependency validation issues
+	if (operations.delete && operations.delete.length > 0) {
+		for (const taskId of operations.delete) {
+			const taskIndex = existingTasks.findIndex((task) => task.id === taskId);
+			if (taskIndex < 0) {
+				throw new Error(`Task with ID '${taskId}' does not exist`);
+			}
+
+			// Check if any other tasks depend on this task
+			const dependentTasks = existingTasks.filter((task) =>
+				task.predecessors.includes(taskId),
+			);
+			if (dependentTasks.length > 0) {
+				const dependentIds = dependentTasks.map((task) => task.id).join(", ");
+				throw new Error(
+					`Cannot delete task '${taskId}' because it is a predecessor for tasks: ${dependentIds}`,
+				);
+			}
+
+			// Delete the task file
+			await deleteTaskFile(initiativeId, taskId);
+			existingTasks.splice(taskIndex, 1);
+			deleteCount++;
+		}
+	}
 
 	// Process creates
 	if (operations.create && operations.create.length > 0) {
@@ -144,6 +206,13 @@ export async function processTaskOperations(
 				validatedTask.predecessors,
 				validatedTask.id,
 			);
+
+			// Write the task file
+			const tasksDir = getInitiativeTasksPath(initiativeId);
+			await mkdir(tasksDir, { recursive: true });
+			const filePath = getTaskFilePath(initiativeId, validatedTask.id);
+			const content = taskToMarkdownContent(validatedTask);
+			await writeFile(filePath, content, "utf-8");
 
 			existingTasks.push(validatedTask);
 			insertCount++;
@@ -169,44 +238,24 @@ export async function processTaskOperations(
 				validatePredecessors(existingTasks, validatedTask.predecessors, taskId);
 			}
 
+			// Write the updated task file
+			const filePath = getTaskFilePath(initiativeId, taskId);
+			const content = taskToMarkdownContent(validatedTask);
+			await writeFile(filePath, content, "utf-8");
+
 			existingTasks[taskIndex] = validatedTask;
 			updateCount++;
 		}
 	}
 
-	// Process deletes
-	if (operations.delete && operations.delete.length > 0) {
-		for (const taskId of operations.delete) {
-			const taskIndex = existingTasks.findIndex((task) => task.id === taskId);
-			if (taskIndex < 0) {
-				throw new Error(`Task with ID '${taskId}' does not exist`);
-			}
-
-			// Check if any other tasks depend on this task
-			const dependentTasks = existingTasks.filter((task) =>
-				task.predecessors.includes(taskId),
-			);
-			if (dependentTasks.length > 0) {
-				const dependentIds = dependentTasks.map((task) => task.id).join(", ");
-				throw new Error(
-					`Cannot delete task '${taskId}' because it is a predecessor for tasks: ${dependentIds}`,
-				);
-			}
-
-			existingTasks.splice(taskIndex, 1);
-			deleteCount++;
-		}
-	}
-
-	// Save updated tasks
+	// Final validation: check for circular dependencies if any operations were performed
 	if (insertCount > 0 || updateCount > 0 || deleteCount > 0) {
 		if (existingTasks.length === 0) {
-			// If no tasks left, delete the file
+			// If no tasks left, clean up the directory
 			await deleteTasks(initiativeId);
 		} else {
-			// Final validation: check for circular dependencies
+			// Check for circular dependencies
 			detectCircularDependencies(existingTasks);
-			await saveTasks(initiativeId, existingTasks);
 		}
 	}
 

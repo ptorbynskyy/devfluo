@@ -25,9 +25,14 @@ export function getInitiativeSpecPath(id: string): string {
 	return path.join(getInitiativePath(id), "spec.md");
 }
 
-// Helper function to get tasks.json path for an initiative
+// Helper function to get tasks directory path for an initiative
 export function getInitiativeTasksPath(id: string): string {
-	return path.join(getInitiativePath(id), "tasks.json");
+	return path.join(getInitiativePath(id), "tasks");
+}
+
+// Helper function to get specific task file path
+export function getTaskFilePath(initiativeId: string, taskId: string): string {
+	return path.join(getInitiativeTasksPath(initiativeId), `${taskId}.md`);
 }
 
 // Helper function to get issues directory path for an initiative
