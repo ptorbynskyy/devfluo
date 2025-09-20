@@ -1,10 +1,7 @@
 // ABOUTME: Tool for adding or updating memory cards by scope and name
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-	ErrorCode,
-	McpError,
-} from "@modelcontextprotocol/sdk/types.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import {
 	type MemoryCardAddOrUpdate,

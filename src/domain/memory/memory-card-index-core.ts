@@ -1,9 +1,6 @@
 // ABOUTME: Pure vector operations for memory card indexing using Vectra
 
-import {
-	mkdir,
-	rm,
-} from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import path from "node:path";
 import { LocalIndex } from "vectra";
 import { config } from "../../config.js";

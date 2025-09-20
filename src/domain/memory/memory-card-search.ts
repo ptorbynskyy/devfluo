@@ -1,16 +1,10 @@
 // ABOUTME: Memory card search public API with fallback text search
 
-import {
-	readdir,
-	readFile,
-} from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { getInitiativeMemoryCardsPath } from "../initiative/paths.js";
 import { isEmbeddingServiceReady } from "./embedding-service.js";
-import {
-	getIndex,
-	searchIndex,
-} from "./memory-card-index-core.js";
+import { getIndex, searchIndex } from "./memory-card-index-core.js";
 import {
 	ensureIndexConsistency,
 	indexMemoryCard as indexMemoryCardImpl,
