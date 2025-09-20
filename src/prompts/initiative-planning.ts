@@ -2,6 +2,7 @@
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
 import { loadInitiative } from "../domain/initiative/index.js";
 import { loadTasks } from "../domain/initiative/tasks.js";
 import {
@@ -48,10 +49,12 @@ export async function generateInitiativePlanningPrompt(
 		spec?: string | undefined;
 	},
 	context: ProjectContext,
+	comments?: string,
 ): Promise<string> {
 	return await renderTemplateFile("initiative-planning.eta", {
 		initiative,
 		context,
+		comments,
 	});
 }
 
@@ -66,9 +69,16 @@ export function setupInitiativePlanningPrompt(server: McpServer): void {
 				initiativeId: createCompletableInitiativeId(
 					"ID of the initiative to create tasks for",
 				),
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ initiativeId }: { initiativeId: string }) => {
+		async ({
+			initiativeId,
+			comments,
+		}: {
+			initiativeId: string;
+			comments?: string | undefined;
+		}) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -89,6 +99,7 @@ export function setupInitiativePlanningPrompt(server: McpServer): void {
 				const promptText = await generateInitiativePlanningPrompt(
 					initiative,
 					context,
+					comments,
 				);
 
 				return {

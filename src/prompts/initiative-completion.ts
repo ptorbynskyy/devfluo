@@ -20,6 +20,7 @@ import {
 // Zod schema for completion input validation
 export const InitiativeCompletionInputSchema = z.object({
 	initiativeId: initiativeIdSchema.describe("ID of the initiative to complete"),
+	comments: z.string().optional().describe("Additional comments"),
 });
 
 export type InitiativeCompletionInput = z.infer<
@@ -77,9 +78,11 @@ export async function validateInitiativeForCompletion(initiativeId: string) {
 
 export async function generateInitiativeCompletionPrompt(
 	context: InitiativeContext,
+	comments?: string,
 ): Promise<string> {
 	return await renderTemplateFile("initiative-completion.eta", {
 		context,
+		comments,
 	});
 }
 
@@ -94,9 +97,10 @@ export function setupInitiativeCompletionPrompt(server: McpServer): void {
 				initiativeId: createCompletableInitiativeId(
 					"ID of the initiative to complete",
 				),
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ initiativeId }: InitiativeCompletionInput) => {
+		async ({ initiativeId, comments }: InitiativeCompletionInput) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -109,7 +113,10 @@ export function setupInitiativeCompletionPrompt(server: McpServer): void {
 				const context = await loadInitiativeContext(initiative);
 
 				// Generate the prompt
-				const promptText = await generateInitiativeCompletionPrompt(context);
+				const promptText = await generateInitiativeCompletionPrompt(
+					context,
+					comments,
+				);
 
 				return {
 					messages: [

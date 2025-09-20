@@ -175,3 +175,8 @@ After tool execution:
 ---
 
 **Ready to Execute**: You now have all the context and tools needed to complete this initiative successfully. Begin with the knowledge base updates, then mark the initiative as complete.
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

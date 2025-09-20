@@ -96,3 +96,8 @@ For each task you complete:
 You now have all the context needed to execute these tasks effectively. Begin with the first task and work systematically through each one, tracking your decisions and solutions as you progress.
 
 Remember to update task statuses and capture knowledge using the initiative_update tool after completing each task.
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

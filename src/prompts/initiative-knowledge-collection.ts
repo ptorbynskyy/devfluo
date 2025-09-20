@@ -16,6 +16,7 @@ export const KnowledgeCollectionInputSchema = z.object({
 	initiativeId: initiativeIdSchema.describe(
 		"ID of the initiative to collect knowledge for",
 	),
+	comments: z.string().optional().describe("Additional comments"),
 });
 
 export type KnowledgeCollectionInput = z.infer<
@@ -39,9 +40,11 @@ export async function validateInitiativeForKnowledgeCollection(
 
 export async function generateKnowledgeCollectionPrompt(
 	initiativeId: string,
+	comments?: string,
 ): Promise<string> {
 	return await renderTemplateFile("initiative-knowledge-collection.eta", {
 		initiativeId,
+		comments,
 	});
 }
 
@@ -58,9 +61,10 @@ export function setupInitiativeKnowledgeCollectionPrompt(
 				initiativeId: createCompletableInitiativeId(
 					"ID of the initiative to collect knowledge for",
 				),
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ initiativeId }: KnowledgeCollectionInput) => {
+		async ({ initiativeId, comments }: KnowledgeCollectionInput) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -69,8 +73,10 @@ export function setupInitiativeKnowledgeCollectionPrompt(
 				await validateInitiativeForKnowledgeCollection(initiativeId);
 
 				// Generate the prompt
-				const promptText =
-					await generateKnowledgeCollectionPrompt(initiativeId);
+				const promptText = await generateKnowledgeCollectionPrompt(
+					initiativeId,
+					comments,
+				);
 
 				return {
 					messages: [

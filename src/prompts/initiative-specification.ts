@@ -2,6 +2,7 @@
 
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
 import { loadInitiative } from "../domain/initiative/index.js";
 import {
 	loadProjectContext,
@@ -38,10 +39,12 @@ export async function generateInitiativeSpecificationPrompt(
 		overview?: string | undefined;
 	},
 	context: ProjectContext,
+	comments?: string,
 ): Promise<string> {
 	return await renderTemplateFile("initiative-specification.eta", {
 		initiative,
 		context,
+		comments,
 	});
 }
 
@@ -56,9 +59,16 @@ export function setupInitiativeSpecificationPrompt(server: McpServer): void {
 				initiativeId: createCompletableInitiativeId(
 					"ID of the initiative to create a specification for",
 				),
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ initiativeId }: { initiativeId: string }) => {
+		async ({
+			initiativeId,
+			comments,
+		}: {
+			initiativeId: string;
+			comments?: string | undefined;
+		}) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -79,6 +89,7 @@ export function setupInitiativeSpecificationPrompt(server: McpServer): void {
 				const promptText = await generateInitiativeSpecificationPrompt(
 					initiative,
 					context,
+					comments,
 				);
 
 				return {

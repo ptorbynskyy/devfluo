@@ -40,10 +40,12 @@ export async function generateBacklogSpecificationPrompt(
 		effort?: string | undefined;
 	},
 	context: ProjectContext,
+	comments?: string,
 ): Promise<string> {
 	return await renderTemplateFile("backlog-specification.eta", {
 		backlogItem,
 		context,
+		comments,
 	});
 }
 
@@ -78,9 +80,16 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 							.filter((id) => id.startsWith(backlogItemId));
 					},
 				),
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ backlogItemId }: { backlogItemId: string }) => {
+		async ({
+			backlogItemId,
+			comments,
+		}: {
+			backlogItemId: string;
+			comments?: string | undefined;
+		}) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -99,6 +108,7 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 				const promptText = await generateBacklogSpecificationPrompt(
 					backlogItem,
 					context,
+					comments,
 				);
 
 				return {

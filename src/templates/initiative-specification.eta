@@ -22,3 +22,8 @@ You are helping create a detailed specification for the following initiative (th
 	}, null, 2),
 	context: it.context
 }) %>
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

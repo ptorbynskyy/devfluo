@@ -118,3 +118,8 @@ Use the `memory_card_add_or_update` tools to store collected knowledge:
 5. **Provide a summary** of knowledge collected and stored
 
 Begin your analysis now and collect all valuable knowledge from this initiative work session.
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

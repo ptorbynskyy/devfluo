@@ -73,3 +73,8 @@ When you've created the task plan, use the initiative_update tool to save the ta
 ```
 
 Please analyze the specification and create a comprehensive task breakdown that will guide the successful implementation of this initiative.
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

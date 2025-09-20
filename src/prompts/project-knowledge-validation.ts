@@ -8,18 +8,23 @@ import { ensureProjectInitialized } from "../utils/project-validation.js";
 import { renderTemplateFile } from "../utils/template-engine.js";
 
 // Zod schema for project knowledge validation input validation
-export const ProjectKnowledgeValidationInputSchema = z.object({});
+export const ProjectKnowledgeValidationInputSchema = z.object({
+	comments: z.string().optional().describe("Additional comments"),
+});
 
 export type ProjectKnowledgeValidationInput = z.infer<
 	typeof ProjectKnowledgeValidationInputSchema
 >;
 
-export async function generateProjectKnowledgeValidationPrompt(): Promise<string> {
+export async function generateProjectKnowledgeValidationPrompt(
+	comments?: string,
+): Promise<string> {
 	const projectContext = await loadProjectContext({
 		includeAllMemoryCards: true,
 	});
 	return await renderTemplateFile("project-knowledge-validation.eta", {
 		context: projectContext,
+		comments,
 	});
 }
 
@@ -30,15 +35,18 @@ export function setupProjectKnowledgeValidationPrompt(server: McpServer): void {
 			title: "validate-project-knowledge",
 			description:
 				"Validate and update existing project knowledge base artifacts (architecture, codebase documentation, decisions, solutions, patterns) against current codebase state. Ensures accuracy and relevance of all knowledge artifacts.",
-			argsSchema: {},
+			argsSchema: {
+				comments: z.string().optional().describe("Additional comments"),
+			},
 		},
-		async (_args: ProjectKnowledgeValidationInput) => {
+		async ({ comments }: ProjectKnowledgeValidationInput) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
 
 				// Generate the prompt
-				const promptText = await generateProjectKnowledgeValidationPrompt();
+				const promptText =
+					await generateProjectKnowledgeValidationPrompt(comments);
 
 				return {
 					messages: [

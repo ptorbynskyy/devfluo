@@ -26,3 +26,8 @@ You are helping create a detailed specification for the following backlog item (
 	})(),
 	context: it.context
 }) %>
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

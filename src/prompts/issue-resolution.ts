@@ -32,6 +32,7 @@ export const IssueResolutionInputSchema = z.object({
 		.describe(
 			"User's chosen resolution strategy. If not provided, will show options and ask for choice. Options: embed/replan/defer/cancelInitiative",
 		),
+	comments: z.string().optional().describe("Additional comments"),
 });
 
 export type IssueResolutionInput = z.infer<typeof IssueResolutionInputSchema>;
@@ -81,6 +82,7 @@ export async function generateIssueResolutionPrompt(
 	context: InitiativeContext,
 	issueId: string,
 	userChoice?: string,
+	comments?: string,
 ): Promise<string> {
 	const issue = context.issues.find((i) => i.id === issueId);
 	if (!issue) {
@@ -92,6 +94,7 @@ export async function generateIssueResolutionPrompt(
 		issue,
 		userChoice,
 		generateTasksMarkdownReport,
+		comments,
 	});
 }
 
@@ -108,9 +111,15 @@ export function setupIssueResolutionPrompt(server: McpServer): void {
 				),
 				issueId: IssueResolutionInputSchema.shape.issueId,
 				userChoice: IssueResolutionInputSchema.shape.userChoice,
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ initiativeId, issueId, userChoice }: IssueResolutionInput) => {
+		async ({
+			initiativeId,
+			issueId,
+			userChoice,
+			comments,
+		}: IssueResolutionInput) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -129,6 +138,7 @@ export function setupIssueResolutionPrompt(server: McpServer): void {
 					context,
 					issueId,
 					userChoice,
+					comments,
 				);
 
 				return {

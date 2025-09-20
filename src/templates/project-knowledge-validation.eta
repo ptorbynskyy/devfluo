@@ -115,3 +115,8 @@ Your validation is successful when:
 **MAINTAIN comprehensive documentation coverage**
 
 **Remember**: The knowledge base is a critical project asset. Future developers and AI agents depend on its accuracy. Changes must be evidence-based and justified to maintain trust and reliability.
+
+<% if (it.comments?.length > 0 ) {%>
+# User comments
+<%= it.comments %>
+<%}%>

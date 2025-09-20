@@ -31,6 +31,7 @@ export const TaskExecutionInputSchema = z.object({
 		.describe(
 			"Task specification: single task (t001), comma-separated (t001,t002), or range (t003-t005)",
 		),
+	comments: z.string().optional().describe("Additional comments"),
 });
 
 export type TaskExecutionInput = z.infer<typeof TaskExecutionInputSchema>;
@@ -173,11 +174,13 @@ export async function validateInitiativeForTaskExecution(
 export async function generateTaskExecutionPrompt(
 	context: InitiativeContext,
 	selectedTasks: Task[],
+	comments?: string,
 ): Promise<string> {
 	return await renderTemplateFile("initiative-task-execution.eta", {
 		context,
 		selectedTasks,
 		generateTasksMarkdownReport,
+		comments,
 	});
 }
 
@@ -193,9 +196,10 @@ export function setupInitiativeTaskExecutionPrompt(server: McpServer): void {
 					"ID of the initiative containing tasks to execute",
 				),
 				taskRange: TaskExecutionInputSchema.shape.taskRange,
+				comments: z.string().optional().describe("Additional comments"),
 			},
 		},
-		async ({ initiativeId, taskRange }: TaskExecutionInput) => {
+		async ({ initiativeId, taskRange, comments }: TaskExecutionInput) => {
 			try {
 				// Ensure project is initialized
 				await ensureProjectInitialized();
@@ -211,6 +215,7 @@ export function setupInitiativeTaskExecutionPrompt(server: McpServer): void {
 				const promptText = await generateTaskExecutionPrompt(
 					context,
 					selectedTasks,
+					comments,
 				);
 
 				return {
