@@ -88,8 +88,12 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 				// Validate backlog item exists and doesn't already have a spec
 				const backlogItem = await validateBacklogItemForSpec(backlogItemId);
 
-				// Load all project context
-				const context = await loadProjectContext();
+				// Load project context with semantic enrichment
+				const semanticQueries = [
+					backlogItem.name,
+					backlogItem.description,
+				].filter(Boolean);
+				const context = await loadProjectContext({ semanticQueries });
 
 				// Generate the prompt
 				const promptText = await generateBacklogSpecificationPrompt(
