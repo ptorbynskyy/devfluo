@@ -1,6 +1,6 @@
 # Complete Initiative: <%= it.context.initiative.name %>
 
-You are completing the following initiative and consolidating its knowledge into the project knowledge base (think hard):
+You are completing the following initiative and consolidating its knowledge into the project knowledge base:
 
 **Initiative ID:** <%= it.context.initiative.id %>
 **Initiative Name:** <%= it.context.initiative.name %>

@@ -1,6 +1,6 @@
 # Initiative Scope Change Analysis: <%= it.context.initiative.name %>
 
-You are analyzing a scope change situation for the following initiative (think hard):
+You are analyzing a scope change situation for the following initiative:
 
 **Initiative ID:** <%= it.context.initiative.id %>
 **Initiative Name:** <%= it.context.initiative.name %>

@@ -1,6 +1,6 @@
 # Issue Resolution: <%= it.issue.name %>
 
-You are resolving an issue within the following initiative (think hard):
+You are resolving an issue within the following initiative:
 
 **Initiative ID:** <%= it.context.initiative.id %>
 **Initiative Name:** <%= it.context.initiative.name %>
