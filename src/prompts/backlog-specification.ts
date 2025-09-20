@@ -2,9 +2,15 @@
 
 import { completable } from "@modelcontextprotocol/sdk/server/completable.js";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
+import {
+	ErrorCode,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
-import { loadBacklogItem, loadBacklogItems } from "../domain/backlog.js";
+import {
+	loadBacklogItem,
+	loadBacklogItems,
+} from "../domain/backlog.js";
 import {
 	loadProjectContext,
 	type ProjectContext,
@@ -65,7 +71,7 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 						.min(1)
 						.describe("ID of the backlog item to create a specification for"),
 					async (backlogItemId): Promise<string[]> => {
-						// Ensure project is initialized
+						// Ensure the project is initialized
 						await ensureProjectInitialized();
 
 						const items = await loadBacklogItems();
@@ -73,10 +79,9 @@ export function setupBacklogSpecificationPrompt(server: McpServer): void {
 							return items.map((item) => item.id);
 						}
 
-						const existingIds = items
+						return items
 							.map((item) => item.id)
 							.filter((id) => id.startsWith(backlogItemId));
-						return existingIds;
 					},
 				),
 			},
