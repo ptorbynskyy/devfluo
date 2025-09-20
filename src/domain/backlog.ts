@@ -10,6 +10,7 @@ import {
 	writeFile,
 } from "node:fs/promises";
 import path from "node:path";
+import matter from "gray-matter";
 import {
 	type BacklogItem,
 	BacklogItemSchema,
@@ -25,9 +26,9 @@ function getBacklogItemPath(id: string): string {
 	return path.join(backlogPath, id);
 }
 
-// Helper function to get data.json path for an item
-function getBacklogItemDataPath(id: string): string {
-	return path.join(getBacklogItemPath(id), "data.json");
+// Helper function to get overview.md path for an item
+function getBacklogItemOverviewPath(id: string): string {
+	return path.join(getBacklogItemPath(id), "overview.md");
 }
 
 // Helper function to get spec.md path for an item
@@ -35,20 +36,42 @@ function getBacklogItemSpecPath(id: string): string {
 	return path.join(getBacklogItemPath(id), "spec.md");
 }
 
+// Parse backlog item from Markdown file content with front matter
+export function parseBacklogItemFromFile(
+	itemId: string,
+	fileContent: string,
+): BacklogItem {
+	const { data, content } = matter(fileContent);
+
+	return BacklogItemSchema.parse({
+		id: itemId,
+		name: data.name,
+		description: content.trim(),
+		effort: data.effort,
+	});
+}
+
+// Generate Markdown file content with front matter from backlog item
+export function backlogItemToMarkdownContent(item: BacklogItem): string {
+	const frontmatter = {
+		name: item.name,
+		effort: item.effort,
+	};
+
+	return matter.stringify(item.description, frontmatter);
+}
+
 // Load basic backlog item data (without spec content)
 async function loadBacklogItemBasic(
 	id: string,
 ): Promise<BacklogItemWithSpec | null> {
 	try {
-		const dataPath = getBacklogItemDataPath(id);
+		const overviewPath = getBacklogItemOverviewPath(id);
 		const specPath = getBacklogItemSpecPath(id);
 
-		// Read data.json only
-		const dataContent = await readFile(dataPath, "utf-8");
-		const itemData = JSON.parse(dataContent);
-
-		// Validate the data structure
-		const validatedItem = BacklogItemSchema.parse({ id, ...itemData });
+		// Read overview.md only
+		const overviewContent = await readFile(overviewPath, "utf-8");
+		const validatedItem = parseBacklogItemFromFile(id, overviewContent);
 
 		// Check if spec.md exists without reading its content
 		let hasSpec = false;
@@ -101,15 +124,12 @@ export async function loadBacklogItem(
 	id: string,
 ): Promise<BacklogItemWithSpec | null> {
 	try {
-		const dataPath = getBacklogItemDataPath(id);
+		const overviewPath = getBacklogItemOverviewPath(id);
 		const specPath = getBacklogItemSpecPath(id);
 
-		// Read data.json
-		const dataContent = await readFile(dataPath, "utf-8");
-		const itemData = JSON.parse(dataContent);
-
-		// Validate the data structure
-		const validatedItem = BacklogItemSchema.parse({ id, ...itemData });
+		// Read overview.md
+		const overviewContent = await readFile(overviewPath, "utf-8");
+		const validatedItem = parseBacklogItemFromFile(id, overviewContent);
 
 		// Check if spec.md exists and read it
 		let spec: string | undefined;
@@ -155,15 +175,15 @@ async function saveBacklogItem(
 	spec?: string,
 ): Promise<void> {
 	const itemPath = getBacklogItemPath(item.id);
-	const dataPath = getBacklogItemDataPath(item.id);
+	const overviewPath = getBacklogItemOverviewPath(item.id);
 	const specPath = getBacklogItemSpecPath(item.id);
 
 	// Create item directory
 	await mkdir(itemPath, { recursive: true });
 
-	// Save data.json (without the id field since it's in the folder name)
-	const { id: _, ...dataToSave } = item;
-	await writeFile(dataPath, JSON.stringify(dataToSave, null, 2), "utf-8");
+	// Save overview.md with front matter and description in body
+	const overviewContent = backlogItemToMarkdownContent(item);
+	await writeFile(overviewPath, overviewContent, "utf-8");
 
 	// Save spec.md if provided
 	if (spec !== undefined) {
@@ -184,14 +204,14 @@ async function saveBacklogItem(
 export async function deleteBacklogItem(id: string): Promise<boolean> {
 	try {
 		const itemPath = getBacklogItemPath(id);
-		const dataPath = getBacklogItemDataPath(id);
+		const overviewPath = getBacklogItemOverviewPath(id);
 		const specPath = getBacklogItemSpecPath(id);
 
 		// Remove files if they exist
 		try {
-			await unlink(dataPath);
+			await unlink(overviewPath);
 		} catch {
-			// data.json doesn't exist
+			// overview.md doesn't exist
 		}
 
 		try {
