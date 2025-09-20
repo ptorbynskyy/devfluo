@@ -1,5 +1,6 @@
 // ABOUTME: Zod schemas for validating initiative data structure
 
+import matter from "gray-matter";
 import { z } from "zod";
 import { TaskOperationsSchema } from "./task-schema.js";
 
@@ -102,3 +103,30 @@ export type InitiativeCreateInput = z.infer<typeof InitiativeCreateSchema>;
 export type InitiativeUpdateInput = z.infer<typeof InitiativeUpdateSchema>;
 export type InitiativeDeleteInput = z.infer<typeof InitiativeDeleteSchema>;
 export type InitiativeState = (typeof InitiativeStates)[number];
+
+// Parse initiative from Markdown file content with front matter
+export function parseInitiativeFromFile(
+	initiativeId: string,
+	fileContent: string,
+): Initiative {
+	const { data } = matter(fileContent);
+
+	return InitiativeSchema.parse({
+		id: initiativeId,
+		name: data.name,
+		state: data.state || "new",
+	});
+}
+
+// Generate Markdown file content with front matter from initiative
+export function initiativeToMarkdownContent(
+	initiative: Initiative,
+	overviewContent = "",
+): string {
+	const frontmatter = {
+		name: initiative.name,
+		state: initiative.state,
+	};
+
+	return matter.stringify(overviewContent, frontmatter);
+}

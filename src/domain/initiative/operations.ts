@@ -4,7 +4,6 @@ import { mkdir, rmdir, unlink } from "node:fs/promises";
 import { deleteBacklogItem, loadBacklogItem } from "../backlog.js";
 import { loadInitiative } from "./loader.js";
 import {
-	getInitiativeDataPath,
 	getInitiativeOverviewPath,
 	getInitiativePath,
 	getInitiativeSpecPath,
@@ -91,18 +90,11 @@ export async function deleteInitiative(id: string): Promise<void> {
 	}
 
 	const itemPath = getInitiativePath(id);
-	const dataPath = getInitiativeDataPath(id);
 	const overviewPath = getInitiativeOverviewPath(id);
 	const specPath = getInitiativeSpecPath(id);
 	const tasksPath = getInitiativeTasksPath(id);
 
 	// Remove files if they exist
-	try {
-		await unlink(dataPath);
-	} catch {
-		// data.json doesn't exist
-	}
-
 	try {
 		await unlink(overviewPath);
 	} catch {

@@ -1,42 +1,28 @@
 // ABOUTME: Loading functions for initiatives from file system
 
 import { access, mkdir, readdir, readFile } from "node:fs/promises";
+import matter from "gray-matter";
 import {
-	getInitiativeDataPath,
 	getInitiativeOverviewPath,
 	getInitiativeSpecPath,
 	initiativePath,
 } from "./paths.js";
-import { InitiativeSchema, type InitiativeWithOverview } from "./schema.js";
+import {
+	type InitiativeWithOverview,
+	parseInitiativeFromFile,
+} from "./schema.js";
 
 // Load basic initiative data (without overview content)
 async function loadInitiativeBasic(
 	id: string,
 ): Promise<InitiativeWithOverview | null> {
 	try {
-		const dataPath = getInitiativeDataPath(id);
 		const overviewPath = getInitiativeOverviewPath(id);
 		const specPath = getInitiativeSpecPath(id);
 
-		// Read data.json only
-		const dataContent = await readFile(dataPath, "utf-8");
-		const initiativeData = JSON.parse(dataContent);
-
-		// Validate the data structure
-		const validatedInitiative = InitiativeSchema.parse({
-			id,
-			...initiativeData,
-		});
-
-		// Check if overview.md exists without reading its content
-		let hasOverview = false;
-		try {
-			await access(overviewPath);
-			hasOverview = true;
-		} catch {
-			// overview.md doesn't exist
-			hasOverview = false;
-		}
+		// Read overview.md only for front matter
+		const overviewContent = await readFile(overviewPath, "utf-8");
+		const validatedInitiative = parseInitiativeFromFile(id, overviewContent);
 
 		// Check if spec.md exists without reading its content
 		let hasSpec = false;
@@ -51,7 +37,7 @@ async function loadInitiativeBasic(
 		return {
 			...validatedInitiative,
 			overview: undefined, // Don't load overview content for performance
-			hasOverview,
+			hasOverview: true, // overview.md always exists now
 			spec: undefined, // Don't load spec content for performance
 			hasSpec,
 		};
@@ -93,32 +79,13 @@ export async function loadInitiative(
 	id: string,
 ): Promise<InitiativeWithOverview | null> {
 	try {
-		const dataPath = getInitiativeDataPath(id);
 		const overviewPath = getInitiativeOverviewPath(id);
 		const specPath = getInitiativeSpecPath(id);
 
-		// Read data.json
-		const dataContent = await readFile(dataPath, "utf-8");
-		const initiativeData = JSON.parse(dataContent);
-
-		// Validate the data structure
-		const validatedInitiative = InitiativeSchema.parse({
-			id,
-			...initiativeData,
-		});
-
-		// Check if overview.md exists and read it
-		let overview: string | undefined;
-		let hasOverview = false;
-
-		try {
-			overview = await readFile(overviewPath, "utf-8");
-			hasOverview = true;
-		} catch {
-			// overview.md doesn't exist
-			overview = undefined;
-			hasOverview = false;
-		}
+		// Read overview.md and parse front matter
+		const overviewContent = await readFile(overviewPath, "utf-8");
+		const { content } = matter(overviewContent);
+		const validatedInitiative = parseInitiativeFromFile(id, overviewContent);
 
 		// Check if spec.md exists and read it
 		let spec: string | undefined;
@@ -135,8 +102,8 @@ export async function loadInitiative(
 
 		return {
 			...validatedInitiative,
-			overview,
-			hasOverview,
+			overview: content.trim(), // Extract content from markdown body
+			hasOverview: true, // overview.md always exists now
 			spec,
 			hasSpec,
 		};

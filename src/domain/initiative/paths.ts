@@ -10,11 +10,6 @@ export function getInitiativePath(id: string): string {
 	return path.join(initiativePath, id);
 }
 
-// Helper function to get data.json path for an initiative
-export function getInitiativeDataPath(id: string): string {
-	return path.join(getInitiativePath(id), "data.json");
-}
-
 // Helper function to get overview.md path for an initiative
 export function getInitiativeOverviewPath(id: string): string {
 	return path.join(getInitiativePath(id), "overview.md");
