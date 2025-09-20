@@ -1,5 +1,6 @@
 // ABOUTME: Zod schemas for validating issue data structure within initiatives
 
+import matter from "gray-matter";
 import { z } from "zod";
 import { EffortLevels } from "../backlog-schema.js";
 
@@ -81,3 +82,38 @@ export type Issue = z.infer<typeof IssueSchema>;
 export type IssueOperations = z.infer<typeof IssueOperationsSchema>;
 export type IssueStrategy = (typeof IssueStrategies)[number];
 export type IssueStatus = (typeof IssueStatuses)[number];
+
+// Parse issue from Markdown file content with front matter
+export function parseIssueFromFile(
+	issueId: string,
+	fileContent: string,
+): Issue {
+	const { data, content } = matter(fileContent);
+
+	return IssueSchema.parse({
+		id: issueId,
+		name: data.name,
+		description: content.trim(),
+		recommendedStrategy: data.recommendedStrategy,
+		effortAssessment: data.effortAssessment,
+		tags: data.tags || [],
+		status: data.status || "open",
+		actualStrategy: data.actualStrategy,
+		summary: data.summary,
+	});
+}
+
+// Generate Markdown file content with front matter from issue
+export function issueToMarkdownContent(issue: Issue): string {
+	const frontmatter = {
+		name: issue.name,
+		recommendedStrategy: issue.recommendedStrategy,
+		effortAssessment: issue.effortAssessment,
+		tags: issue.tags,
+		status: issue.status,
+		actualStrategy: issue.actualStrategy,
+		summary: issue.summary,
+	};
+
+	return matter.stringify(issue.description, frontmatter);
+}

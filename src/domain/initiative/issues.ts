@@ -1,40 +1,36 @@
 // ABOUTME: CRUD operations for issues within initiatives
 
-import {
-	mkdir,
-	readdir,
-	readFile,
-	rmdir,
-	unlink,
-	writeFile,
-} from "node:fs/promises";
+import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
+import path from "node:path";
 import {
 	type Issue,
 	type IssueOperations,
 	IssueSchema,
+	issueToMarkdownContent,
+	parseIssueFromFile,
 } from "./issue-schema.js";
-import {
-	getInitiativeIssuesPath,
-	getIssueDataPath,
-	getIssueDirectoryPath,
-} from "./paths.js";
+import { getInitiativeIssuesPath, getIssueFilePath } from "./paths.js";
 
 // Load all issues for a specific initiative
 export async function loadIssues(initiativeId: string): Promise<Issue[]> {
 	try {
 		const issuesPath = getInitiativeIssuesPath(initiativeId);
-		const issueDirectories = await readdir(issuesPath);
+		const files = await readdir(issuesPath);
 
 		const issues: Issue[] = [];
-		for (const issueId of issueDirectories) {
-			const issueDataPath = getIssueDataPath(initiativeId, issueId);
-			try {
-				const data = await readFile(issueDataPath, "utf-8");
-				const issue = JSON.parse(data);
-				issues.push(IssueSchema.parse(issue));
-			} catch (error) {
-				// Skip invalid or missing issue files
-				console.warn(`Skipping invalid issue file: ${issueDataPath}`, error);
+		for (const file of files) {
+			if (file.endsWith(".md")) {
+				const issueId = path.basename(file, ".md");
+				const filePath = path.join(issuesPath, file);
+
+				try {
+					const fileContent = await readFile(filePath, "utf-8");
+					const issue = parseIssueFromFile(issueId, fileContent);
+					issues.push(issue);
+				} catch (error) {
+					// Skip invalid or missing issue files
+					console.warn(`Skipping invalid issue file: ${filePath}`, error);
+				}
 			}
 		}
 
@@ -54,10 +50,9 @@ export async function loadIssue(
 	issueId: string,
 ): Promise<Issue | null> {
 	try {
-		const issueDataPath = getIssueDataPath(initiativeId, issueId);
-		const data = await readFile(issueDataPath, "utf-8");
-		const issue = JSON.parse(data);
-		return IssueSchema.parse(issue);
+		const issueFilePath = getIssueFilePath(initiativeId, issueId);
+		const fileContent = await readFile(issueFilePath, "utf-8");
+		return parseIssueFromFile(issueId, fileContent);
 	} catch (error) {
 		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
 			return null;
@@ -71,17 +66,18 @@ export async function saveIssue(
 	initiativeId: string,
 	issue: Issue,
 ): Promise<void> {
-	const issueDirectoryPath = getIssueDirectoryPath(initiativeId, issue.id);
-	const issueDataPath = getIssueDataPath(initiativeId, issue.id);
+	const issueFilePath = getIssueFilePath(initiativeId, issue.id);
 
 	// Validate issue before saving
 	const validatedIssue = IssueSchema.parse(issue);
 
-	// Ensure directories exist
-	await mkdir(issueDirectoryPath, { recursive: true });
+	// Ensure issues directory exists
+	const issuesDir = getInitiativeIssuesPath(initiativeId);
+	await mkdir(issuesDir, { recursive: true });
 
-	// Write issue data
-	await writeFile(issueDataPath, JSON.stringify(validatedIssue, null, "\t"));
+	// Write issue data as Markdown with Front Matter
+	const content = issueToMarkdownContent(validatedIssue);
+	await writeFile(issueFilePath, content, "utf-8");
 }
 
 // Delete an issue
@@ -90,14 +86,10 @@ export async function deleteIssue(
 	issueId: string,
 ): Promise<void> {
 	try {
-		const issueDirectoryPath = getIssueDirectoryPath(initiativeId, issueId);
-		const issueDataPath = getIssueDataPath(initiativeId, issueId);
+		const issueFilePath = getIssueFilePath(initiativeId, issueId);
 
-		// Remove data file
-		await unlink(issueDataPath);
-
-		// Remove directory
-		await rmdir(issueDirectoryPath);
+		// Remove issue file
+		await unlink(issueFilePath);
 	} catch (error) {
 		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
 			// Issue doesn't exist, nothing to delete
@@ -111,7 +103,10 @@ export async function deleteIssue(
 export async function getIssueIds(initiativeId: string): Promise<string[]> {
 	try {
 		const issuesPath = getInitiativeIssuesPath(initiativeId);
-		return await readdir(issuesPath);
+		const files = await readdir(issuesPath);
+		return files
+			.filter((file) => file.endsWith(".md"))
+			.map((file) => path.basename(file, ".md"));
 	} catch (error) {
 		if (error instanceof Error && "code" in error && error.code === "ENOENT") {
 			return [];

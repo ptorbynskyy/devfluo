@@ -35,20 +35,12 @@ export function getInitiativeIssuesPath(id: string): string {
 	return path.join(getInitiativePath(id), "issues");
 }
 
-// Helper function to get specific issue directory path
-export function getIssueDataPath(
+// Helper function to get specific issue file path
+export function getIssueFilePath(
 	initiativeId: string,
 	issueId: string,
 ): string {
-	return path.join(getInitiativeIssuesPath(initiativeId), issueId, "data.json");
-}
-
-// Helper function to get issue directory path
-export function getIssueDirectoryPath(
-	initiativeId: string,
-	issueId: string,
-): string {
-	return path.join(getInitiativeIssuesPath(initiativeId), issueId);
+	return path.join(getInitiativeIssuesPath(initiativeId), `${issueId}.md`);
 }
 
 // Helper function to get memory cards directory path for an initiative
