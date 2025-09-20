@@ -67,7 +67,13 @@ export function setupInitiativeSpecificationPrompt(server: McpServer): void {
 				const initiative = await validateInitiativeForSpec(initiativeId);
 
 				// Load all project context
-				const context = await loadProjectContext();
+				const context = await loadProjectContext({
+					semanticQueries: [
+						initiative.name,
+						initiative.overview,
+						initiative.spec,
+					].filter((i) => i !== undefined),
+				});
 
 				// Generate the prompt
 				const promptText = await generateInitiativeSpecificationPrompt(

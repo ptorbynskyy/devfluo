@@ -81,7 +81,13 @@ export async function loadInitiativeContext(
 		initiativeSolutions,
 		initiativePatterns,
 	] = await Promise.all([
-		loadProjectContext(),
+		loadProjectContext({
+			semanticQueries: [
+				initiative.name,
+				initiative.overview,
+				initiative.spec,
+			].filter((i) => i !== undefined),
+		}),
 		loadTasks(initiative.id),
 		loadIssues(initiative.id),
 		loadInitiativeDecisions(initiative.id),

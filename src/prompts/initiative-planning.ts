@@ -77,7 +77,13 @@ export function setupInitiativePlanningPrompt(server: McpServer): void {
 				const initiative = await validateInitiativeForPlanning(initiativeId);
 
 				// Load all project context
-				const context = await loadProjectContext();
+				const context = await loadProjectContext({
+					semanticQueries: [
+						initiative.name,
+						initiative.overview,
+						initiative.spec,
+					].filter((i) => i !== undefined),
+				});
 
 				// Generate the prompt
 				const promptText = await generateInitiativePlanningPrompt(
