@@ -25,20 +25,19 @@ You are executing specific tasks within the following initiative:
 You are specifically assigned to execute the following tasks:
 
 <% it.selectedTasks.forEach(function(task, index) { %>### Task <%= index + 1 %>: <%= task.name %> (ID: <%= task.id %>)
-
-**Description:** <%= task.description %>
 <% if (task.effort) { %>**Effort:** <%= task.effort %>
 <% } %>**Phase:** <%= task.phase %>
 **Order:** <%= task.order %>
 <% if (task.predecessors.length > 0) { %>**Prerequisites:** <%= task.predecessors.join(', ') %> (all completed or included in this execution batch)
 <% } else { %>**Prerequisites:** None
 <% } %>
+<%= task.description %>
 <% }); %>
 
 ## Execution Guidelines
 
 ### Work Approach
-1. **Use Available Knowledge**: Leverage the project decisions, solutions, and patterns shown above
+1. **Use Available Knowledge**: Leverage the project memory shown above
 2. **Follow Architecture**: Respect existing codebase patterns and constraints
 3. **Maintain Quality**: Follow established coding standards and practices
 4. **Test Thoroughly**: Ensure all changes work correctly and don't break existing functionality
@@ -64,7 +63,7 @@ For each task you complete:
 
 1. **Execute the work** following the task description and acceptance criteria
 2. **Test your implementation** to ensure it works correctly
-3. **Document any knowledge gained** (decisions, solutions, patterns)
+3. **Document any knowledge gained** (decisions, solutions, patterns etc.)
 4. **Update task status** using the initiative_update tool
 
 ### Status Updates
@@ -82,7 +81,7 @@ For each task you complete:
 }
 ```
 
- - Initiative memory cards craete/update/remove using the `memory_card_add_or_update`/`memory_card_remove` tool
+ - Initiative memory cards create/update/remove using the `memory_card_add_or_update`/`memory_card_remove` tool
 
 ### Code Quality Requirements
 

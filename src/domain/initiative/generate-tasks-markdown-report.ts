@@ -24,8 +24,8 @@ export function generateTasksMarkdownReport(tasks: Task[]): string {
 		markdown += `### Phase ${phaseNum}\n\n`;
 
 		// Create table
-		markdown += `| ID | Name | Effort | Status | Predecessors | Description |\n`;
-		markdown += `|---|---|---|---|---|---|\n`;
+		markdown += `| ID | Name | Effort | Status | Predecessors |\n`;
+		markdown += `|---|---|---|---|---|\n`;
 
 		// Sort tasks by order within phase
 		const sortedTasks = phaseTasks.sort((a, b) => a.order - b.order);
@@ -35,7 +35,7 @@ export function generateTasksMarkdownReport(tasks: Task[]): string {
 			const status = task.status === "done" ? "✅ Done" : "🔲 New";
 			const predecessors =
 				task.predecessors.length > 0 ? task.predecessors.join(", ") : "-";
-			markdown += `| ${task.id} | ${task.name} | ${effort} | ${status} | ${predecessors} | ${task.description} |\n`;
+			markdown += `| ${task.id} | ${task.name} | ${effort} | ${status} | ${predecessors} |\n`;
 		}
 
 		markdown += `\n`;
