@@ -43,20 +43,58 @@ You are specifically assigned to execute the following tasks:
 3. **Maintain Quality**: Follow established coding standards and practices
 4. **Test Thoroughly**: Ensure all changes work correctly and don't break existing functionality
 
-### Knowledge Tracking (initiative memory cards)
-During execution, capture emerging insights for the initiative:
+### ✨ Capturing High-Value Knowledge (Memory Cards)
 
-**Decisions Made**: Track key technical or design decisions you make
-- Format: `decision-name: description`
-- Example: `auth-middleware: Use JWT tokens for API authentication`
+Your goal is to capture **high-value, reusable knowledge**, not to create a detailed log of your actions. Before creating a memory card, ask yourself: **"Будет ли эта информация полезна другому разработчику через месяц?"**
 
-**Problems & Solutions**: Document problems encountered and how you solved them
-- Format: `problem → solution`
-- Example: `Database connection timeout → Implemented connection pooling with retry logic`
+#### The Quality Filter: What to Capture
 
-**Patterns Applied**: Note reusable patterns you implement or discover
-- Format: `pattern-name: description`
-- Example: `error-boundary: Centralized error handling wrapper for React components`
+Only create memory cards for insights that meet these criteria:
+
+**🧠 1. Non-Obvious Decisions**
+Capture decisions that have long-term consequences, required trade-offs, or deviate from established standards.
+* **WHEN?** You chose one technical approach over several alternatives.
+* **WHAT?** Document the **decision**, the **alternatives considered**, and crucially, the **rationale (why)**.
+* **TAGS:** `decision`, `architecture`, `trade-off`
+
+> **Example:**
+> - **Title:** Choice of 'Vectra' for Vector Search
+> - **Content:**
+>   `**Decision:**` Adopted `Vectra` for local vector search.
+>   `**Rationale:**` It's a lightweight, file-based solution without external dependencies, perfect for a self-contained MCP server. Alternatives like FAISS were considered too complex to set up.
+>   `**Trade-off:**` Sacrificed potential performance of larger systems for simplicity and portability.
+
+**💡 2. Reusable Solutions to Non-Trivial Problems**
+Document solutions to unexpected, complex, or tricky problems that another developer might encounter.
+* **WHEN?** You spent significant time debugging an issue or found a clever workaround.
+* **WHAT?** Describe the **problem context**, the **solution implemented**, and any key code snippets.
+* **TAGS:** `solution`, `bugfix`, `workaround`, `[technology-name]`
+
+> **Example:**
+> - **Title:** Handling Circular Dependencies in Task Predecessors
+> - **Content:**
+>   `**Problem:**` The `processTaskOperations` function could create a circular dependency (e.g., t001 -> t002 -> t001), causing infinite loops.
+>   `**Solution:**` Implemented a depth-first search (DFS) algorithm (`detectCircularDependencies`) that traverses the task graph, keeping track of visited nodes in the current recursion stack to detect cycles before saving.
+
+**📐 3. Emergent & Reusable Patterns**
+Capture design or code patterns that you successfully applied and believe should be reused throughout the project.
+* **WHEN?** You refactored code to create a more generic, reusable component or function.
+* **WHAT?** Provide a concise **name for the pattern**, a **description of its use case**, and a short, canonical **code example**.
+* **TAGS:** `pattern`, `refactoring`, `best-practice`
+
+> **Example:**
+> - **Title:** Completable Zod Schema for Dynamic Autocomplete
+> - **Content:**
+>   `**Pattern:**` Created a factory function `createCompletableInitiativeId` that wraps a Zod schema with a completion function for dynamic suggestions in MCP prompts.
+>   `**Use Case:**` For any prompt argument requiring an existing initiative ID, this pattern provides validation and IDE-like autocomplete.
+
+#### What to AVOID (Low-Value Cards) 🚫
+
+**Do not** create memory cards for:
+* **Obvious steps:** "Started the server", "Installed dependencies".
+* **Routine debugging:** "Fixed a typo in a variable name".
+* **Verbose logs:** A chronological diary of every command you ran.
+* **Large, unfocused documents:** A single card should represent a single, atomic piece of knowledge. **Keep it concise!**
 
 ### Task Completion Process
 
