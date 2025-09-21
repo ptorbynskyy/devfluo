@@ -14,9 +14,9 @@ You are executing specific tasks within the following initiative:
 
 <%~ include('partials/project-context', it) %>
 
-<%~ include('partials/memory-cards', { memoryCards: it.initiativeMemoryCards }) %>
+<%~ include('partials/memory-cards', { memoryCards: it.context.initiativeMemoryCards }) %>
 
-<% } %>## Current Initiative Tasks
+## Current Initiative Tasks
 
 <%= it.generateTasksMarkdownReport(it.context.tasks) %>
 

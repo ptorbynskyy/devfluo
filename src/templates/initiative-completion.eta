@@ -52,7 +52,7 @@ All tasks in this initiative have been completed:
 <% } %>## Stage 2: Knowledge Extraction
 
 ### Initiative Memory Cards Summary
-<%~ include('partials/memory-cards', { memoryCards: it.initiativeMemoryCards }) %>
+<%~ include('partials/memory-cards', { memoryCards: it.context.initiativeMemoryCards }) %>
 
 ### Git Analysis Instructions
 

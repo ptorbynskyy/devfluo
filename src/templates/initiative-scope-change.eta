@@ -15,7 +15,7 @@ You are analyzing a scope change situation for the following initiative:
 
 <%~ include('partials/project-context', it) %>
 
-<%~ include('partials/memory-cards', { memoryCards: it.initiativeMemoryCards }) %>
+<%~ include('partials/memory-cards', { memoryCards: it.context.initiativeMemoryCards }) %>
 
 <% } %>## Current Initiative Tasks
 
