@@ -37,8 +37,8 @@ Configure your MCP client to use this server with stdio transport:
 {
   "mcpServers": {
     "devfluo": {
-      "command": "node",
-      "args": ["path/to/devfluo/build/index.js"],
+      "command": "npx",
+      "args": ["devfluo"],
       "env": {
         "PROJECT_ROOT": "/path/to/your/project/.knowledge-base"
       }
@@ -51,7 +51,7 @@ Configure your MCP client to use this server with stdio transport:
 
 For Claude Code integration:
 ```bash
-claude mcp add --scope project --env PROJECT_ROOT=$(pwd)/.knowledge-base -- node /path/to/devfluo/build/index.js
+claude mcp add --scope project --env PROJECT_ROOT=$(pwd)/.knowledge-base -- npx devfluo
 ```
 
 ## Configuration

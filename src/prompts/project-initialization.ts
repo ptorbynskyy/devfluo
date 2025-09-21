@@ -11,10 +11,6 @@ export const ProjectInitializationInputSchema = z.object({
 	comments: z.string().optional().describe("Additional comments"),
 });
 
-export type ProjectInitializationInput = z.infer<
-	typeof ProjectInitializationInputSchema
->;
-
 export async function generateProjectInitializationPrompt(
 	comments: string | undefined,
 ): Promise<string> {
@@ -30,9 +26,9 @@ export function setupProjectInitializationPrompt(server: McpServer): void {
 			title: "initialize-project",
 			description:
 				"Initialize project with comprehensive codebase analysis and knowledge base setup. Creates architecture and codebase documentation.",
-			argsSchema: {},
+			argsSchema: ProjectInitializationInputSchema.shape,
 		},
-		async ({ comments }: ProjectInitializationInput) => {
+		async ({ comments }) => {
 			try {
 				// Ensure project is not already initialized
 				await ensureProjectNotInitialized();

@@ -39,16 +39,7 @@ export const BacklogItemWithSpecSchema = BacklogItemSchema.extend({
 // Schema for backlog operations (create/update/delete)
 export const BacklogOperationsSchema = z.object({
 	create: z
-		.array(
-			BacklogItemSchema.extend({
-				spec: z
-					.string()
-					.optional()
-					.describe(
-						"Optional markdown content for specification. User should provide the content directly.",
-					),
-			}),
-		)
+		.array(BacklogItemSchema)
 		.optional()
 		.describe("Array of complete backlog item objects to create."),
 	update: z

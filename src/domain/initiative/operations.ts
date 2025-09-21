@@ -16,7 +16,7 @@ import {
 	type InitiativeCreateInput,
 	InitiativeSchema,
 	type InitiativeUpdateInput,
-} from "./schema.js";
+} from "./schema.js"; // Create a new initiative
 
 // Create a new initiative
 export async function createInitiative(
@@ -40,6 +40,7 @@ export async function createInitiative(
 
 	// Handle creation from backlog if specified
 	let specFromBacklog: string | undefined;
+	let overview = input.overview;
 	if (input.fromBacklogId) {
 		const backlogItem = await loadBacklogItem(input.fromBacklogId);
 		if (!backlogItem) {
@@ -47,11 +48,14 @@ export async function createInitiative(
 		}
 		// Copy spec from backlog if it exists
 		specFromBacklog = backlogItem.spec;
+		overview = [overview, backlogItem.description]
+			.filter(Boolean)
+			.join("\n\r\n\r");
 	}
 
 	// Validate the initiative data
 	const validatedInitiative = InitiativeSchema.parse(newInitiative);
-	await saveInitiative(validatedInitiative, input.overview, specFromBacklog);
+	await saveInitiative(validatedInitiative, overview, specFromBacklog);
 
 	// Delete backlog item after successful initiative creation
 	if (input.fromBacklogId) {
