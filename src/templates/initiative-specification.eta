@@ -2,11 +2,7 @@
 
 You are helping create a detailed specification for the following initiative:
 
-**ID:** <%= it.initiative.id %>
-**Name:** <%= it.initiative.name %>
-<% if (it.initiative.overview) { %>**Overview:** <%= it.initiative.overview %>
-
-<% } %>
+<%~ include('partials/initiative-data', { initiative: it.context.initiative }) %>
 
 <%~ include('partials/project-context', it) %>
 

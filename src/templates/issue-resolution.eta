@@ -2,16 +2,7 @@
 
 You are resolving an issue within the following initiative:
 
-**Initiative ID:** <%= it.context.initiative.id %>
-**Initiative Name:** <%= it.context.initiative.name %>
-**Initiative State:** <%= it.context.initiative.state %>
-<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
-
-<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
-
-<%= it.context.initiative.spec %>
-
-<% } %>
+<%~ include('partials/initiative-data', { initiative: it.context.initiative }) %>
 
 <%~ include('partials/project-context', it) %>
 

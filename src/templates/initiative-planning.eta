@@ -2,13 +2,7 @@
 
 You are helping create a structured task list for the following initiative:
 
-**ID:** <%= it.initiative.id %>
-**Name:** <%= it.initiative.name %>
-<% if (it.initiative.overview) { %>**Overview:** <%= it.initiative.overview %>
-
-<% } %>## Initiative Specification
-
-<%= it.initiative.spec %>
+<%~ include('partials/initiative-data', { initiative: it.context.initiative }) %>
 
 <%~ include('partials/project-context', it) %>
 

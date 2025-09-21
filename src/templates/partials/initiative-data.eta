@@ -1,0 +1,12 @@
+<initiative-data>
+**Initiative ID:** <%= it.initiative.id %>
+**Initiative Name:** <%= it.initiative.name %>
+**Initiative State:** <%= it.initiative.state %>
+<% if (it.initiative.overview) { %>**Overview:** <%= it.initiative.overview %>
+
+<% } %><% if (it.initiative.spec) { %>## Initiative Specification
+
+<%= it.initiative.spec %>
+
+<% } %>
+</initiative-data>

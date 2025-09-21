@@ -1,16 +1,8 @@
-# Execute Tasks for Initiative: <%= it.context.initiative.name %>
+# Execute Tasks for Initiative
 
 You are executing specific tasks within the following initiative:
 
-**Initiative ID:** <%= it.context.initiative.id %>
-**Initiative Name:** <%= it.context.initiative.name %>
-<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
-
-<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
-
-<%= it.context.initiative.spec %>
-
-<% } %>
+<%~ include('partials/initiative-data', { initiative: it.context.initiative }) %>
 
 <%~ include('partials/project-context', it) %>
 
@@ -35,6 +27,15 @@ You are specifically assigned to execute the following tasks:
 <% }); %>
 
 ## Execution Guidelines
+
+### Work Context
+1. Use git to get the latest commits in the initiative branch.
+2. Analyze the task and collect any relevant information.
+3. Use the `memory_cards_search` tool to find relevant memory cards.
+
+### Planning
+1. Always start with detailed planning and analysis.
+2. Validate your plan before starting work.
 
 ### Work Approach
 1. **Use Available Knowledge**: Leverage the project memory shown above

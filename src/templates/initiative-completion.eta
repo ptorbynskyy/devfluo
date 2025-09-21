@@ -2,17 +2,9 @@
 
 You are completing the following initiative and consolidating its knowledge into the project knowledge base:
 
-**Initiative ID:** <%= it.context.initiative.id %>
-**Initiative Name:** <%= it.context.initiative.name %>
-**Current State:** <%= it.context.initiative.state %>
+<%~ include('partials/initiative-data', { initiative: it.context.initiative }) %>
 
-<% if (it.context.initiative.overview) { %>**Overview:** <%= it.context.initiative.overview %>
-
-<% } %><% if (it.context.initiative.spec) { %>## Initiative Specification
-
-<%= it.context.initiative.spec %>
-
-<% } %><%~ include('partials/project-context', it) %>
+<%~ include('partials/project-context', it) %>
 
 ## Stage 1: Task Validation ✓
 
