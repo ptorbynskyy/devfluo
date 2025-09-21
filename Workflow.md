@@ -1,280 +1,190 @@
+Of course. Here is the updated `Workflow.md` documentation.
+
 # Devfluo Workflow Guide
 
-This document provides detailed instructions for using the Devfluo MCP server in your development workflow.
+This guide provides a comprehensive overview of the Devfluo MCP server, designed to help new users get started and effectively manage their development workflow. Devfluo empowers AI assistants to manage project initiatives, track decisions, and maintain a persistent, multi-level knowledge base.
 
-## Installation & Setup
+## 🚀 Quick Start: Your First Steps
 
-### Prerequisites
-- Node.js ≥22.0.0
-- npm or equivalent package manager
+Getting started with Devfluo is simple. The first step is always to initialize your project's knowledge base.
 
-### Installation Steps
+1.  **Install & Configure:** First, ensure the Devfluo server is installed and your MCP client (like Claude Desktop or Continue) is configured to connect to it. You must set the `PROJECT_ROOT` environment variable to a dedicated directory where your knowledge will be stored (e.g., `/path/to/your/project/.knowledge-base`).
 
-1. Clone and install dependencies:
-```bash
-git clone <repository-url>
-cd devfluo
-npm install
+2.  **Initialize the Project:** Before you can do anything else, you must initialize the knowledge base. Use the `project_initialization` prompt. This command analyzes your codebase and creates the foundational `architecture.md` and `codebase.md` documents.
+
+    * **MCP Prompt Command:**
+      ```mcp
+      @devfluo/project_initialization
+      ```
+    * **Natural Language Command for LLM:**
+      > "Initialize the project. Analyze the entire codebase and create the initial architecture and codebase documentation."
+
+## Core Development Workflow
+
+The primary workflow in Devfluo is initiative-driven. An "initiative" represents a single, focused development project, like building a new feature or fixing a complex bug. The typical lifecycle follows a clear sequence of prompts.
+
+```mermaid
+graph TD
+    A[Start] --> B(1. Project Initialization);
+    B --> C(2. Create Initiative);
+    C --> D(3. Define Specification);
+    D --> E(4. Plan Tasks);
+    E --> F(5. Execute Tasks);
+    F --> G(6. Collect Knowledge);
+    G --> H(7. Complete Initiative);
+    H --> I[End];
+
+    subgraph "Day-to-Day Operations"
+        F;
+        G;
+    end
+
+    subgraph "Initial Setup"
+        B;
+    end
+
+    subgraph "Initiative Lifecycle"
+        C;
+        D;
+        E;
+        H;
+    end
 ```
 
-2. Build the project:
-```bash
-npm run build
+### 1\. Project Initialization
+
+As mentioned in the Quick Start, this is the mandatory first step. It sets up the foundational knowledge that all other operations build upon.
+
+* **Prompt:** `project_initialization`
+* **LLM Command:** \> "Initialize this project's knowledge base."
+
+### 2\. Create an Initiative
+
+Once the project is initialized, you can create an initiative to track a specific piece of work.
+
+* **Prompt:** `initiative_create`
+* **LLM Command:** \> "Create a new initiative with the ID 'user-authentication' and the name 'User Authentication System'."
+
+### 3\. Define the Specification
+
+With an initiative created, the next step is to define what needs to be built. This prompt starts a brainstorming session with the AI to produce a detailed specification document.
+
+* **Prompt:** `initiative_specification`
+* **LLM Command:** \> "Let's create the specification for the 'user-authentication' initiative."
+
+### 4\. Plan the Tasks
+
+After the specification is complete, the `initiative_planning` prompt helps you break down the work into a structured list of actionable tasks with phases and dependencies.
+
+* **Prompt:** `initiative_planning`
+* **LLM Command:** \> "Generate a complete task plan for the 'user-authentication' initiative based on its specification."
+
+### 5\. Execute Tasks
+
+This is where the core development work happens. The `initiative_task_execution` prompt provides the AI with all the necessary context (project knowledge, initiative spec, memory cards, and specific task details) to help implement a solution.
+
+* **Prompt:** `initiative_task_execution`
+* **LLM Command:** \> "Let's start working on tasks 't001' through 't003' for the 'user-authentication' initiative."
+
+### 6\. Collect Knowledge
+
+During or after task execution, it's crucial to capture what you've learned. This prompt helps you extract valuable decisions, solutions, and patterns and save them as **Memory Cards**.
+
+* **Prompt:** `initiative_knowledge_collection`
+* **LLM Command:** \> "Review the recent changes and our conversation for the 'user-authentication' initiative and help me create memory cards for any important decisions or patterns we developed."
+
+### 7\. Complete the Initiative
+
+Once all tasks are done, the final step is to complete the initiative. This prompt analyzes all the knowledge generated (memory cards, issues) and helps you promote any valuable, reusable insights to the global knowledge base.
+
+* **Prompt:** `initiative_completion`
+* **LLM Command:** \> "All tasks for the 'user-authentication' initiative are done. Let's complete the initiative and update the project's knowledge base."
+
+## Managing Your Project: Common Operations
+
+Not all work fits into a linear workflow. The following are common commands for managing the overall project state.
+
+* **View Initiatives:**
+
+  > "Show me a list of all current initiatives."
+
+* **Manage the Backlog:** The `backlog_management` tool handles creating, updating, and deleting backlog items.
+
+  > "Add a new item to the backlog with the ID 'api-rate-limiting' and name 'Implement API Rate Limiting'. The description is 'Protect the public API from abuse'."
+
+* **Handle Issues & Scope Changes:** When things don't go as planned, use these prompts to analyze the situation and decide on a course of action.
+
+    * **Prompt:** `initiative_scope_change`
+    * **LLM Command:** \> "I've run into an issue with the 'user-authentication' initiative. The third-party OAuth provider just deprecated the API we were using. Let's analyze this scope change."
+    * **Prompt:** `issue_resolution`
+    * **LLM Command:** \> "Let's resolve the 'deprecated-oauth-api' issue for the 'user-authentication' initiative. I think we should choose the 'replan' strategy."
+
+* **Search the Knowledge Base:** Use the `memory_cards_search` tool to find relevant information.
+
+  > "Search the global memory cards for information about 'API design patterns'."
+
+## Knowledge Base Structure
+
+The `PROJECT_ROOT` directory contains all the persisted knowledge for your project, organized into a clear structure.
+
+```
+.
+└── .knowledge-base/
+    ├── base/
+    │   ├── architecture.md
+    │   └── codebase.md
+    ├── backlog/
+    │   └── user-feedback-system/
+    │       ├── overview.md
+    │       └── spec.md
+    ├── initiatives/
+    │   └── user-authentication/
+    │       ├── overview.md
+    │       ├── spec.md
+    │       ├── memory-cards/
+    │       │   └── oauth-redirect-handling.md
+    │       ├── tasks/
+    │       │   ├── t001.md
+    │       │   └── t002.md
+    │       └── issues/
+    │           └── third-party-api-deprecation.md
+    └── memory-cards/
+        └── api-design-patterns.md
 ```
 
-3. Initialize for development:
-```bash
-npm run dev
-```
+### Artifact Examples
 
-## MCP Client Integration
-
-### General MCP Client Configuration
-
-Configure your MCP client to use this server with stdio transport:
-
-```json
-{
-  "mcpServers": {
-    "devfluo": {
-      "command": "npx",
-      "args": ["devfluo"],
-      "env": {
-        "PROJECT_ROOT": "/path/to/your/project/.knowledge-base"
-      }
-    }
-  }
-}
-```
-
-### Claude Code Integration
-
-For Claude Code integration:
-```bash
-claude mcp add --scope project --env PROJECT_ROOT=$(pwd)/.knowledge-base -- npx devfluo
-```
-
-## Configuration
-
-The server uses the `PROJECT_ROOT` environment variable to determine where to store the knowledge base. This should point to a dedicated directory (typically `.knowledge-base` in your project root).
-
-### Directory Structure
-```
-PROJECT_ROOT/
-├── base/
-│   ├── architecture.md    # Project architecture documentation
-│   └── codebase.md       # Codebase understanding and conventions
-├── backlog/              # Backlog items
-├── initiatives/          # Development initiatives
-│   └── {initiative-id}/
-│       ├── overview.md   # Initiative overview
-│       ├── spec.md       # Detailed specification
-│       ├── tasks.json    # Task definitions and progress
-│       ├── decisions.json# Decisions made during initiative
-│       ├── solutions.json# Solutions discovered
-│       └── patterns.json # Patterns established
-└── decisions.json        # Global project decisions
-```
-
-## Complete Development Workflow
-
-### 1. Initialize Project
-Use the `project_init` tool to create the base knowledge structure:
-```
-Tool: project_init
-Purpose: Creates the foundational knowledge base directories and template files
-Result: Sets up architecture.md and codebase.md templates
-```
-
-### 2. Create Initiative
-Use `initiative_create` to start a new development project:
-```
-Tool: initiative_create
-Required: id, name
-Optional: overview, fromBacklogId
-Purpose: Creates a new development initiative with structured folders
-```
-
-### 3. Plan Tasks
-Use the `initiative-planning` prompt to break down work:
-```
-Prompt: initiative-planning
-Purpose: Generates comprehensive task breakdown with dependencies
-Input: Initiative context and requirements
-Output: Structured task list with timelines and dependencies
-```
-
-### 4. Execute Development
-Use `initiative-task-execution` prompt for guided implementation:
-```
-Prompt: initiative-task-execution
-Purpose: Provides step-by-step guidance for task implementation
-Input: Specific task and context
-Output: Implementation plan with validation steps
-```
-
-### 5. Capture Knowledge
-Use `initiative-knowledge-collection` to document learnings:
-```
-Prompt: initiative-knowledge-collection
-Purpose: Captures decisions, patterns, and solutions discovered
-Input: Implementation experience and outcomes
-Output: Structured knowledge entries for future reference
-```
-
-## Available Tools
-
-### Core Management Tools
-- **project_init**: Initialize the knowledge base structure
-- **initiative_create**: Create new development initiatives
-- **initiative_update**: Update existing initiatives with tasks, decisions, patterns
-- **initiative_delete**: Remove initiatives and cleanup
-- **backlog_management**: Handle project backlog items
-- **issue_management**: Track and resolve development issues
-- **update_knowledge**: Maintain base knowledge documents
-
-### Tool Usage Examples
-
-#### Creating an Initiative
-```json
-{
-  "id": "user-auth",
-  "name": "User Authentication System", 
-  "overview": "# User Authentication\n\nImplement OAuth-based authentication..."
-}
-```
-
-#### Updating an Initiative with Tasks
-```json
-{
-  "id": "user-auth",
-  "tasks": {
-    "create": [
-      {
-        "id": "setup-oauth",
-        "name": "Setup OAuth Provider",
-        "description": "Configure OAuth with Google and GitHub",
-        "status": "pending",
-        "effort": "M"
-      }
-    ]
-  }
-}
-```
-
-## Available Resources
-
-### Knowledge Resources
-- **knowledge**: Access to base project knowledge (architecture.md, codebase.md)
-- **initiatives**: Initiative data and specifications  
-- **decisions**: Architecture and design decisions with rationale
-- **patterns**: Reusable code patterns and best practices
-- **solutions**: Problem-solution pairs for common challenges
-- **backlog**: Project backlog items with priorities
-
-### Resource Access Examples
-
-Query initiatives:
-```
-Resource: initiatives
-Returns: List of all initiatives with metadata and content
-```
-
-Access specific knowledge:
-```
-Resource: knowledge  
-Returns: Current architecture and codebase documentation
-```
-
-## Available Prompts
-
-### Development Phase Prompts
-- **project-initialization**: Guide initial project setup with templates
-- **initiative-specification**: Create detailed initiative specifications  
-- **initiative-planning**: Generate task breakdowns and timelines
-- **initiative-task-execution**: Guide task implementation with validation
-- **initiative-knowledge-collection**: Capture learnings post-implementation
-- **initiative-scope-change**: Handle requirement changes systematically
-- **initiative-completion**: Finalize initiatives and extract knowledge
-- **issue-resolution**: Structured problem-solving approach
-- **backlog-specification**: Define backlog item requirements
-- **project-knowledge-validation**: Validate and update project knowledge
-
-### Prompt Usage Patterns
-
-Most prompts follow this pattern:
-1. **Context Gathering**: Prompt analyzes current project state
-2. **Template Application**: Uses ETA templates for consistent output  
-3. **Structured Output**: Returns formatted guidance or documentation
-4. **Knowledge Integration**: Updates relevant knowledge stores
-
-## Advanced Workflows
-
-### Initiative Lifecycle Management
-
-1. **Conception**: Create initiative from backlog item
-2. **Specification**: Use prompts to create detailed specs
-3. **Planning**: Break down into executable tasks
-4. **Execution**: Implement with guided prompts
-5. **Knowledge Capture**: Document patterns and decisions
-6. **Completion**: Finalize and extract reusable knowledge
-
-### Cross-Initiative Knowledge Sharing
-
-The system automatically shares knowledge between initiatives:
-- **Decisions**: Available across all initiatives
-- **Patterns**: Reusable in similar contexts
-- **Solutions**: Applied to similar problems
-- **Base Knowledge**: Updated based on all initiative learnings
-
-### Debugging and Inspection
-
-Use the MCP inspector for development:
-```bash
-npm run inspector
-```
-
-This provides a web interface to interact with all tools, resources, and prompts for testing and debugging.
-
-## Best Practices
-
-### Initiative Management
-- Use descriptive, kebab-case IDs for initiatives
-- Start with clear overview before detailed specification
-- Break large initiatives into smaller, manageable tasks
-- Regularly capture knowledge during implementation
-
-### Knowledge Maintenance  
-- Keep base knowledge documents current
-- Document decisions with clear rationale
-- Extract reusable patterns from implementations
-- Validate knowledge accuracy periodically
-
-### Development Workflow
-- Initialize project knowledge base early
-- Use prompts consistently for guided development
-- Leverage existing patterns and solutions
-- Maintain initiative state accurately
-
-## Troubleshooting
-
-### Common Issues
-
-**Knowledge Base Not Found**:
-- Ensure PROJECT_ROOT environment variable is set
-- Run project_init tool to create base structure
-
-**Initiative Creation Fails**:
-- Check ID format (lowercase, hyphens only)
-- Ensure unique initiative IDs
-- Verify PROJECT_ROOT permissions
-
-**Prompt Template Errors**:
-- Check template file availability in templates/
-- Verify ETA template syntax
-- Ensure required context data is provided
-
-**Resource Access Issues**:
-- Verify knowledge base structure exists
-- Check file permissions in PROJECT_ROOT
-- Ensure JSON files are valid format
+* **architecture.md:** High-level overview of your system's components and design patterns.
+* **codebase.md:** Details on project structure, key files, dependencies, and coding conventions.
+* **memory-cards/api-design-patterns.md:** (Global Memory Card)
+  ```markdown
+  ---
+  title: API Design Patterns
+  contextIncludingPolicy: auto
+  tags:
+    - api
+    - patterns
+  ---
+  # API Patterns
+  This document outlines our standard approach to API design, including RESTful conventions...
+  ```
+* **initiatives/user-authentication/overview.md:** (Initiative Overview)
+  ```markdown
+  ---
+  name: User Authentication System
+  state: inprogress
+  ---
+  This initiative covers the implementation of a full OAuth2-based authentication system.
+  ```
+* **initiatives/user-authentication/tasks/t001.md:** (Task)
+  ```markdown
+  ---
+  name: Setup OAuth Provider
+  effort: M
+  status: new
+  order: 1
+  phase: 1
+  predecessors: []
+  ---
+  Configure the application to connect to Google and GitHub OAuth providers...
+  ```
