@@ -255,11 +255,11 @@ export async function processBacklogOperations(
 
 			if (existingItem) {
 				// Item already exists, treat as update
-				await saveBacklogItem(validatedItem, newItem.spec);
+				await saveBacklogItem(validatedItem);
 				updateCount++;
 			} else {
 				// Create new item
-				await saveBacklogItem(validatedItem, newItem.spec);
+				await saveBacklogItem(validatedItem);
 				insertCount++;
 			}
 		}
